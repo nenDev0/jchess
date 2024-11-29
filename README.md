@@ -1,4 +1,4 @@
-# java_chess
+# jchess
 
 ## Description
 
