@@ -28,7 +28,7 @@ I forgot to eat sometimes.
 - functional warranty
 - promises for your eyes and brain to function after reading the code
 
-### Dependencies
+### Requirements
 
 - Java
 - JUnit with Hamcrest-Core
@@ -50,4 +50,4 @@ feel free to assist me in my effort
 - I attempted to care about object-orientation, however at some points, I just wished it to work at all
 
 ## Authors
-@nen.Dev0
+@nenDev0
