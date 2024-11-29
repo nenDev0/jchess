@@ -1,0 +1,424 @@
+@startuml
+
+skinparam backgroundcolor #eee
+skinparam classBackgroundColor #fff
+skinparam classHeaderBackgroundColor #444
+skinparam classFontColor automatic
+
+
+package application {
+
+    class main {
+
+    }
+    main *-- Window
+
+
+
+
+    class Window {
+        + Window()
+        + run() : void
+    }
+    Window *-- "1" BoardGrid
+
+
+
+
+
+    class BoardGrid {
+        - panel : JPanel
+        - game : Game
+
+        + BoardGrid(game : Game)
+        + get_panel() : JPanel
+        + get_board() : Board
+        + get_game() : Game
+        + get_imagefinder() : ImageFinder
+    }
+    BoardGrid "1" *-- "64" PositionListener : grid, listeners[][]
+    BoardGrid *-- "1" ImageFinder : imagefinder
+    BoardGrid *-- "1" .engine.Game : game
+
+
+
+
+    class PositionListener {
+        - pane : JLayeredPane
+        - x : int
+        - y : int
+
+        + PositionListener(x : int, y : int, grid : Boardgrid)
+        __getters__
+        + get_pane() : JLayeredPane
+        __modifiers__
+        + m_select() : void
+        + m_deselect() : void
+        + m_update(type : Type, impl : PieceImplementation) : void
+        __MouseListener__
+        + mouseClicked() : void
+        + mousePressed() : void
+        + mouseReleased() : void
+        + mouseEntered() : void
+        + mouseExited() : void
+        - create_label(image : ImageIcon) : JLabel
+    }
+
+    class ImageFinder {
+        - background_b : ImageIcon
+        - background_w : ImageIcon
+        - selection : ImageIcon
+        - map_white_pieces : HashMap<PieceImplementation, ImageIcon>
+        - map_black_pieces : HashMap<PieceImplementation, ImageIcon>
+
+        + ImageFinder()
+        __modifiers__
+        + get_piece(type : Type, impl : PieceImplementation) : ImageIcon
+        + get_selection() : ImageIcon
+        + get_background(x : int, y : int) : ImageIcon
+    }
+
+}
+
+
+
+
+
+package engine {
+
+
+    Class Game
+    {
+        +Game()
+        +run()
+        +get_board() : Board
+        +print_state() : void
+        -m_change_turn()
+    }
+    Game *-- "1" board.Board : board
+    Game *-- "1" InputReader : input_reader
+    Game *-- "1" GameState : state
+
+    Class InputReader
+    {
+        +InputReader()
+        +read_next() : int[]
+    }
+
+    Class GameState {
+        
+    }
+    GameState -> "1" State : state
+    GameState o-- "1" board.Type : type
+
+
+    Enum State { 
+
+    }
+
+
+
+
+    package board {
+        Class Board extends updatesystem.NotificationCollector implements BoardAccess 
+        {
+            + Board(columns : int, rows : int)
+            __getters__
+            + get_position(column: int, row: int) : Position
+            + get_collection(type : Type) : PieceCollection
+            + y_lim : int
+            + x_lim : int
+            + get_history() : History
+            + get_last_move() : Position[]
+            __modifiers__
+            + m_initialise() : void
+            - m_initialise_piece(type : Type, impl : PieceImplementation, index : int, x : int, y : int)
+            + clone() : Board
+        }
+        Board *-- "64" Position : arr_positions
+        Board *-- "2" PieceCollection : black_pieces, white_pieces
+        Board *-- "1" History : history
+
+
+
+
+        interface BoardAccess 
+        {
+            get_position(x : int, y : int) : Position
+            get_last_move() : Position[]
+        }
+
+
+
+
+        Class History {
+            + History()
+            __getters__
+            + get_move(i : int) : Move
+            + get_length() : int
+            __modifiers__
+            + m_register_move(position1 : Position, position2 : Position) : void
+
+        }
+        History *-- "0..*" Move : ll_moves
+
+
+
+
+        Class Move {
+            + Move(position1 : Position, position2 : Position)
+            __getters__
+            get_position1() : Position
+            get_position2() : Position
+            __modifiers__
+            m_reverse() : void
+        }
+        Move o-- "2" Position : position1, position2
+        Move o-- "2" .engine.board.piecelib.Piece : position1_piece, position2_piece
+
+
+
+
+        Class PieceCollection implements .engine.board.updatesystem.Restrictor{
+            + PieceCollection(type : Type, board : Board)
+            __ getters __
+            + get_board_access() : BoardAccess
+            + get_active_pieces() : LinkedList<Piece>
+            + get_all_piece_implementations(impl : PieceImplementation) : LinkedList<Piece>
+            + get_type() : Type
+            __testers__
+            + can_move() : boolean
+            __ modifiers__
+            + m_take(piece : Piece) : void
+            + m_add_piece(piece : Piece) : void
+            + m_rm_piece(piece : Piece) : void
+            + m_standard_lineup() : void
+            + m_initialise_updates(ll_restrictions : LinkedList<Position>) : void
+        }
+        PieceCollection o-- "1" Type : -type {final}
+        PieceCollection -> "1" BoardAccess : -board_access
+        PieceCollection "1" *-- "0..*" .engine.board.piecelib.Piece : -pieces, -collection
+
+
+
+
+        Class Position
+        {
+            - x : int
+            - y : int
+            __
+            + Position(x : int , y : int)
+            __ getters __
+            + get_x() : int
+            + get_y() : int
+            + get_piece() : Piece
+            + get_observers() : LinkedList<ObserverStorage>
+            __ modifiers __
+            + m_set_piece(piece : Piece) : void
+            + m_rm_piece(piece : Piece) : void
+            + m_subscribe(o : Observer) : void
+            + m_unsubscribe(o : Observer) : void
+            - m_pass_observers_over() : void
+        }
+
+        Position "1" - "0..1" .engine.board.piecelib.Piece : is on
+        Position -> "1" .engine.board.updatesystem.NotificationCollector : notification_collector
+        Position -> "0.." .engine.board.updatesystem.ObserverStorage : ll_observers
+
+
+
+
+        package updatesystem {
+
+            Abstract Class NotificationCollector
+            {
+                + NotificationCollector()
+                __modifiers__
+                + m_add_required_observers(observer : Observer) : void
+                + m_receive_update_notification(observer : ObserverSender) : void
+                + m_receive_update_notification(observer : ObserverSender, ll_restrictions : LinkedList<Position>) : void
+                + m_dump_update_notifications() : void
+            }
+            NotificationCollector -> "0..*" ObserverSender : collected_observers, required_observers
+
+
+
+            Interface ObserverStorage
+            {
+            }
+
+
+
+
+            Interface ObserverSender
+            {
+                + m_update() : void
+            }
+
+
+
+
+            Interface ObserverReceiver
+            {
+                __modifiers__
+                +m_subscribe(position : Position) : void
+                +m_unsubscribe_from_all() : void
+            }
+
+
+
+
+            Class Observer implements ObserverSender, ObserverReceiver, ObserverStorage
+            { 
+                + Observer(piece : Piece)
+                __getters__
+                + get_piece() : Piece
+                __modifiers__
+                + m_subscribe(position : Position) : void
+                + m_unsubscribe_from_all() : void
+                + m_update() : void
+            }
+            Observer -> "1" .engine.board.piecelib.Piece : piece
+
+            Interface Restrictor {
+                + Restrictor(notification_collector : NotificationCollector)
+                __modifiers__
+                + m_restrict(piece : Piece, LinkedList<Position>)
+                + m_restrict_all_to(positions : LinkedList<Position>)
+            }
+
+        }
+
+
+
+
+        Enum Type
+        {
+            WHITE,
+            BLACK
+        }
+
+
+
+
+        package piecelib {
+
+            Abstract Class Piece
+            {
+                + Piece(collection : PieceCollection)
+                __getters__
+                + get_legal_moves() : LinkedList<Position>
+                + get_type() : Type
+                + get_collection() : PieceCollection
+                + get_position() : Position
+                + get_observer() : Observer
+                + get_index() : int
+                + {abstract} get_weight() : int
+                + {abstract} get_implementation() : PieceImplementation
+                __testers__
+                + is_legal_move(position : Position) : boolean
+                __modifiers__
+                + m_set_position(position : Position) : void
+                + m_update(ll_restrictions : LinkedList<Position>) : void
+                + m_update() : void
+                + {abstract} m_legal_moves() : void
+                + m_vertical_moves() : void
+                + m_horizontal_moves() : void
+                + m_diagonal_moves() : void
+                + m_king_moves() : void
+                + m_pawn_moves() : void
+                + m_knight_moves() : void
+                - m_check_move() : boolean 
+                - m_pawn_check_move(int x, int y) : boolean
+                - m_pawn_check_move_diagonal(int x, int y) : void
+            }
+            Piece -> "0..*" Position : ll_legal_moves
+            Piece *-- "1" .engine.board.updatesystem.ObserverReceiver : observer
+
+            Piece <|-- King
+            Piece <|-- Queen
+            Piece <|-- Rook
+            Piece <|-- Bishop
+            Piece <|-- Knight
+            Piece <|-- Pawn
+
+
+
+
+            Class King {
+                - weight : int {static final}
+                + King(collection : PieceCollection)
+                + get_weight() : int
+                + get_implementation() : PieceImplementation
+                + m_legal_moves() : void
+                + m_restrict(ll_restrictions : LinkedList<Position>) : void
+                + m_set_position(position : Position) : void
+                - m_check_all_directions() : void
+                - check_direction(x_increment : int, y_increment : int, ll_implementations : LinkedList<PieceImplementation>)
+                - calculate_restrictions(x_increment : int, y_increment : int) : LinkedList<Position>
+                - check_knight() : void
+                - m_check_move(x : int, y : int) : void
+                - m_send_restriction(ll_restrictions : LinkedList<Position>) : void
+                - m_send_restrictions(piece : Piece, ll_restrictions : LinkedList<Position>)
+            }
+
+
+
+
+            Class Queen {
+                - weight : int {static final}
+                + Queen(collection : PieceCollection)
+                + get_weight() : int
+                + get_implementation() : PieceImplementation
+                + m_legal_moves() : void
+            }
+
+
+
+
+            Class Rook {
+                - weight : int {static final}
+                + Rook(collection : PieceCollection)
+                + get_weight() : int
+                + get_implementation() : PieceImplementation
+                + m_legal_moves() : void
+            }
+
+
+
+
+            Class Bishop {
+                - weight : int {static final}
+                + Bishop(collection : PieceCollection)
+                + get_weight() : int
+                + get_implementation() : PieceImplementation
+                + m_legal_moves() : void
+            }
+
+
+
+
+            Class Knight {
+                - weight : int {static final} 
+                + Knight(collection : PieceCollection)
+                + get_weight() : int
+                + get_implementation() : PieceImplementation
+                + m_legal_moves() : void
+            }
+
+
+
+
+            Class Pawn  {
+                - weight : int {static final}
+                + Pawn(collection : PieceCollection)
+                + get_weight() : int
+                + get_implementation() : PieceImplementation
+                + m_legal_moves() : void
+                + m_set_position(position : Position) : void
+            }
+        }
+    }
+}
+
+@enduml

@@ -1,0 +1,70 @@
+
+@startuml
+
+skinparam backgroundcolor #eee
+skinparam classBackgroundColor #fff
+skinparam classHeaderBackgroundColor #444
+skinparam classFontColor automatic
+
+
+package intelligence {
+
+    package evaluation {
+        class EvaluationCalculator {
+            + EvaluationCalculator(configuration : EvaluationConfiguration)
+            + evaluate(board: Board) : float
+
+        }
+        EvaluationCalculator *-- "1" EvaluationConfiguration
+
+    
+
+
+        class EvaluationConfiguration {
+            - id : int
+
+            +EvaluationConfiguration(config_file_path: String)
+
+        }
+
+        EvaluationType "1" - "1" EvaluationSetting
+        (EvaluationType, EvaluationSetting) .. EvaluationConfiguration: HashMap
+
+
+        enum EvaluationType {
+            ID,
+            PIECECOUNT,
+            SPACE,
+            KING_SAFETY,
+            CASTLING_RIGHTS,
+            HANGING,
+            POSITIONING
+        }
+
+
+
+
+        class EvaluationSetting {
+            - initial_value : float
+            - change : float
+
+            + get_initial_value() : float
+            + get_change() : float
+        }
+
+        class JsonReader {
+            - file_data : String
+            + JsonReader(file : File)
+            - read_file(file: File) : void
+            + get_values(identification : String)
+        }
+    }
+
+    package configs {
+        file info {
+
+        }
+    }
+}
+
+@enduml
