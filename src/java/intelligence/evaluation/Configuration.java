@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.Set;
 
 import src.java.application.Config;
-import src.java.engine.board.Type;
-import src.java.engine.board.piecelib.PieceType;
+import src.java.engine.board.piecelib.Piece.Type;
+import src.java.engine.board.piecelib.Piece.PieceType;
 
 import java.util.Random;
 

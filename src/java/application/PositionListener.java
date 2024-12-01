@@ -6,8 +6,8 @@ import java.awt.event.MouseListener;
 
 import javax.swing.*;
 
-import src.java.engine.board.Type;
-import src.java.engine.board.piecelib.PieceType;
+import src.java.engine.board.piecelib.Piece.Type;
+import src.java.engine.board.piecelib.Piece.PieceType;
 import src.java.engine.game.VisualState;
 
 public class PositionListener implements MouseListener

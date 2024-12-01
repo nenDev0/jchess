@@ -3,7 +3,7 @@ package src.java.application;
 import java.io.File;
 import java.util.HashMap;
 
-import src.java.engine.board.Type;
+import src.java.engine.board.piecelib.Piece.Type;
 import src.java.intelligence.evaluation.JsonHandler;
 
 public class Config {
@@ -13,9 +13,11 @@ public class Config {
     @SuppressWarnings("unused")
     private JsonHandler cfg_handler;
 
-    public static final String default_theme = "src/resources/icons/default_theme/";
-    public static final String sacred_theme = "src/resources/icons/sacred_theme/";
-    public static final String skooter_theme = "src/resources/icons/skooter_theme/";
+    public static final String themes_path = "src/resources/icons/";
+    public static final String audios_path = "src/resources/sounds/";
+    public static final String default_theme = "default_theme/";
+    public static final String sacred_theme = "sacred_theme/";
+    public static final String skooter_theme = "skooter_theme/";
 
 
 

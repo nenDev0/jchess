@@ -10,8 +10,8 @@ import src.java.engine.board.Board;
 import src.java.engine.board.GameState;
 import src.java.engine.board.Move;
 import src.java.engine.board.Position;
-import src.java.engine.board.Type;
 import src.java.engine.board.piecelib.Piece;
+import src.java.engine.board.piecelib.Piece.Type;
 import src.java.intelligence.Bot;
 
 public class Game extends Thread {

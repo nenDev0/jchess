@@ -8,8 +8,11 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.DataLine;
 
+import src.java.application.Config;
+
 public class SoundEngine extends Thread{
     
+    private String path = Config.audios_path;
     private File move;
     //private File take;
     private AudioInputStream stream_move;
@@ -20,7 +23,7 @@ public class SoundEngine extends Thread{
 
     public SoundEngine() {
         is_open = false;
-        move = new File("src/resources/sounds/move.wav");
+        move = new File(path + "move.wav");
         //take = new File("src/sounds/taking.wav");
         try {
         stream_move = AudioSystem.getAudioInputStream(move);

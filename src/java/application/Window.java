@@ -80,11 +80,6 @@ public class Window extends JFrame
         keybindings.getActionMap().put("reverse", new History_Reverse(grid.get_board().get_history()));
     }
     
-    public void m_reset(BoardGrid grid)
-    {
-        this.grid = grid;
-    }
-
     public void m_set_eval(float eval)
     {
         this.evaluation.setText("evaluation: " + eval);

@@ -5,7 +5,6 @@ import java.util.LinkedList;
 
 import src.java.engine.board.PieceCollection;
 import src.java.engine.board.Position;
-import src.java.engine.board.Type;
 import src.java.engine.board.updatesystem.ObserverStorage;
 
 

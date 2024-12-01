@@ -4,13 +4,13 @@ import java.util.HashMap;
 
 import javax.swing.ImageIcon;
 
-import src.java.engine.board.Type;
-import src.java.engine.board.piecelib.PieceType;
+import src.java.engine.board.piecelib.Piece.Type;
+import src.java.engine.board.piecelib.Piece.PieceType;
 
 public class ImageFinder {
 
 
-    private static final String theme = Config.skooter_theme;
+    private static final String theme = Config.themes_path + Config.skooter_theme;
 
 
     private static final ImageIcon background_b = new ImageIcon(theme + "white_tile.png");

@@ -4,8 +4,8 @@ import java.io.FileWriter;
 import java.io.File;
 import java.util.Scanner;
 
-import src.java.engine.board.Type;
-import src.java.engine.board.piecelib.PieceType;
+import src.java.engine.board.piecelib.Piece.Type;
+import src.java.engine.board.piecelib.Piece.PieceType;
 
 public class JsonHandler
 {

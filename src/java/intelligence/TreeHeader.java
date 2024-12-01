@@ -8,7 +8,7 @@ import java.util.Map.Entry;
 
 import src.java.engine.board.Board;
 import src.java.engine.board.Move;
-import src.java.engine.board.Type;
+import src.java.engine.board.piecelib.Piece.Type;
 import src.java.intelligence.evaluation.Calculator;
 
 import java.util.Set;

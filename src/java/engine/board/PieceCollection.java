@@ -3,6 +3,8 @@ package src.java.engine.board;
 import java.util.LinkedList;
 
 import src.java.engine.board.piecelib.*;
+import src.java.engine.board.piecelib.Piece.PieceType;
+import src.java.engine.board.piecelib.Piece.Type;
 import src.java.engine.board.updatesystem.Restrictor;
 
 import java.util.HashMap;

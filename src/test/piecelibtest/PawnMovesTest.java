@@ -6,8 +6,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import src.java.engine.board.Board;
-import src.java.engine.board.Type;
 import src.java.engine.board.piecelib.*;
+import src.java.engine.board.piecelib.Piece.Type;
+import src.java.engine.board.piecelib.Piece.PieceType;
 
 
 public class PawnMovesTest {

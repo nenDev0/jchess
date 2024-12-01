@@ -3,12 +3,26 @@ import java.util.LinkedList;
 
 import src.java.engine.board.PieceCollection;
 import src.java.engine.board.Position;
-import src.java.engine.board.Type;
 import src.java.engine.board.updatesystem.Observer;
 import src.java.engine.board.updatesystem.ObserverReceiver;
 
 public abstract class Piece implements Comparable<Piece>{
     
+
+    public enum PieceType {
+        KING,
+        QUEEN,
+        ROOK,
+        BISHOP,
+        KNIGHT,
+        PAWN
+    }
+
+    public enum Type {
+    WHITE,
+    BLACK
+    }
+
     private PieceCollection collection;
     private Position position;
     private LinkedList<Position> ll_legal_moves;

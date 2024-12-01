@@ -2,7 +2,8 @@ package src.java.engine.board;
 
 
 import src.java.engine.board.piecelib.Piece;
-import src.java.engine.board.piecelib.PieceType;
+import src.java.engine.board.piecelib.Piece.Type;
+import src.java.engine.board.piecelib.Piece.PieceType;
 import src.java.engine.board.updatesystem.NotificationCollector;
 
 public class Board extends NotificationCollector implements BoardAccess{
@@ -263,20 +264,6 @@ public class Board extends NotificationCollector implements BoardAccess{
         }
         clone.m_dump_update_notifications();
         return clone;
-    }
-
-    /*
-     * reduces board to exclusively save coordinates of the pieces
-     */
-    public int[][][] reduce()
-    {
-        int[][][] reduced = new int[2][16][2];
-        int[][] white_pieces = get_collection(Type.WHITE).reduce();
-        int[][] black_pieces = get_collection(Type.BLACK).reduce();
-
-        reduced[0] =  white_pieces;
-        reduced[1] =  black_pieces;
-        return reduced;
     }
 
     @Override

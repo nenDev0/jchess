@@ -2,7 +2,8 @@ package src.java.engine.board;
 
 import src.java.engine.board.piecelib.Pawn;
 import src.java.engine.board.piecelib.Piece;
-import src.java.engine.board.piecelib.PieceType;
+import src.java.engine.board.piecelib.Piece.Type;
+import src.java.engine.board.piecelib.Piece.PieceType;
 
 public class Move {
 

@@ -4,6 +4,8 @@ import java.util.LinkedList;
 
 import src.java.application.PositionListener;
 import src.java.engine.board.piecelib.Piece;
+import src.java.engine.board.piecelib.Piece.Type;
+import src.java.engine.board.piecelib.Piece.PieceType;
 import src.java.engine.board.updatesystem.NotificationCollector;
 import src.java.engine.board.updatesystem.Observer;
 import src.java.engine.board.updatesystem.ObserverSender;
