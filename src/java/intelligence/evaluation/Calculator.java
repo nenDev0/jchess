@@ -3,7 +3,7 @@ package src.java.intelligence.evaluation;
 import java.util.LinkedList;
 
 import src.java.engine.board.Board;
-import src.java.engine.board.GameState;
+import src.java.engine.board.Board.GameState;
 import src.java.engine.board.Position;
 import src.java.engine.board.piecelib.King;
 import src.java.engine.board.piecelib.Piece;

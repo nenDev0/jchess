@@ -8,12 +8,20 @@ import src.java.engine.board.updatesystem.NotificationCollector;
 
 public class Board extends NotificationCollector implements BoardAccess{
     
+    public enum GameState {
+        NORMAL,
+        DRAW,
+        CHECK,
+        CHECKMATE
+        
+    }
+    
     private Position[][] arr_positions;
     private PieceCollection white_pieces;
     private PieceCollection black_pieces;
     private History history;
     private GameState state;
-    private Type type;
+  private Type type;
 
     public Board() {
         super();

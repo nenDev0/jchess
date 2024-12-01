@@ -7,7 +7,7 @@ import java.util.LinkedList;
 
 import src.java.application.Config;
 import src.java.engine.board.Board;
-import src.java.engine.board.GameState;
+import src.java.engine.board.Board.GameState;
 import src.java.engine.board.Move;
 import src.java.engine.board.Position;
 import src.java.engine.board.piecelib.Piece;
