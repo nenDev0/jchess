@@ -5,7 +5,6 @@ import java.util.LinkedList;
 import src.java.application.PositionListener;
 import src.java.engine.board.piecelib.Piece;
 import src.java.engine.board.piecelib.Piece.Type;
-import src.java.engine.board.piecelib.Piece.PieceType;
 import src.java.engine.board.updatesystem.NotificationCollector;
 import src.java.engine.board.updatesystem.Observer;
 import src.java.engine.board.updatesystem.ObserverSender;
@@ -82,7 +81,7 @@ public class Position {
     public void m_set_listener(PositionListener listener) {
         this.listener = listener;
         if (piece != null) {
-            listener.m_update(get_piece().get_type(), get_piece().get_piece_type());
+            listener.m_update_piece(get_piece().get_type(), get_piece().get_piece_type());
         }
     }
 
@@ -101,10 +100,10 @@ public class Position {
         }
         if (listener != null) {
             if (get_piece() != null) {
-                listener.m_update(get_piece().get_type(), get_piece().get_piece_type());
+                listener.m_update_piece(get_piece().get_type(), get_piece().get_piece_type());
             }
             else {
-                listener.m_update(null, null);
+                listener.m_update_piece(null, null);
             }
         }
     }

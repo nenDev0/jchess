@@ -1,7 +1,7 @@
 {
     "ID":0,
-    "PATH":"src/intelligence/configs/gen",
-    "DEPTH":[1],
+    "PATH":"src/resources/configs/gen",
+    "DEPTH":[2],
     "RANDOMIZER_MAX_DEVIATION":[0.25],
     "RANDOMIZER_CHANCE":[0.25]
 }

@@ -33,6 +33,8 @@ public class TreeHeader
     private int nodes_ended;
 
 
+    // TODO: figure out the fix for this outcry 
+    @SuppressWarnings("unchecked")
     public TreeHeader(int depth, Type type, Board board)
     {
         moves = 0;
@@ -42,7 +44,6 @@ public class TreeHeader
         {
             cache_size = 0;
         }
-        // TODO: figure this out
         history_cache = new LinkedList[cache_size];
         m_rm_cache();
         

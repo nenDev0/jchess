@@ -62,6 +62,8 @@ public class History {
         }
         return true;
     }
+
+
     public void m_reverse() {
         Move move = ll_moves.removeLast();
         move.m_reverse();
@@ -75,52 +77,6 @@ public class History {
             fifty_move_rule--;
         }
         
-    }
-
-    /*
-     *  index 0: Move from position
-     *  index 1: from / to
-     *  index 2: x / y
-     * 
-     * @param from : int
-     *  -> the index, at which it starts comparing
-     * 
-     * @return int[][][]
-     */
-    public int[][][] reduce(int from)
-    {
-        int[][][] moves = new int[get_length() - from][2][2];
-        int i = 0;
-
-        for (Move move : ll_moves) {
-            if (from > 0)
-            {
-                from--;
-                continue;
-            }
-            Position pos_from = move.position_from();
-            Position pos_to = move.position_to();
-            moves[i][0][0] = pos_from.get_x();
-            moves[i][0][1] = pos_from.get_y();
-            moves[i][1][0] = pos_to.get_x();
-            moves[i][1][1] = pos_from.get_y();
-            i++;
-        }
-        return moves;
-    }
-    public LinkedList<Integer> to_hashcodes(int from)
-    {
-        LinkedList<Integer> ll_new = new LinkedList<Integer>();
-        for (Move move : ll_moves)
-        {
-            if( from > 0)
-            {
-                from--;
-                continue;
-            }
-            ll_new.add(move.hashCode());
-        }
-        return ll_new;
     }
 
     public TreeMap<Integer, Integer> get_as_vectors(int from)
@@ -147,15 +103,6 @@ public class History {
             i--;
         }
         return map_reduced;
-    }
-
-
-    public void m_to_start() 
-    {
-        while (ll_moves.size() > 0)
-        {
-            m_reverse();
-        }
     }
 
     public TreeMap<Integer, Integer> red(int from)

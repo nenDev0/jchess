@@ -2,19 +2,18 @@ package src.java.intelligence;
 
 import java.io.File;
 
+import src.java.application.Config;
 import src.java.engine.board.Board;
 import src.java.engine.board.Move;
 import src.java.engine.board.piecelib.Piece.Type;
 import src.java.intelligence.evaluation.Calculator;
 import src.java.intelligence.evaluation.Configuration;
-import src.java.intelligence.evaluation.JsonHandler;
 
 public class Bot extends Thread
 {
 
     private Type type;
     private Calculator calculator;
-    private JsonHandler info_handler;
     private int depth;
     private TreeHeader tree;
     private String gen_path;
@@ -26,14 +25,11 @@ public class Bot extends Thread
     public Bot(Type type, boolean randomized)
     {
         this.type = type;
-        //TODO move this higher in the hierarchy
-        this.info_handler = new JsonHandler(new File("src/resources/configs/info.json"));
-        //this.gen_path = info_handler.info("PATH") + info_handler.info("ID") + "_" + type.name().toLowerCase() + ".json";
-        this.gen_path = info_handler.info("PATH") + info_handler.info("ID") + "_"  + ".json";
+        this.gen_path = Config.cfg_handler.info("PATH") + Config.cfg_handler.info("ID") + ".json";
         Configuration config = new Configuration(new File(gen_path), randomized);
         this.calculator = new Calculator(config);
         //System.out.println(info_handler.info("DEPTH"));
-        this.depth = Integer.parseInt(info_handler.info("DEPTH")) * 2 + 1;
+        this.depth = Integer.parseInt(Config.cfg_handler.info("DEPTH")) * 2 + 1;
         tree = new TreeHeader(this.depth, this.type, new Board());
 
         //this.time_taken = 0;

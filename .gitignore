@@ -18,3 +18,6 @@ replay_pid*
 
 # personal preference to write down local changes, so they can easily be pasted into an upcomming commit
 changelog.md
+
+# avoid constantly pushing new generations / config changes
+src/resources/configs/

@@ -3,9 +3,9 @@ package src.java.engine.game;
 
 
 import java.util.HashMap;
+import java.util.LinkedList;
 
 import src.java.application.Config;
-import src.java.application.Window;
 import src.java.engine.board.Board;
 import src.java.engine.board.GameState;
 import src.java.engine.board.Move;
@@ -19,14 +19,12 @@ public class Game extends Thread {
     private Board board;
     private SoundEngine sound_engine;
     private Piece selected_piece;
-    private VisualState visual_state;
     private Bot bot1;
     private Bot bot2;
     //private int movecount;
     //private float black_total;
     //private float white_total;
     private HashMap<Type, Integer> piececount;
-    private Window window;
     private boolean player_interaction;
     //private boolean player;
 
@@ -35,13 +33,7 @@ public class Game extends Thread {
         this.board = new Board();
         this.sound_engine = new SoundEngine();
         this.player_interaction = true;
-        //this.player = true;
         m_reset();
-    }
-
-    public void m_set_window(Window w)
-    {
-        this.window = w;
     }
 
     public void m_reset()
@@ -59,7 +51,7 @@ public class Game extends Thread {
             {
                 rounds_won++;
                 System.out.println(Config.get_loser() + ", is currently on round: " + rounds_won);
-                if (rounds_won == 1)
+                if (rounds_won == 14)
                 {
                     let_bot_write_config(get_opposite_bot(get_turn()));
                     Config.m_add_loss(get_turn());
@@ -94,7 +86,6 @@ public class Game extends Thread {
 
         System.out.println("bot1: "+ Type.WHITE + ", is randomized, if : " + bot1.get_calculator().get_configuration().is_randomized());
         System.out.println("bot2: "+ Type.BLACK + ", is randomized, if : " + bot2.get_calculator().get_configuration().is_randomized());
-        this.visual_state = VisualState.NOMINAL;
         selected_piece = null;
         /*movecount = 0;
         black_total = 0;
@@ -156,10 +147,10 @@ public class Game extends Thread {
         move = move.convert(board);
         try
         {
-            m_select_piece(move.position_from().get_piece());
+            m_select_piece(move.position_from().get_x(), move.position_from().get_y());
             Thread.yield();
             //Thread.sleep(150);
-            m_select_position(move.position_to());
+            m_select_position(move.position_to().get_x(), move.position_to().get_y());
             Thread.yield();
         }
         catch (Exception e)
@@ -167,7 +158,7 @@ public class Game extends Thread {
             throw new IllegalArgumentException("Something went vewwy wong");
         }
 
-        float eval = bot.get_calculator().evaluate(board);
+        //float eval = bot.get_calculator().evaluate(board);
         if (bot.get_type() == Type.WHITE) {
             /*movecount++;
             System.out.println("///// ##### MOVECOUNT : " + movecount);
@@ -187,63 +178,57 @@ public class Game extends Thread {
     }
 
 
-    public VisualState get_visual_state()
+    public boolean m_select_piece(int x, int y)
     {
-        return visual_state;
-    }
-
-    public void m_select_piece(Piece piece) {
-        if (!piece.is_type(get_turn())) {
-            return;
+        Piece piece = board.get_position(x, y).get_piece();
+        if (piece == null)
+        {
+            return false;
+        }
+        if (!piece.is_type(get_turn())) 
+        {
+            return false;
         }
         this.selected_piece = piece;
-        this.selected_piece.position().get_listener().m_select();
         if (player_interaction)
         {
             Board clone = board.clone();
-            for (Position position : selected_piece.get_legal_moves()) {
-                position.get_listener().m_legal_move_activate();
+            for (Position position : selected_piece.get_legal_moves())
+            {
                 clone.m_commit(new Move(selected_piece.position(), position).convert(clone));
                 position.get_listener().m_set_eval(get_bot(get_turn()).get_calculator().evaluate(clone));
                 clone.m_revert();
             }
         }
-        else
-        {
-            for (Position position : selected_piece.get_legal_moves()) {
-                position.get_listener().m_legal_move_activate();
-            }
-        }
-        visual_state = VisualState.SELECTED;
+        return true;
     }
 
-    public void m_deselect_piece()
+    private void m_deselect_piece()
     {
-            this.selected_piece.position().get_listener().m_deselect();
-            for (Position position : selected_piece.get_legal_moves()) {
-                position.get_listener().m_legal_move_deactivate();
-        }
         this.selected_piece = null;
-        visual_state = VisualState.NOMINAL;
     }
 
-    public void m_select_position(Position position)
+    public boolean m_select_position(int x, int y)
     {
-        if (position.get_piece() != null) {
-            if (position.get_piece().is_type(get_turn())) {
+        Position position = board.get_position(x, y);
+        if (position.get_piece() != null)
+        {
+            if (position.get_piece().is_type(get_turn()))
+            {
                 m_deselect_piece();
-                m_select_piece(position.get_piece());
-                return;
+                m_select_piece(position.get_x(), position.get_y());
+                return true;
             }
         }
         if(!selected_piece.is_legal_move(position))
         {
             m_deselect_piece();
-            return;
+            return false;
         }
         Piece piece = selected_piece;
         m_deselect_piece();
         board.m_commit(piece, position);
+        // TODO: adjust tree crashes after reverse, while botplay is disabled.
         bot1.m_adjust_tree(board.get_history().get_move(board.get_history().get_length() - 1));
         bot2.m_adjust_tree(board.get_history().get_move(board.get_history().get_length() - 1));
         //System.out.println(bot1.get_calculator().evaluate(board));
@@ -258,24 +243,24 @@ public class Game extends Thread {
         //}
         piececount.put(get_turn(), board.get_collection(get_turn()).get_active_pieces().size());
 
-        this.window.m_set_eval(get_bot(get_turn()).get_calculator().evaluate(board));
+        
         //print_state();
-        Thread.yield();
+        return false;
     }
 
+    public float get_eval()
+    {
+        return get_bot(get_turn()).get_calculator().evaluate(board);
+    }
+
+    public LinkedList<Position> get_legal_moves()
+    {
+        return selected_piece.get_legal_moves();
+    }
 
     public Board get_board()
     {
         return board;
-    }
-
-    public void print_state() {
-        System.out.println(board);
-    }
-
-
-    public void m_set_board(Board board) {
-        this.board = board;
     }
 
     public Type get_turn() {
@@ -371,6 +356,14 @@ public class Game extends Thread {
 
     }
 
+    private void m_reverse_bot_color()
+    {
+        Bot bot_temp = bot1;
+        bot1 = bot2;
+        bot2 = bot_temp;
+    }
+    
+
    private int rounds_won;
     
     @Override
@@ -383,21 +376,26 @@ public class Game extends Thread {
         for (int i = 0; i < 4000; i++)
         {
             switch (rounds_won) {
-                case 0:
+                case 0: case 7:
                     m_caro_kann();
                     break;
-                case 1:
+                case 1: case 8:
                     m_sicilian_najdorf();
                     break;
-                case 2:
+                case 2: case 9:
                     m_london();
                     break;
-                case 3:
+                case 3: case 10:
                     m_vienna();
                     break;
-                case 4:
+                case 4: case 11:
                     m_catalan();
                     break;
+                case 5: case 12:
+                m_reverse_bot_color();
+                break;
+                case 6: case 13:
+
                 default:
                     break;
             }

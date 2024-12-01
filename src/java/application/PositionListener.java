@@ -8,7 +8,6 @@ import javax.swing.*;
 
 import src.java.engine.board.piecelib.Piece.Type;
 import src.java.engine.board.piecelib.Piece.PieceType;
-import src.java.engine.game.VisualState;
 
 public class PositionListener implements MouseListener
 {
@@ -107,7 +106,7 @@ public class PositionListener implements MouseListener
 
     }
 
-    public void m_update(Type type, PieceType impl)
+    public void m_update_piece(Type type, PieceType impl)
     {
 
         if (type == null)
@@ -130,17 +129,7 @@ public class PositionListener implements MouseListener
     @Override
     public void mouseClicked(MouseEvent e)
     {
-        if (grid.get_game().get_visual_state() == VisualState.NOMINAL)
-        {
-            if (grid.get_board().get_position(x, y).get_piece() == null)
-            {
-                return;
-            }
-            grid.get_game().m_select_piece(grid.get_board().get_position(x, y).get_piece());
-        }
-        else {
-            grid.get_game().m_select_position(grid.get_board().get_position(x, y));
-        }
+       grid.m_send_input(x, y); 
     }
 
     @Override

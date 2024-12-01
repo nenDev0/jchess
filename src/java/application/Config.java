@@ -10,8 +10,7 @@ public class Config {
     
     //TODO implement this to include all configurable settings
     
-    @SuppressWarnings("unused")
-    private JsonHandler cfg_handler;
+    public static JsonHandler cfg_handler;
 
     public static final String themes_path = "src/resources/icons/";
     public static final String audios_path = "src/resources/sounds/";
@@ -26,7 +25,7 @@ public class Config {
 
     private static final float RANDOMIZER_MAX_DEVIATION = (float)4.0;
     public static final float RANDOMIZER_POSITIVE_NEGATIVE_DIFF = (float) 1.0;
-    private static final float RANDOMIZER_RANDOM_CHANCE = (float)0.003;
+    private static final float RANDOMIZER_RANDOM_CHANCE = (float)0.03;
     public static HashMap<Type, Integer> losses;
     private static Type losing;
 
@@ -34,7 +33,7 @@ public class Config {
     public Config()
     {
         losses = new HashMap<Type, Integer>();
-        this.cfg_handler = new JsonHandler(new File("src/resources/configs/info.json"));
+        cfg_handler = new JsonHandler(new File("src/resources/configs/config.json"));
         for (Type type : Type.values())
         {
             losses.putIfAbsent(type, 0);

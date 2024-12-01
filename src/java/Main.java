@@ -7,6 +7,7 @@ import src.java.application.Config;
 public class Main {
 
 
+    @SuppressWarnings("unused")
     public static void main(String[] args)
     {
         Config config = new Config();

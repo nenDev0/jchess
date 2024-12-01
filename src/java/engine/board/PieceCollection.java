@@ -245,16 +245,4 @@ public class PieceCollection implements Restrictor {
             map_active_pieces.get(piece.get_piece_type()).add(piece);
         }
     }
-
-    public int[][] reduce()
-    {
-        int[][] reduced = new int[16][2];
-        for (Piece piece : ll_active_pieces)
-        {
-            Position pos = piece.position();
-            reduced[piece.INDEX()][0] = pos.get_x();
-            reduced[piece.INDEX()][1] = pos.get_y();
-        }
-        return reduced;
-    }
 }
