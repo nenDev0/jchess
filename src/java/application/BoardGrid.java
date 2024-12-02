@@ -8,6 +8,8 @@ import java.util.List;
 import javax.swing.JPanel;
 
 import src.java.engine.board.Board;
+import src.java.engine.board.piecelib.Piece.PieceType;
+import src.java.engine.board.piecelib.Piece.Type;
 import src.java.engine.game.Game;
 import src.java.engine.game.InteractionController;
 
@@ -26,27 +28,29 @@ public class BoardGrid {
     public BoardGrid(Dimension dimension, Window window)
     {
         m_update_dimension(dimension);
-        this.ll_highlighted_legal_moves = new LinkedList<PositionListener>();
-        this.game = new Game();
-        this.game.get_board().m_initialise();
-        this.interaction_controller = new InteractionController(this, game, window);
-        imagefinder = new ImageFinder((int)get_dimension().getWidth(), (int)get_dimension().getHeight());
-        this.listeners = new PositionListener[8][8];
+        this.imagefinder = new ImageFinder((int)get_dimension().getWidth(), (int)get_dimension().getHeight());
         this.panel = new JPanel();
-        panel.setLayout(new GridLayout(8, 8));
-
+        this.listeners = new PositionListener[8][8];
+        this.ll_highlighted_legal_moves = new LinkedList<PositionListener>();
+  
         for     (int y = 7; y >= 0; y--)
         {
             for (int x = 0; x < 8; x++)
             {
                 listeners[x][y] = new PositionListener(x, y, this);
                 panel.add(listeners[x][y].get_pane());
-                game.get_board().get_position(x, y).m_set_listener(listeners[x][y]);
             }
         }
+
+
+        this.game = new Game();
+        this.game.get_board().m_initialise();
+        this.interaction_controller = new InteractionController(this, game, window);
+        game.m_set_interaction_controller(interaction_controller);
+        panel.setLayout(new GridLayout(8, 8));
         panel.setVisible(true);
         panel.setPreferredSize(this.dimension);
-        
+    
     }
 
 
@@ -71,11 +75,22 @@ public class BoardGrid {
         return game;
     }
 
+
     public void m_send_input(int x, int y)
     {
         interaction_controller.m_click_on_position(x, y);
     }
 
+    public void m_update_piece(int x, int y, Type type, PieceType piece_type)
+    {
+        listeners[x][y].m_update_piece(type, piece_type);
+    }
+
+    public void m_set_grid_position_eval(int x , int y, float eval)
+    {
+        listeners[x][y].m_set_eval(eval);
+    }
+    
     public void m_highlight_legal_move(int x, int y)
     {
         PositionListener position_listener = this.listeners[x][y];

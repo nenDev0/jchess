@@ -14,6 +14,7 @@ public class PieceCollection implements Restrictor {
     private HashMap<PieceType, LinkedList<Piece>> map_active_pieces;
     private LinkedList<Piece> ll_active_pieces;
     private LinkedList<Piece> ll_taken_pieces; 
+    //TODO: this can be removed, if piece class gets overhauled
     private LinkedList<Piece> ll_continuity;
     private Type type;
     private Board board;
@@ -140,7 +141,7 @@ public class PieceCollection implements Restrictor {
 
     public void m_demote(Piece piece)
     {
-        Position position = piece.position();
+        Position position = piece.get_position();
         piece.m_set_position(null);
         m_rm_piece(piece);
 
@@ -172,7 +173,7 @@ public class PieceCollection implements Restrictor {
             board.m_set_check();
             return;
         }
-        if (get_pieces_of_type(PieceType.KING).get(0).position().has_opposing_pieces_observing(get_type()))
+        if (get_pieces_of_type(PieceType.KING).get(0).get_position().has_opposing_pieces_observing(get_type()))
         {
             board.m_set_checkmate();
         }
@@ -217,7 +218,7 @@ public class PieceCollection implements Restrictor {
     public void m_request_update(PieceType piece_type)
     {
         for (Piece piece : map_active_pieces.get(piece_type))
-        if (piece.position().get_y() == piece.pawn_directional(4, 3))
+        if (piece.get_position().get_y() == piece.pawn_directional(4, 3))
         {
             board.m_receive_update_notification(piece.observer());
         }

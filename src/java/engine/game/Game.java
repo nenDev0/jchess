@@ -17,6 +17,7 @@ import src.java.intelligence.Bot;
 public class Game extends Thread {
     
     private Board board;
+    private InteractionController interaction_controller; 
     private SoundEngine sound_engine;
     private Piece selected_piece;
     private Bot bot1;
@@ -34,6 +35,18 @@ public class Game extends Thread {
         this.sound_engine = new SoundEngine();
         this.player_interaction = true;
         m_reset();
+    }
+
+    public void m_set_interaction_controller(InteractionController interaction_controller)
+    {
+        this.interaction_controller = interaction_controller;
+        board.m_set_interaction_controller(interaction_controller);
+        for (Piece piece : board.get_collection(Type.WHITE).get_active_pieces()) {
+            interaction_controller.m_update_grid_position(piece.get_position());
+        }
+        for (Piece piece : board.get_collection(Type.BLACK).get_active_pieces()) {
+            interaction_controller.m_update_grid_position(piece.get_position());
+        }
     }
 
     public void m_reset()
@@ -195,8 +208,8 @@ public class Game extends Thread {
             Board clone = board.clone();
             for (Position position : selected_piece.get_legal_moves())
             {
-                clone.m_commit(new Move(selected_piece.position(), position).convert(clone));
-                position.get_listener().m_set_eval(get_bot(get_turn()).get_calculator().evaluate(clone));
+                clone.m_commit(new Move(selected_piece.get_position(), position).convert(clone));
+                interaction_controller.m_set_move_eval(position, get_bot(get_turn()).get_calculator().evaluate(clone));
                 clone.m_revert();
             }
         }
@@ -227,7 +240,7 @@ public class Game extends Thread {
         }
         Piece piece = selected_piece;
         m_deselect_piece();
-        board.m_commit(piece, position);
+        board.m_commit(piece.get_position(), position);
         // TODO: adjust tree crashes after reverse, while botplay is disabled.
         bot1.m_adjust_tree(board.get_history().get_move(board.get_history().get_length() - 1));
         bot2.m_adjust_tree(board.get_history().get_move(board.get_history().get_length() - 1));
@@ -280,79 +293,79 @@ public class Game extends Thread {
     public void m_london()
     {
         System.out.println(">>>>>>> LONDON");
-        board.m_commit(board.get_position(3, 1).get_piece(), board.get_position(3, 3));
-        board.m_commit(board.get_position(3, 6).get_piece(), board.get_position(3, 4));
-        board.m_commit(board.get_position(2, 0).get_piece(), board.get_position(5, 3));
-        board.m_commit(board.get_position(6, 7).get_piece(), board.get_position(5, 5));
-        board.m_commit(board.get_position(4, 1).get_piece(), board.get_position(4, 2));
-        board.m_commit(board.get_position(4, 6).get_piece(), board.get_position(4, 5));
+        board.m_commit(board.get_position(3, 1), board.get_position(3, 3));
+        board.m_commit(board.get_position(3, 6), board.get_position(3, 4));
+        board.m_commit(board.get_position(2, 0), board.get_position(5, 3));
+        board.m_commit(board.get_position(6, 7), board.get_position(5, 5));
+        board.m_commit(board.get_position(4, 1), board.get_position(4, 2));
+        board.m_commit(board.get_position(4, 6), board.get_position(4, 5));
     }
 
     public void m_sicilian_najdorf()
     {
         System.out.println(">>>>>>> SICILIAN NAJDORF");
         // white pawn e2-e4
-        board.m_commit(board.get_position(4, 1).get_piece(), board.get_position(4, 3));
+        board.m_commit(board.get_position(4, 1), board.get_position(4, 3));
         // black pawn c7-c5
-        board.m_commit(board.get_position(2, 6).get_piece(), board.get_position(2, 4));
+        board.m_commit(board.get_position(2, 6), board.get_position(2, 4));
         // white knight g2-f3
-        board.m_commit(board.get_position(6, 0).get_piece(), board.get_position(5, 2));
+        board.m_commit(board.get_position(6, 0), board.get_position(5, 2));
         // black pawn d7-d6
-        board.m_commit(board.get_position(3, 6).get_piece(), board.get_position(3, 5));
+        board.m_commit(board.get_position(3, 6), board.get_position(3, 5));
         // white pawn d2-d4
-        board.m_commit(board.get_position(3, 1).get_piece(), board.get_position(3, 3));
+        board.m_commit(board.get_position(3, 1), board.get_position(3, 3));
         // black pawn c5-d4
-        board.m_commit(board.get_position(2, 4).get_piece(), board.get_position(3, 3));
+        board.m_commit(board.get_position(2, 4), board.get_position(3, 3));
         // white knight f3-d4
-        board.m_commit(board.get_position(5, 2).get_piece(), board.get_position(3, 3));
+        board.m_commit(board.get_position(5, 2), board.get_position(3, 3));
         // black knight g8-f6
-        board.m_commit(board.get_position(6, 7).get_piece(), board.get_position(5, 5));
+        board.m_commit(board.get_position(6, 7), board.get_position(5, 5));
         // white knight b1-c3
-        board.m_commit(board.get_position(1, 0).get_piece(), board.get_position(2, 2));
+        board.m_commit(board.get_position(1, 0), board.get_position(2, 2));
         // black pawn a7-a6
-        board.m_commit(board.get_position(0, 6).get_piece(), board.get_position(0, 5));
+        board.m_commit(board.get_position(0, 6), board.get_position(0, 5));
     }
 
     public void m_vienna()
     {
         System.out.println(">>>>>>> VIENNA");
         // white pawn e2-e4
-        board.m_commit(board.get_position(4, 1).get_piece(), board.get_position(4, 3));
+        board.m_commit(board.get_position(4, 1), board.get_position(4, 3));
         // black pawn e7-e5
-        board.m_commit(board.get_position(4, 6).get_piece(), board.get_position(4, 4));
+        board.m_commit(board.get_position(4, 6), board.get_position(4, 4));
         // white bishop f1-c4
-        board.m_commit(board.get_position(5, 0).get_piece(), board.get_position(2, 3));
+        board.m_commit(board.get_position(5, 0), board.get_position(2, 3));
         // black knight g8-f6
-        board.m_commit(board.get_position(6, 7).get_piece(), board.get_position(5, 5));
+        board.m_commit(board.get_position(6, 7), board.get_position(5, 5));
         // white pawn d2-d3
-        board.m_commit(board.get_position(3, 1).get_piece(), board.get_position(3, 2));
+        board.m_commit(board.get_position(3, 1), board.get_position(3, 2));
         // black pawn c7-c6
-        board.m_commit(board.get_position(2, 6).get_piece(), board.get_position(2, 5));
+        board.m_commit(board.get_position(2, 6), board.get_position(2, 5));
 
     }
 
     public void m_caro_kann()
     {
         System.out.println(">>>>>>> CARO KANN");
-        board.m_commit(board.get_position(4, 1).get_piece(), board.get_position(4, 3));
-        board.m_commit(board.get_position(2, 6).get_piece(), board.get_position(2, 5));
-        board.m_commit(board.get_position(3, 1).get_piece(), board.get_position(3, 3));
-        board.m_commit(board.get_position(3, 6).get_piece(), board.get_position(3, 4));
-        board.m_commit(board.get_position(4, 3).get_piece(), board.get_position(4, 4));
-        board.m_commit(board.get_position(2, 7).get_piece(), board.get_position(5, 4));
-        board.m_commit(board.get_position(6, 0).get_piece(), board.get_position(5, 2));
-        board.m_commit(board.get_position(4, 6).get_piece(), board.get_position(4, 5));
+        board.m_commit(board.get_position(4, 1), board.get_position(4, 3));
+        board.m_commit(board.get_position(2, 6), board.get_position(2, 5));
+        board.m_commit(board.get_position(3, 1), board.get_position(3, 3));
+        board.m_commit(board.get_position(3, 6), board.get_position(3, 4));
+        board.m_commit(board.get_position(4, 3), board.get_position(4, 4));
+        board.m_commit(board.get_position(2, 7), board.get_position(5, 4));
+        board.m_commit(board.get_position(6, 0), board.get_position(5, 2));
+        board.m_commit(board.get_position(4, 6), board.get_position(4, 5));
     }    
 
     public void m_catalan()
     {
         System.out.println(">>>>>>> CATALAN");
-        board.m_commit(board.get_position(3, 1).get_piece(), board.get_position(3, 3));
-        board.m_commit(board.get_position(3, 6).get_piece(), board.get_position(3, 4));
-        board.m_commit(board.get_position(2, 1).get_piece(), board.get_position(2, 3));
-        board.m_commit(board.get_position(4, 6).get_piece(), board.get_position(4, 5));
-        board.m_commit(board.get_position(6, 0).get_piece(), board.get_position(5, 2));
-        board.m_commit(board.get_position(6, 7).get_piece(), board.get_position(5, 5));
+        board.m_commit(board.get_position(3, 1), board.get_position(3, 3));
+        board.m_commit(board.get_position(3, 6), board.get_position(3, 4));
+        board.m_commit(board.get_position(2, 1), board.get_position(2, 3));
+        board.m_commit(board.get_position(4, 6), board.get_position(4, 5));
+        board.m_commit(board.get_position(6, 0), board.get_position(5, 2));
+        board.m_commit(board.get_position(6, 7), board.get_position(5, 5));
 
     }
 

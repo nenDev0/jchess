@@ -2,7 +2,6 @@ package src.java.engine.board;
 
 import java.util.LinkedList;
 
-import src.java.application.PositionListener;
 import src.java.engine.board.piecelib.Piece;
 import src.java.engine.board.piecelib.Piece.Type;
 import src.java.engine.board.updatesystem.NotificationCollector;
@@ -17,7 +16,6 @@ public class Position {
     private LinkedList<ObserverStorage> ll_silent_observers;
     private Piece piece;
     private NotificationCollector notification_collector;
-    private PositionListener listener;
    
     public Position(int x, int y, NotificationCollector notification_collector) {
         ll_observers = new LinkedList<ObserverStorage>();
@@ -77,19 +75,7 @@ public class Position {
         this.ll_observers.remove(o);
         this.ll_silent_observers.remove(o);
     }
-    
-    public void m_set_listener(PositionListener listener) {
-        this.listener = listener;
-        if (piece != null) {
-            listener.m_update_piece(get_piece().get_type(), get_piece().get_piece_type());
-        }
-    }
-
-    public PositionListener get_listener() {
-        return listener;
-    }
-
-
+   
 
     private void m_pass_observers_over() {
         for (ObserverStorage observer : ll_observers) {
@@ -98,14 +84,7 @@ public class Position {
         for (ObserverStorage observer : ll_silent_observers) {
             notification_collector.m_receive_update_notification((ObserverSender) observer);
         }
-        if (listener != null) {
-            if (get_piece() != null) {
-                listener.m_update_piece(get_piece().get_type(), get_piece().get_piece_type());
-            }
-            else {
-                listener.m_update_piece(null, null);
-            }
-        }
+        notification_collector.m_receive_visual_update_notification(this);
     }
 
 

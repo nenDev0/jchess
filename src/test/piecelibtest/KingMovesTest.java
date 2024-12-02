@@ -130,7 +130,7 @@ public class KingMovesTest {
         white_king.m_set_position(board.get_position(7, 6));
 
         white_pawn.m_set_position(board.get_position(0, 6));
-        white_pawn.collection().m_untake(white_pawn);
+        white_pawn.get_collection().m_untake(white_pawn);
         board.m_dump_update_notifications();
 
         expected.add(board.get_position(0, 6));
@@ -148,7 +148,7 @@ public class KingMovesTest {
 
 
         black_king.m_set_position(board.get_position(0, 6));
-        assertEquals(7, white_king.collection().get_pieces_of_type(PieceType.PAWN).size());    
+        assertEquals(7, white_king.get_collection().get_pieces_of_type(PieceType.PAWN).size());    
     }
 
 

@@ -46,7 +46,7 @@ public class King extends Piece
         int y = pawn_directional(0, 7);
 
         //System.out.println("Castling: queenside: " + queenside_castle + ", kingside: " + kingside_castle);
-        Piece rook_queenside = collection().get_board_access().get_position(0, y).get_piece();
+        Piece rook_queenside = get_collection().get_board_access().get_position(0, y).get_piece();
 
         if (rook_queenside != null)
         {
@@ -66,7 +66,7 @@ public class King extends Piece
         }
         int y = pawn_directional(0, 7);
 
-        Piece rook_kingside = collection().get_board_access().get_position(7, y).get_piece();
+        Piece rook_kingside = get_collection().get_board_access().get_position(7, y).get_piece();
         if (rook_kingside != null) {
             if (is_type(rook_kingside.get_type()) && rook_kingside.moves() == 0)
             {
@@ -112,11 +112,11 @@ public class King extends Piece
 
     public void m_set_position(Position position)
     {
-        Position previous_position = position();
+        Position previous_position = get_position();
         boolean queenside_castle = can_castle_queenside();
         boolean kingside_castle = can_castle_kingside();
         super.m_set_position(position);
-        collection().m_release_check();
+        get_collection().m_release_check();
 
         if (previous_position == null)
         {
@@ -139,8 +139,8 @@ public class King extends Piece
         {
             if (position.get_x() == 2)
             {
-                Piece rook_queenside = collection().get_board_access().get_position(0, y).get_piece();
-                rook_queenside.m_set_position(collection().get_board_access().get_position(3, y));
+                Piece rook_queenside = get_collection().get_board_access().get_position(0, y).get_piece();
+                rook_queenside.m_set_position(get_collection().get_board_access().get_position(3, y));
                 rook_queenside.m_increase_move();
                 return;
             }
@@ -149,8 +149,8 @@ public class King extends Piece
         {
             if (position.get_x() == 6)
             {
-                Piece rook_kingside = collection().get_board_access().get_position(7, y).get_piece();
-                rook_kingside.m_set_position(collection().get_board_access().get_position(5, y));
+                Piece rook_kingside = get_collection().get_board_access().get_position(7, y).get_piece();
+                rook_kingside.m_set_position(get_collection().get_board_access().get_position(5, y));
                 rook_kingside.m_increase_move();
                 return;
             }
@@ -163,15 +163,15 @@ public class King extends Piece
         }
         if (previous_position.get_x() == 2)
         {
-            Piece rook_queenside = collection().get_board_access().get_position(3, y).get_piece();
-            rook_queenside.m_set_position(collection().get_board_access().get_position(0, y));
+            Piece rook_queenside = get_collection().get_board_access().get_position(3, y).get_piece();
+            rook_queenside.m_set_position(get_collection().get_board_access().get_position(0, y));
             rook_queenside.m_decrease_move();
             return;
         }
         else if (previous_position.get_x() == 6)
         {
-            Piece rook_kingside = collection().get_board_access().get_position(5, y).get_piece();
-            rook_kingside.m_set_position(collection().get_board_access().get_position(7, y));
+            Piece rook_kingside = get_collection().get_board_access().get_position(5, y).get_piece();
+            rook_kingside.m_set_position(get_collection().get_board_access().get_position(7, y));
             rook_kingside.m_decrease_move();
             return;
         }
@@ -198,15 +198,15 @@ public class King extends Piece
     }
 
     private void check_direction(int x_increment, int y_increment, LinkedList<PieceType> ll_implementations) {
-        int x = super.position().get_x();
-        int y = super.position().get_y();
+        int x = super.get_position().get_x();
+        int y = super.get_position().get_y();
 
         Piece previous_piece = null;
         Piece piece = null;
         int visible = 0;
 
         for (int i_x = x + x_increment, i_y = y + y_increment; i_x >= 0 && i_x < 8 && i_y >= 0 && i_y < 8; i_x += x_increment, i_y += y_increment) {
-            piece = super.collection().get_board_access().get_position(i_x, i_y).get_piece();
+            piece = super.get_collection().get_board_access().get_position(i_x, i_y).get_piece();
             if (piece == null) {
                 visible++;
                 continue;
@@ -236,17 +236,17 @@ public class King extends Piece
     }
 
     private LinkedList<Position> calculate_restrictions(int x_increment, int y_increment) {
-        int x = super.position().get_x();
-        int y = super.position().get_y();
+        int x = super.get_position().get_x();
+        int y = super.get_position().get_y();
 
         LinkedList<Position> ll_restrictions = new LinkedList<Position>();
 
         if (x - x_increment >= 0 && x - x_increment < 8 && y - y_increment >= 0 && y - y_increment < 8) {
-            get_legal_moves().remove(super.collection().get_board_access().get_position(position().get_x() - x_increment, position().get_y() - y_increment));
+            get_legal_moves().remove(super.get_collection().get_board_access().get_position(get_position().get_x() - x_increment, get_position().get_y() - y_increment));
         }
 
         for (int i_x = x + x_increment, i_y = y + y_increment; i_x >= 0 && i_x < 8 && i_y >= 0 && i_y < 8; i_x += x_increment, i_y += y_increment) {
-            Position p = collection().get_board_access().get_position(i_x, i_y);
+            Position p = get_collection().get_board_access().get_position(i_x, i_y);
             ll_restrictions.add(p);
             if (p.get_piece() == null) {
                 continue;
@@ -265,8 +265,8 @@ public class King extends Piece
     }
 
     private void check_knight() {
-        int x = position().get_x();
-        int y = position().get_y();
+        int x = get_position().get_x();
+        int y = get_position().get_y();
         PieceType knight = PieceType.KNIGHT;
         if (x < 7) {
             if (y < 6)
@@ -297,8 +297,8 @@ public class King extends Piece
     }
 
     private void check_pawn() {
-        int x = position().get_x();
-        int y = position().get_y();
+        int x = get_position().get_x();
+        int y = get_position().get_y();
         int directional_constant;
         if (is_type(Type.WHITE)) {
             directional_constant = 1;
@@ -313,7 +313,7 @@ public class King extends Piece
     }
 
     private void m_check_move(int x, int y, PieceType impl) {
-        Position position = collection().get_board_access().get_position(x, y);
+        Position position = get_collection().get_board_access().get_position(x, y);
         if (position.get_piece() == null) {
             return;
         }
@@ -328,39 +328,39 @@ public class King extends Piece
     private void m_check_castling() {
         int y = pawn_directional(0, 7);
         if (can_castle_queenside()) {
-            Piece rook_queenside = collection().get_board_access().get_position(0, y).get_piece();
+            Piece rook_queenside = get_collection().get_board_access().get_position(0, y).get_piece();
             //
             //  
             //  
             //
             if (is_type(rook_queenside.get_type()) && rook_queenside.moves() == 0 )
             {
-                if (collection().get_board_access().get_position(1, y).get_piece() == null &&
-                    collection().get_board_access().get_position(2, y).get_piece() == null &&
-                    collection().get_board_access().get_position(3, y).get_piece() == null) {
-                    if (!collection().get_board_access().get_position(4, y).has_opposing_pieces_observing(get_type()) &&
-                        !collection().get_board_access().get_position(1, y).has_opposing_pieces_observing(get_type()) &&
-                        !collection().get_board_access().get_position(2, y).has_opposing_pieces_observing(get_type()) &&
-                        !collection().get_board_access().get_position(3, y).has_opposing_pieces_observing(get_type())) {
-                        get_legal_moves().add(collection().get_board_access().get_position(2, y));
+                if (get_collection().get_board_access().get_position(1, y).get_piece() == null &&
+                    get_collection().get_board_access().get_position(2, y).get_piece() == null &&
+                    get_collection().get_board_access().get_position(3, y).get_piece() == null) {
+                    if (!get_collection().get_board_access().get_position(4, y).has_opposing_pieces_observing(get_type()) &&
+                        !get_collection().get_board_access().get_position(1, y).has_opposing_pieces_observing(get_type()) &&
+                        !get_collection().get_board_access().get_position(2, y).has_opposing_pieces_observing(get_type()) &&
+                        !get_collection().get_board_access().get_position(3, y).has_opposing_pieces_observing(get_type())) {
+                        get_legal_moves().add(get_collection().get_board_access().get_position(2, y));
                     }
                 }
             }
         }
         if (can_castle_kingside()) {
-            Piece rook_kingside = collection().get_board_access().get_position(7, y).get_piece();
+            Piece rook_kingside = get_collection().get_board_access().get_position(7, y).get_piece();
             //
             //  
             //  
             //
             if (is_type(rook_kingside.get_type()) && rook_kingside.moves() < 1)
             {
-                if (collection().get_board_access().get_position(5, y).get_piece() == null &&
-                    collection().get_board_access().get_position(6, y).get_piece() == null) {
-                    if (!collection().get_board_access().get_position(4, y).has_opposing_pieces_observing(get_type()) &&
-                        !collection().get_board_access().get_position(6, y).has_opposing_pieces_observing(get_type()) &&
-                        !collection().get_board_access().get_position(6, y).has_opposing_pieces_observing(get_type())) {
-                        get_legal_moves().add(collection().get_board_access().get_position(6, y));
+                if (get_collection().get_board_access().get_position(5, y).get_piece() == null &&
+                    get_collection().get_board_access().get_position(6, y).get_piece() == null) {
+                    if (!get_collection().get_board_access().get_position(4, y).has_opposing_pieces_observing(get_type()) &&
+                        !get_collection().get_board_access().get_position(6, y).has_opposing_pieces_observing(get_type()) &&
+                        !get_collection().get_board_access().get_position(6, y).has_opposing_pieces_observing(get_type())) {
+                        get_legal_moves().add(get_collection().get_board_access().get_position(6, y));
                     }
                 }
             }
@@ -369,12 +369,12 @@ public class King extends Piece
     }
 
     private void m_send_restrictions(LinkedList<Position> ll_restrictions) {
-        collection().m_restrict_all_to(ll_restrictions);
-        collection().m_acknowledge_check();
+        get_collection().m_restrict_all_to(ll_restrictions);
+        get_collection().m_acknowledge_check();
     }
 
     private void m_send_restrictions(Piece piece, LinkedList<Position> ll_restrictions) {
-        super.collection().m_restrict(piece, ll_restrictions);
+        super.get_collection().m_restrict(piece, ll_restrictions);
     }
 
     @Override

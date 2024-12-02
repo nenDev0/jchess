@@ -223,7 +223,7 @@ public class Calculator
     private float protection(Board board, Piece piece)
     {
         float value = 0;
-        for(ObserverStorage o: piece.position().get_observers())
+        for(ObserverStorage o: piece.get_position().get_observers())
         {
             if (piece.is_type(o.get_piece().get_type()))
             {
@@ -249,8 +249,8 @@ public class Calculator
 
     private float likes_center(Piece piece)
     {
-        float x = piece.position().get_x();
-        float y = piece.position().get_y();
+        float x = piece.get_position().get_x();
+        float y = piece.get_position().get_y();
 
         x = (float)(-1/3.5 * Math.pow((3.5-x), 2) + 3.5);
         y = (float)(-1/3.5 * Math.pow((3.5-y), 2) + 3.5);
@@ -263,9 +263,9 @@ public class Calculator
         switch (piece.get_type())
         {
             case WHITE:
-                return piece.position().get_y();
+                return piece.get_position().get_y();
             default:
-            return 7 - piece.position().get_y();
+            return 7 - piece.get_position().get_y();
         }
     }
 
@@ -342,7 +342,7 @@ public class Calculator
     private float is_observed(Board board, Piece piece)
     {
         float value = 0;
-        for (ObserverStorage o : piece.position().get_observers())
+        for (ObserverStorage o : piece.get_position().get_observers())
         {
             if (!piece.is_type(o.get_piece().get_type()))
             {

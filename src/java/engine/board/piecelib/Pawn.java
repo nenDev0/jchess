@@ -35,7 +35,7 @@ public class Pawn extends Piece {
             super.m_set_position(position);
             return;
         }
-        if (this.position() == null)
+        if (this.get_position() == null)
         {
             super.m_set_position(position);
             return;
@@ -46,7 +46,7 @@ public class Pawn extends Piece {
         if (position.get_y() == pawn_directional(7, 0))
         {
             super.m_set_position(null);
-            collection().m_promote(this, position);
+            get_collection().m_promote(this, position);
             return;
         }
 
@@ -58,7 +58,7 @@ public class Pawn extends Piece {
         //
         //  checks, if the move was an en passant move
         //
-        if (position().get_y() != pawn_directional(5, 2))
+        if (get_position().get_y() != pawn_directional(5, 2))
         {
             return;
         }
@@ -66,7 +66,7 @@ public class Pawn extends Piece {
         {
             return;
         }
-        Piece opposing_pawn = collection().get_board_access().get_position(position().get_x(), position().get_y() - pawn_directional(1, -1)).get_piece();
+        Piece opposing_pawn = get_collection().get_board_access().get_position(get_position().get_x(), get_position().get_y() - pawn_directional(1, -1)).get_piece();
         if (opposing_pawn == null)
         {
             return;
@@ -80,8 +80,8 @@ public class Pawn extends Piece {
             return;
         }
         en_passant = opposing_pawn;
-        en_passant_position = opposing_pawn.position();
-        opposing_pawn.collection().m_take(opposing_pawn);
+        en_passant_position = opposing_pawn.get_position();
+        opposing_pawn.get_collection().m_take(opposing_pawn);
 
     }
 

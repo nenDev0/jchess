@@ -130,8 +130,9 @@ public class Board extends NotificationCollector implements BoardAccess{
     }
 
 
-    public void m_commit(Piece piece, Position position) {
-        m_commit(new Move(piece.position(), position));
+    public void m_commit(Position position_from , Position position_to)
+    {
+        m_commit(new Move(position_from, position_to));
         
     }
 
@@ -182,9 +183,9 @@ public class Board extends NotificationCollector implements BoardAccess{
                     return p1.ID() + " >> " + p2.ID();
                 }
 
-                if (!p1.position().equals(p2.position().convert(this)))
+                if (!p1.get_position().equals(p2.get_position().convert(this)))
                 {
-                    return p1.position();
+                    return p1.get_position();
                 }
                 // legal positions
                 if (p1.get_legal_moves().size() != p2.get_legal_moves().size())
@@ -198,7 +199,7 @@ public class Board extends NotificationCollector implements BoardAccess{
                     Position pos2 = p2.get_legal_moves().get(j);
                     if (pos1.equals(pos2))
                     {
-                        return new Move(p1.position(), pos1);
+                        return new Move(p1.get_position(), pos1);
                     }
                 }
             }

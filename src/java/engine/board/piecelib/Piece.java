@@ -71,12 +71,12 @@ public abstract class Piece implements Comparable<Piece>{
         return collection.get_type();
     }
 
-    public PieceCollection collection()
+    public PieceCollection get_collection()
     {
         return collection;
     }
 
-    public Position position()
+    public Position get_position()
     {
         return position;
     }
@@ -144,7 +144,7 @@ public abstract class Piece implements Comparable<Piece>{
         
         if(position == null) {
             ll_legal_moves.clear();
-            position().m_rm_piece();
+            get_position().m_rm_piece();
             this.position = null;
             return;
         }
@@ -154,7 +154,7 @@ public abstract class Piece implements Comparable<Piece>{
         }
         
         if(position.get_piece() != null) {
-            position.get_piece().collection().m_take(position.get_piece());
+            position.get_piece().get_collection().m_take(position.get_piece());
         }
 
         this.position = position;
@@ -177,7 +177,7 @@ public abstract class Piece implements Comparable<Piece>{
     public void m_update() {
         ll_legal_moves.clear();
         observer().m_clear_observations();
-        if (position() == null) {
+        if (position == null) {
             return;
         }
         m_legal_moves();
@@ -259,8 +259,8 @@ public abstract class Piece implements Comparable<Piece>{
     }
 
     public void m_pawn_moves() {
-        int x = position().get_x();
-        int y = position().get_y();
+        int x = get_position().get_x();
+        int y = get_position().get_y();
         int directional_constant = pawn_directional(1, -1);
 
         // pawn forward

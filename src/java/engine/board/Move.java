@@ -105,7 +105,7 @@ public class Move {
 
         if (taken_piece != null)
         {
-            taken_piece.collection().m_untake(taken_piece);
+            taken_piece.get_collection().m_untake(taken_piece);
             taken_piece.m_set_position(position_to);
         }
         if (piece.get_piece_type() != PieceType.KING)
@@ -119,7 +119,7 @@ public class Move {
             if (position_to.get_y() == 7 && piece.is_type(Type.WHITE) ||
                 position_to.get_y() == 0 && piece.is_type(Type.BLACK))
             {
-                piece.collection().m_demote(piece);
+                piece.get_collection().m_demote(piece);
                 return;
             }
             // en passant reversal
@@ -130,7 +130,7 @@ public class Move {
                 {
                     return;
                 }
-                pawn.en_passant.collection().m_untake(pawn.en_passant);
+                pawn.en_passant.get_collection().m_untake(pawn.en_passant);
                 pawn.en_passant.m_set_position(pawn.en_passant_position);
                 pawn.en_passant_position = null;
                 pawn.en_passant = null;
