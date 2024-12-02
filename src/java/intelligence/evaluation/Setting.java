@@ -50,7 +50,6 @@ public class Setting
         end_game = end_game * modifier;
     }
 
-
     private float[] m_calculate_coefficient_vector(float[][] matrix_state)
     {
         float[] setting_vector = new float[16];

@@ -17,6 +17,18 @@ public class Move
 
     // TODO fix move-test -> give moves an ID, so consistency is more clear
 
+    /**
+     *      Note that some of these can happen at the same time.
+     *      In those cases it prioritizes from bottom to top.
+     *  <p> In case of implementing the Chess Standard String Notation, one would have to avoid this.
+     */
+    public enum MoveType {
+        NORMAL,
+        TAKES,
+        UPGRADE,
+        CASTLING,
+        EN_PASSANT,
+    }
 
     private float weight;
     
@@ -56,13 +68,10 @@ public class Move
         improvement = false;
     }
 
-
     public boolean is_improvement()
     {
         return improvement;
     }
-
-
 
     public void m_add_weight(float weight)
     {
@@ -159,7 +168,6 @@ public class Move
         Move conversion = new Move(pos1, pos2);
         return conversion;
     }
-
 
     @Override
     public String toString()

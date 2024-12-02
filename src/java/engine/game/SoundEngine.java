@@ -85,7 +85,6 @@ public class SoundEngine extends Thread{
         is_open = false;
     }*/
 
-
     public void s_stop() {
         take_clip.close();
         move_clip.close();
