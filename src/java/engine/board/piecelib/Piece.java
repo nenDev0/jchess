@@ -16,11 +16,23 @@ public abstract class Piece implements Comparable<Piece>{
         BISHOP,
         KNIGHT,
         PAWN
+
     }
 
+    //TODO move this to PieceCollection?
     public enum Type {
     WHITE,
-    BLACK
+    BLACK;
+
+        public static Type get_opposite(Type type) {
+            switch (type) {
+                case WHITE:
+                    return Type.BLACK ;
+            
+                default:
+                    return Type.WHITE; 
+            }
+        }
     }
 
     private PieceCollection collection;

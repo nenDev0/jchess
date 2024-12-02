@@ -1,6 +1,5 @@
 package src.java.application;
 
-import java.io.File;
 import java.util.HashMap;
 
 import src.java.engine.board.piecelib.Piece.Type;
@@ -31,7 +30,7 @@ public class Config {
     public Config()
     {
         losses = new HashMap<Type, Integer>();
-        cfg_handler = new JsonHandler(new File("src/resources/configs/config.json"));
+        cfg_handler = new JsonHandler("src/resources/configs/config.json");
         for (Type type : Type.values())
         {
             losses.putIfAbsent(type, 0);

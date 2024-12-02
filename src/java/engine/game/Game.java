@@ -60,13 +60,13 @@ public class Game extends Thread {
         if (bot1 != null)
         {
             if (board.get_state() == GameState.CHECKMATE
-             && get_opposite_bot(board.get_type()).get_calculator().get_configuration().is_randomized())
+             && get_bot(Type.get_opposite(get_turn())).get_calculator().get_configuration().is_randomized())
             {
                 rounds_won++;
                 System.out.println(Config.get_loser() + ", is currently on round: " + rounds_won);
                 if (rounds_won == 14)
                 {
-                    let_bot_write_config(get_opposite_bot(get_turn()));
+                    let_bot_write_config(get_bot(Type.get_opposite(get_turn())));
                     Config.m_add_loss(get_turn());
                     System.out.println("WRITING TO CONFIG!");
                     this.bot1 = new Bot(Type.WHITE, !bot1.get_calculator().get_configuration().is_randomized());
@@ -106,14 +106,6 @@ public class Game extends Thread {
     }
 
 
-
-    public Bot get_opposite_bot(Type type)
-    {
-        if (type != Type.WHITE) {
-            return bot1;
-        }
-        return bot2;
-    }
 
     public Bot get_bot(Type type)
     {

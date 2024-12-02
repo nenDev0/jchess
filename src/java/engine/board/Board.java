@@ -143,15 +143,9 @@ public class Board extends NotificationCollector implements BoardAccess
 
     public void m_type()
     {
-        if (this.type == Type.WHITE)
-        {
-            this.type = Type.BLACK;
-        }
-        else if (this.type == Type.BLACK)
-        {
-            this.type = Type.WHITE;
-        }
+        this.type = Type.get_opposite(this.type);
     }
+    
 
 
     public void m_commit(Position position_from , Position position_to)

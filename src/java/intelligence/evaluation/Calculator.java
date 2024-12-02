@@ -90,7 +90,6 @@ public class Calculator
         }
     }
 
-
     private int piececount(Type type)
     {
          switch (type)
@@ -104,12 +103,10 @@ public class Calculator
         }
     }
 
-
     private int m_piececount(Board board, Type type)
     {
         return board.get_collection(type).get_active_pieces().size();
     }
-
 
     private float delta(float x, float y)
     {
@@ -119,7 +116,6 @@ public class Calculator
         }
         return x / y - 1;
     }
-
 
     private float legal_moves(Board board, Piece piece)
     {
@@ -196,7 +192,6 @@ public class Calculator
         return value;
     }
 
-
     private float vision(Board board, Piece piece)
     {
         float value = 0;
@@ -244,8 +239,6 @@ public class Calculator
 
         return value;
     }
-
-
 
     private float likes_center(Piece piece)
     {
@@ -337,7 +330,6 @@ public class Calculator
 
         return value;
     }
-
 
     private float is_observed(Board board, Piece piece)
     {

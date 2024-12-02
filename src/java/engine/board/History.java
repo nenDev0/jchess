@@ -12,6 +12,7 @@ public class History
     private LinkedList<Integer> ll_fifty_move_rule;
     private int fifty_move_rule;
 
+
     public History()
     {
         ll_moves = new LinkedList<Move>();
@@ -68,7 +69,6 @@ public class History
         }
         return true;
     }
-
 
     public void m_reverse()
     {

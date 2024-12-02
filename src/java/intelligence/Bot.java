@@ -1,6 +1,5 @@
 package src.java.intelligence;
 
-import java.io.File;
 
 import src.java.application.Config;
 import src.java.engine.board.Board;
@@ -26,7 +25,7 @@ public class Bot extends Thread
     {
         this.type = type;
         this.gen_path = Config.cfg_handler.info("PATH") + Config.cfg_handler.info("ID") + ".json";
-        Configuration config = new Configuration(new File(gen_path), randomized);
+        Configuration config = new Configuration(gen_path, randomized);
         this.calculator = new Calculator(config);
         //System.out.println(info_handler.info("DEPTH"));
         this.depth = Integer.parseInt(Config.cfg_handler.info("DEPTH")) * 2 + 1;
@@ -61,7 +60,6 @@ public class Bot extends Thread
 
     public void write_config()
     {
-        get_calculator().get_configuration().m_i_forgot();
         get_calculator().get_configuration().write_config(gen_path, type);
     }
 
@@ -79,7 +77,7 @@ public class Bot extends Thread
     {
         //moves_total++;
         //long start = System.nanoTime() / 1000000;
-        tree.create_Tree(calculator, depth);
+        tree.create_tree(calculator, depth);
         Move move = tree.get_best_move();
         //long stop = System.nanoTime() / 1000000;
         //time_taken += stop - start;

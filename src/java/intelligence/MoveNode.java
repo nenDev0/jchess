@@ -55,7 +55,6 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         //return Integer.MAX_VALUE;
     }
 
-
     public TreeSet<MoveNode> children()
     {
         this.children_requested = true;
@@ -72,24 +71,12 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         return map_history_vectors;
     }
 
-    public Type opposite(Type type)
-    {
-        if (type == Type.WHITE) {
-            return Type.BLACK;
-        }
-        else {
-            return Type.WHITE;
-        }
-    }
-
 
     ///
     /// ###               ### ///
     /// ###   modifiers   ### ///
     /// ###               ### ///
     ///
-
-    
 
     public void m_delete()
     {
@@ -136,8 +123,6 @@ public class MoveNode extends Move implements Comparable<MoveNode>
             this.set_abandoned = new_set_abandoned;
         }
     }
-
-
 
     /**
      *  Node is first created -> used to determine the state of the node
@@ -212,9 +197,6 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         }
         return false;
     }
-
-
-
 
     /**
      *  continues down this node
@@ -321,7 +303,6 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         }
     }
     
-
     private void m_reunite_children(Board board, int iteration)
     {
         if (board.get_type() == Type.WHITE)
@@ -385,7 +366,7 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         while (iterator.hasNext())
         {
             MoveNode move = iterator.next();
-            move.get_best_move_recursive(opposite(type));
+            move.get_best_move_recursive(Type.get_opposite(type));
         }
         Move move;
         if (type == Type.WHITE)

@@ -44,5 +44,6 @@ public enum EvalType {
 
     // MUST EDIT JSONHANDLER.NUMBER_OF_TOPICS
     GLOBAL,
-    TIMELINE,
+    TIMELINE;
+
 }

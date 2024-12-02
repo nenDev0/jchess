@@ -14,11 +14,12 @@ public class JsonHandler
     public static final int NUMBER_OF_PIECE_SPECIFIC_VALUES = 24; 
     public static final int NUMBER_OF_GLOBAL_VALUES = 8;
     public static final int NUMBER_OF_TOPICS = 2;
-    public JsonHandler(File file)
+
+    public JsonHandler(String path)
     {
         try
         {
-            read_file(file);
+            read_file(new File(path));
         }
         catch (Exception e)
         {
@@ -161,7 +162,6 @@ public class JsonHandler
         //System.out.println("extracted segment: " + segment + ", called: " + identification);
         return segment;
     }
-
 
     private int m_next_ender(String data)
     {

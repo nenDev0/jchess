@@ -20,15 +20,15 @@ public class TreeHeader
     private Board board;
     private float weight;
     private LinkedList<MoveNode>[] history_cache;
+    private int depth;
+    private int moves;
+    private Type type;
 
     // telemetry
     private float total;
     private int values_added;
     private int total_executions;
     private int total_executions_saved;
-    private Type type;
-    private int depth;
-    private int moves;
     public long time;
     private int nodes_ended;
 
@@ -145,7 +145,7 @@ public class TreeHeader
     }
 
 
-    public void create_Tree(Calculator calculator, int depth)
+    public void create_tree(Calculator calculator, int depth)
     {
         this.weight = calculator.evaluate(board);
 

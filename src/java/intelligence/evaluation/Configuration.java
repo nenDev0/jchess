@@ -1,8 +1,6 @@
 package src.java.intelligence.evaluation;
 
-import java.io.File;
 import java.util.HashMap;
-import java.util.Set;
 
 import src.java.application.Config;
 import src.java.engine.board.piecelib.Piece.Type;
@@ -24,10 +22,10 @@ public class Configuration
     private boolean randomized;
 
 
-    public Configuration(File file, boolean randomized)
+    public Configuration(String path, boolean randomized)
     {
         this.randomized = randomized;
-        cfg_handler = new JsonHandler(file);
+        cfg_handler = new JsonHandler(path);
         map_overall_config = new HashMap<EvalType, Setting>();
         map_piece_config = new HashMap<PieceType, HashMap<EvalType, Setting>>();
         m_read_config();
@@ -48,16 +46,6 @@ public class Configuration
         cfg_handler.write_config(this, file_path, type);
     }
 
-    public Set<EvalType> get_piece_configs()
-    {
-        return map_piece_config.get(PieceType.ROOK).keySet();
-    }
-
-    public Set<PieceType> get_implementations()
-    {
-        return map_piece_config.keySet();
-    }
-
     public float coefficient(EvalType eval_type, PieceType piece_implementation, int piececount)
     {
         return setting(eval_type, piece_implementation).get(piececount);
@@ -68,7 +56,7 @@ public class Configuration
         return setting(eval_type).get(piececount);
     }
 
-    public Setting setting (EvalType eval_type, PieceType piece_type)
+    public Setting setting(EvalType eval_type, PieceType piece_type)
     {
         return map_piece_config.get(piece_type).get(eval_type);
     }
@@ -77,7 +65,6 @@ public class Configuration
     {
         return map_overall_config.get(eval_type);
     }
-
 
     private void m_read_config()
     {
@@ -103,11 +90,15 @@ public class Configuration
 
         //System.out.println(map_overall_config);
         //System.out.println(map_piece_config);
-        m_i_forgot();
+        m_normalize_values();
     }
 
-
-    public void m_i_forgot()
+    /**
+     * normalizes all values, so the bot configuration has a global maximum value equal to {@code 10}. 
+     * 
+     * @return void
+     */
+    private void m_normalize_values()
     {
         EvalType[] evals = EvalType.values();
         float max = 0;
@@ -146,7 +137,6 @@ public class Configuration
             }
         }
     }
-
 
     private float get_max(Setting setting)
     {
