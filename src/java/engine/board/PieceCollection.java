@@ -53,15 +53,11 @@ public class PieceCollection implements Restrictor {
 
     /// ### modifiers ### ///
 
-
-
-
     public void m_restrict(Piece piece, LinkedList<Position> ll_restrictions)
     {
         piece.m_restrict(ll_restrictions);
         m_request_update(piece);
     }
-
 
     public void m_restrict_all_to(LinkedList<Position> ll_restrictions)
     {
@@ -71,8 +67,6 @@ public class PieceCollection implements Restrictor {
         m_acknowledge_check();
     }
 
-
-
     public void m_take(Piece piece)
     {
         m_rm_piece(piece);
@@ -80,14 +74,11 @@ public class PieceCollection implements Restrictor {
         piece.m_set_position(null);
     }
 
-
     public void m_untake(Piece piece) {
         m_add_piece(piece);
         ll_taken_pieces.remove(piece);
     }
 
-
-    
     public void m_add_piece(Piece piece) {
         map_active_pieces.get(piece.get_piece_type()).add(piece);
         ll_active_pieces.add(piece);
@@ -138,7 +129,6 @@ public class PieceCollection implements Restrictor {
         m_add_piece(piece);
     }
 
-
     public void m_demote(Piece piece)
     {
         Position position = piece.get_position();
@@ -149,7 +139,6 @@ public class PieceCollection implements Restrictor {
         m_add_piece(piece_continuity);
         piece_continuity.m_set_position(position);
     }
-
 
     public void m_acknowledge_check()
     {
@@ -214,7 +203,6 @@ public class PieceCollection implements Restrictor {
         board.m_receive_update_notification(piece.observer());
     }
 
-
     public void m_request_update(PieceType piece_type)
     {
         for (Piece piece : map_active_pieces.get(piece_type))
@@ -223,7 +211,6 @@ public class PieceCollection implements Restrictor {
             board.m_receive_update_notification(piece.observer());
         }
     }
-
 
     public void m_standard_lineup() {
 

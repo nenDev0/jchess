@@ -25,7 +25,6 @@ public class Position {
         this.notification_collector = notification_collector;
     }
 
-
     public int get_x() {
         return x;
     }
@@ -75,7 +74,6 @@ public class Position {
         this.ll_observers.remove(o);
         this.ll_silent_observers.remove(o);
     }
-   
 
     private void m_pass_observers_over() {
         for (ObserverStorage observer : ll_observers) {
@@ -86,7 +84,6 @@ public class Position {
         }
         notification_collector.m_receive_visual_update_notification(this);
     }
-
 
     public Position convert(Board board)
     {

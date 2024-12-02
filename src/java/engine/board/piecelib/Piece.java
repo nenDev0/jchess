@@ -149,8 +149,6 @@ public abstract class Piece implements Comparable<Piece>{
         moves++;
     }
 
-
-
     public void m_set_position(Position position) {
         observer.m_clear_observations();
         
@@ -173,8 +171,6 @@ public abstract class Piece implements Comparable<Piece>{
         position.m_set_piece(this);
         m_update();
     }
-
-
 
     public void m_restrict(LinkedList<Position> ll_restrictions) {
         LinkedList<Position> ll_legal_moves_new = new LinkedList<Position>();
