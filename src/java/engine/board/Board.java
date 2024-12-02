@@ -6,30 +6,37 @@ import src.java.engine.board.piecelib.Piece.Type;
 import src.java.engine.board.piecelib.Piece.PieceType;
 import src.java.engine.board.updatesystem.NotificationCollector;
 
-public class Board extends NotificationCollector implements BoardAccess{
+public class Board extends NotificationCollector implements BoardAccess
+{
     
-    public enum GameState {
+    public enum GameState
+    {
         NORMAL,
         DRAW,
         CHECK,
         CHECKMATE
         
     }
-    
+
+
     private Position[][] arr_positions;
     private PieceCollection white_pieces;
     private PieceCollection black_pieces;
     private History history;
     private GameState state;
-  private Type type;
+    private Type type;
 
-    public Board() {
+
+    public Board()
+    {
         super();
         this.type = Type.WHITE;
         this.state = GameState.NORMAL;
         arr_positions = new Position[8][8];
-        for (int row = 0; row < 8; row++) {
-            for (int column = 0; column < 8; column++) {
+        for (int row = 0; row < 8; row++)
+        {
+            for (int column = 0; column < 8; column++)
+            {
                 arr_positions[column][row] = new Position(column, row, this);
             }
         }
@@ -45,11 +52,13 @@ public class Board extends NotificationCollector implements BoardAccess{
 
     /// ### getters ### ///
 
-    public Position get_position(int column, int row) {
+    public Position get_position(int column, int row)
+    {
         return arr_positions[column][row];
     }
 
-    public PieceCollection get_collection(Type type) {
+    public PieceCollection get_collection(Type type)
+    {
         if (type == Type.WHITE)
         return white_pieces;
         else if (type == Type.BLACK)
@@ -58,7 +67,8 @@ public class Board extends NotificationCollector implements BoardAccess{
     }
 
 
-    public History get_history() {
+    public History get_history()
+    {
         return history;
     }
 
@@ -70,33 +80,38 @@ public class Board extends NotificationCollector implements BoardAccess{
         }
     }
 
-    public Position[] get_last_move() {
-    if (history.get_length() == 0)
+    public Position[] get_last_move()
     {
-        return null;
+        if (history.get_length() == 0)
+        {
+            return null;
+        }
+
+        Position[] vec = new Position[2];
+
+
+        Move move = history.get_move(history.get_length() - 1);
+        vec[0] = move.position_from();
+        vec[1] = move.position_to();
+        return vec;
     }
 
-    Position[] vec = new Position[2];
-
-
-    Move move = history.get_move(history.get_length() - 1);
-    vec[0] = move.position_from();
-    vec[1] = move.position_to();
-    return vec;
-    }
-
-    public boolean is_final() {
-        if (get_state() == GameState.CHECKMATE || get_state() == GameState.DRAW) {
+    public boolean is_final()
+    {
+        if (get_state() == GameState.CHECKMATE || get_state() == GameState.DRAW)
+        {
             return true;
         }
         return false;
     }
 
-    public GameState get_state() {
+    public GameState get_state()
+    {
         return state;
     }
 
-    public Type get_type() {
+    public Type get_type()
+    {
         return type;
     }
 
@@ -106,27 +121,36 @@ public class Board extends NotificationCollector implements BoardAccess{
     /// ###               ### ///
     ///
 
-    public void m_set_check() {
+    public void m_set_check()
+    {
         this.state = GameState.CHECK;
     }
 
-    public void m_set_checkmate() {
+    public void m_set_checkmate()
+    {
         this.state = GameState.CHECKMATE;
     }
 
-    public void m_set_normal() {
+    public void m_set_normal()
+    {
         this.state = GameState.NORMAL;
     }
 
-    public void m_set_draw() {
+    public void m_set_draw()
+    {
         this.state = GameState.DRAW;
     }
 
-    public void m_type() {
+    public void m_type()
+    {
         if (this.type == Type.WHITE)
+        {
             this.type = Type.BLACK;
+        }
         else if (this.type == Type.BLACK)
+        {
             this.type = Type.WHITE;
+        }
     }
 
 
@@ -136,7 +160,8 @@ public class Board extends NotificationCollector implements BoardAccess{
         
     }
 
-    public void m_commit(Move move) {
+    public void m_commit(Move move)
+    {
         get_history().m_register_move(move);
         move.m_commit();
         get_collection(get_type()).m_release_check();
@@ -145,9 +170,11 @@ public class Board extends NotificationCollector implements BoardAccess{
         get_collection(get_type()).m_state();
     }
 
-    public void m_revert() {
+    public void m_revert()
+    {
 
-        if (get_history().get_length() <= 0) {
+        if (get_history().get_length() <= 0)
+        {
             return;
         }
 
@@ -155,6 +182,7 @@ public class Board extends NotificationCollector implements BoardAccess{
         m_type();
         get_history().m_reverse();
         get_collection(get_type()).m_state();
+        //TODO do they need to be updated?
         get_collection(get_type()).m_request_update(PieceType.PAWN);
         m_dump_update_notifications();
     }
@@ -207,16 +235,20 @@ public class Board extends NotificationCollector implements BoardAccess{
         return null;
     }
 
-    /*
-     * Board will be setup in a standard state
-     *  -> default positions
-     *  -> default number of pieces
-     *  -> White first
+    /**
+     *  Board will be setup in a standard state
+     * <p>
+     *  - default positions
+     * <p>
+     *  - default number of pieces
+     * <p>
+     *  - White first
      * 
      * 
      * @return void
      */
-    public void m_initialise() {
+    public void m_initialise()
+    {
 
         // [0 king, 1 queen, 2-3 rooks, 4-5 bishops, 6-7 knights, 8-16 pawns]
 
@@ -256,19 +288,23 @@ public class Board extends NotificationCollector implements BoardAccess{
 
     }
 
-    private void m_initialise_piece(Type type, PieceType impl, int index, int x, int y) {
+    private void m_initialise_piece(Type type, PieceType impl, int index, int x, int y)
+    {
         get_collection(type).get_pieces_of_type(impl).get(index).m_set_position(get_position(x, y));
     }
 
-    public Board clone() {
+    public Board clone()
+    {
         Board clone = new Board();
         clone.m_initialise();
-        for (int i = 0; i < get_history().get_length(); i++) {
+        for (int i = 0; i < get_history().get_length(); i++)
+        {
             clone.get_history().m_register_move(get_history().get_move(i).convert(clone));
             clone.get_history().get_move(i).m_commit();
         }
 
-        if (get_type() != Type.WHITE) {
+        if (get_type() != Type.WHITE)
+        {
             clone.m_type();
         }
         clone.m_dump_update_notifications();
@@ -276,14 +312,17 @@ public class Board extends NotificationCollector implements BoardAccess{
     }
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         String s = "";
 
-        for (int row = 7; row >= 0; row--) {
+        for (int row = 7; row >= 0; row--)
+        {
             s = s + (row+1) + " : ";
-            for (int column = 0; column < 8; column++) {
-
-                if (get_position(column, row).get_piece() == null) {
+            for (int column = 0; column < 8; column++)
+            {
+                if (get_position(column, row).get_piece() == null)
+                {
                     s = s + "   ";
                     continue;
                 }

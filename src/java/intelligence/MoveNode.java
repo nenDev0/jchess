@@ -139,14 +139,17 @@ public class MoveNode extends Move implements Comparable<MoveNode>
 
 
 
-    /*
-     * create_node()
-     *  Node is first created
-     *   -> used to determine the state of the node
-     *       -> @is_final: boolean
+    /**
+     *  Node is first created -> used to determine the state of the node
+     * <p>
+     *       -> {@code is_final : boolean}
      *           (true: This node has no children)
      * 
+     * @param board
+     * @param calculator
+     * @param iteration
      * 
+     * @return
      */
     public boolean create_node(Board board, Calculator calculator, int iteration)
     {
@@ -166,20 +169,17 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         return true;
     }
 
-    /*
-     * is_dead()
-     *  compares the vectors, which lead to this board state
-     *  with vectors of all currently existing moveorders
-     *  in this iteration
+    /**
+     *  compares the vectors, which lead to this board state, with vectors of all currently existing move orders in this iteration
      * 
-     * @param Board
+     * @param board
      * @param iteration
      * 
      * 
      * @return boolean
      *  (
-     *   -> true: current board position already calculated
-     *   -> false: not calculated, continue calculation
+     *   {@code true}: current board position already calculated
+     *   {@code false}: not calculated, continue calculation
      *  )
      */
     //TODO once ignored, can't be added back, even if this line wasn't followed
@@ -216,17 +216,14 @@ public class MoveNode extends Move implements Comparable<MoveNode>
 
 
 
-    /*
-     * m_continue()
+    /**
      *  continues down this node
-     *   -> only executed, if node has already been created
-     *       in a previous execution
+     *   -> only executed, if node has already been created in a previous execution
      * 
      * @param board
      * @param calculator
      * @param iteration
      * 
-     * @return void
      */
     public void m_continue(Board board, Calculator calculator, int iteration)
     {
@@ -253,29 +250,22 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         System.out.println(set_children);
         for (MoveNode child : set_children)
         {
-            // TODO remove temp & try_catch
-            //Board temp = board.clone();
-            //try
-            //{
-            System.out.println(child);
+           System.out.println(child);
             board.m_commit(child);
-            //} catch (Exception e)
-            //{
-            //    //m_print_hierarchy(child);
-            //    System.out.println("We woulda printed the hierarchy here");
-            //    System.out.println("we printing the clone at iteration: " + iteration + "\n" + temp);
-            //    System.out.println("We printing all children:\n" +this.set_children);
-            //    throw e;
-            //}
-            child.m_continue(board, calculator, iteration + 1);
+           child.m_continue(board, calculator, iteration + 1);
             board.m_revert();
         }
     }
 
-    //
-    //  Create children recursively
-    //  -> Depth First
-    //
+    /**
+     *  Create children recursively
+     *  -> Depth First
+     *  
+     * @param board
+     * @param calculator
+     * @param iteration
+     * 
+     */
     public void m_create_tree(Board board, Calculator calculator, int iteration)
     {
         if (is_final)
@@ -295,7 +285,7 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         {
             for (Position position : piece.get_legal_moves())
             {
-                ll_movetree.add(new MoveNode(piece.position(), position, header));
+                ll_movetree.add(new MoveNode(piece.get_position(), position, header));
             }
         }
 
@@ -303,7 +293,6 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         while (iterator.hasNext())
         {
             MoveNode move = iterator.next();
-            //Board temp = board.clone();
             board.m_commit(move);
             if (!move.create_node(board, calculator, iteration + 1))
             {
@@ -311,14 +300,8 @@ public class MoveNode extends Move implements Comparable<MoveNode>
                 iterator.remove();
             }
             board.m_revert();
-            /*
-            Object o = temp.continuity_check(board);
-            if (o != null)
-            {
-                throw new IllegalArgumentException("\nCONTINUITY ISSUE, board\n\n"+ board +"\n\n\n-> HOW IT SHOULD BE:\n\n"+temp+"\n\n\n---\n The problem child is:\n"+o);
-            }
-                */
         }
+
         set_children.addAll(ll_movetree);
         ll_movetree.clear();
         m_abandon_children(board, iteration);
@@ -332,19 +315,10 @@ public class MoveNode extends Move implements Comparable<MoveNode>
 
         for (MoveNode move : set_children)
         {
-            //Board temp = board.clone(); // REMOVE temp board & try-catch
             board.m_commit(move);
             move.m_create_tree(board, calculator, iteration + 1);
             board.m_revert();
-            /*Object o = temp.continuity_check(board);
-            if (o != null)
-            {
-                System.out.println("\n"+temp+"\n");
-                System.out.println("\n"+board+"\n");
-                throw new IllegalArgumentException("\nCONTINUITY ISSUE, board\n\n"+ board +"\n\n\n-> HOW IT SHOULD BE:\n\n"+temp+"\n\n\n---\n The problem child is:\n"+o);
-            }*/
         }
-
     }
     
 
@@ -370,7 +344,8 @@ public class MoveNode extends Move implements Comparable<MoveNode>
     private void m_abandon_children(Board board, int iteration)
     {
         /*
-         * consider using averages with cutoff again?
+         * TODO: consider using averages with cutoff again?
+         * would require searches to be breadth first to make sense
          * 
          */
         if (board.get_type() == Type.WHITE)
@@ -389,11 +364,16 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         }
     }
 
-    //
-    //  Find the best move
-    //  -> Depth First
-    //
-    //
+    /**
+     *  Find the best move
+     *  -> Depth First
+     * 
+     * 
+     * @param type
+     * 
+     * @return
+     */
+    //TODO cut off every 3+n boards
     public Move get_best_move_recursive(Type type)
     {
 
@@ -433,10 +413,8 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         return false;
     }
 
-    /*
-     * m_set_final_state()
-     *  determines, whether there will be any more
-     *   nodes coming after this
+    /**
+     *  determines, whether there will be any more nodes coming after this
      * 
      * @param board
      * @param calculator
@@ -468,15 +446,13 @@ public class MoveNode extends Move implements Comparable<MoveNode>
     }
 
     
-    /*
-     * compareTo
+    /**
      *  necessary to sort set_children
      *  
      *  @param MoveNode
      * 
      *  @return int
      */
-    //move1.compareTo(move2)
     @Override
     public int compareTo(MoveNode move)
     {

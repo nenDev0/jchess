@@ -42,7 +42,7 @@ public class Observer implements ObserverReceiver, ObserverSender, ObserverStora
     //
     //
 
-    /*
+    /**
      * Observer will observe specified Position
      *  -> Observer can be seen by other Pieces
      *
@@ -56,7 +56,7 @@ public class Observer implements ObserverReceiver, ObserverSender, ObserverStora
         ll_observed_positions.add(position);
     }
 
-    /*
+    /**
      * Observer will observe specified Position
      *  -> Observer is hidden
      *
@@ -72,9 +72,9 @@ public class Observer implements ObserverReceiver, ObserverSender, ObserverStora
 
 
 
-    /*
-     * Observer removes all Positions from storage
-     *
+    /**
+     * Observer removes all Positions from storage.
+     *  It also unsubscribes from Positions
      *  
      * @return void
      */
@@ -89,7 +89,7 @@ public class Observer implements ObserverReceiver, ObserverSender, ObserverStora
 
 
 
-    /*
+    /**
      * Observer will pass over specified restrictions to
      * it's designated Piece 
      * @param ll_restrictions: LinkedList<Position>

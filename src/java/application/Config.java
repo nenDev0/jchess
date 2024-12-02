@@ -8,8 +8,6 @@ import src.java.intelligence.evaluation.JsonHandler;
 
 public class Config {
     
-    //TODO implement this to include all configurable settings
-    
     public static JsonHandler cfg_handler;
 
     public static final String themes_path = "src/resources/icons/";

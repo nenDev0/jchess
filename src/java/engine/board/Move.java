@@ -5,7 +5,8 @@ import src.java.engine.board.piecelib.Piece;
 import src.java.engine.board.piecelib.Piece.Type;
 import src.java.engine.board.piecelib.Piece.PieceType;
 
-public class Move {
+public class Move
+{
 
     private Position position_from;
     private Position position_to;

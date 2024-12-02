@@ -5,31 +5,37 @@ import java.util.LinkedList;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-public class History {
+public class History
+{
 
     private LinkedList<Move> ll_moves;
     private LinkedList<Integer> ll_fifty_move_rule;
     private int fifty_move_rule;
 
-    public History() {
+    public History()
+    {
         ll_moves = new LinkedList<Move>();
         ll_fifty_move_rule = new LinkedList<Integer>();
         fifty_move_rule = 0;
     }
 
-    public Move get_move(int i) {
+    public Move get_move(int i)
+    {
         return ll_moves.get(i);
     }
 
-    public int get_length() {
+    public int get_length()
+    {
         return ll_moves.size();
     }
 
-    public void m_register_move(Position position1, Position position2) {
+    public void m_register_move(Position position1, Position position2)
+    {
         m_register_move(new Move(position1, position2));
     }
 
-    public void m_register_move(Move move) {
+    public void m_register_move(Move move)
+    {
         ll_moves.add(move);
         if (move.is_improvement())
         {
@@ -64,10 +70,12 @@ public class History {
     }
 
 
-    public void m_reverse() {
+    public void m_reverse()
+    {
         Move move = ll_moves.removeLast();
         move.m_reverse();
 
+        //TODO if fifty-move-rule is 0 -> pollLast
         if (move.is_improvement())
         {
             fifty_move_rule = ll_fifty_move_rule.removeLast();

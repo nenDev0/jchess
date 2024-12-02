@@ -103,7 +103,6 @@ public class Game extends Thread {
         /*movecount = 0;
         black_total = 0;
         white_total = 0;*/
-
     }
 
 
