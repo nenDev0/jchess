@@ -1,7 +1,5 @@
 package src.java.application;
 
-import java.util.HashMap;
-
 import src.java.engine.board.piecelib.Piece.Type;
 import src.java.intelligence.evaluation.JsonHandler;
 
@@ -23,52 +21,33 @@ public class Config {
     private static final float RANDOMIZER_MAX_DEVIATION = (float)4.0;
     public static final float RANDOMIZER_POSITIVE_NEGATIVE_DIFF = (float) 1.0;
     private static final float RANDOMIZER_RANDOM_CHANCE = (float)0.03;
-    public static HashMap<Type, Integer> losses;
-    private static Type losing;
+    private static int losses;
 
 
     public Config()
     {
-        losses = new HashMap<Type, Integer>();
         cfg_handler = new JsonHandler("src/resources/configs/config.json");
-        for (Type type : Type.values())
-        {
-            losses.putIfAbsent(type, 0);
-            System.out.println(losses.get(type));
-        }
-        losing = Type.BLACK;
-    }
-
-
-    public static Type get_loser()
-    {
-        return losing;
+        losses = 0;
     }
 
     public static float get_max_deviation()
     {
-        return RANDOMIZER_MAX_DEVIATION + RANDOMIZER_MAX_DEVIATION * losses.get(losing)/32;
+        return RANDOMIZER_MAX_DEVIATION + RANDOMIZER_MAX_DEVIATION * (float)losses/32;
     }
 
     public static float get_random_chance()
     {
-        return RANDOMIZER_RANDOM_CHANCE + RANDOMIZER_RANDOM_CHANCE * losses.get(losing)/64;
+        return RANDOMIZER_RANDOM_CHANCE + RANDOMIZER_RANDOM_CHANCE * (float)losses/64;
+    }
+
+    public static void m_reset_losses()
+    {
+        losses = 0;
     }
 
     public static void m_add_loss()
     {
-        m_add_loss(losing);
-    }
-
-    public static void m_add_loss(Type type)
-    {
-        if (type != losing && losing != null)
-        {
-            losses.put(losing, 0);
-            losing = type;
-        }
-        losses.putIfAbsent(type, 0);
-        losses.put(type, losses.get(type) + 1);
-        System.out.println("losses: " + losses.get(type) + ", by: " + losing);
+        losses++;
+        System.out.println("losses: " + losses);
     }
 }

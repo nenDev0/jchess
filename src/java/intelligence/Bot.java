@@ -11,11 +11,11 @@ import src.java.intelligence.evaluation.Configuration;
 public class Bot extends Thread
 {
 
-    private Type type;
     private Calculator calculator;
     private int depth;
     private TreeHeader tree;
     private String gen_path;
+    private Type type;
 
     // Telemetry
     //private long time_taken;
@@ -29,7 +29,7 @@ public class Bot extends Thread
         this.calculator = new Calculator(config);
         //System.out.println(info_handler.info("DEPTH"));
         this.depth = Integer.parseInt(Config.cfg_handler.info("DEPTH")) * 2 + 1;
-        tree = new TreeHeader(this.depth, this.type, new Board());
+        tree = new TreeHeader(this.depth, new Board());
 
         //this.time_taken = 0;
         //this.moves_total = 0;
@@ -40,18 +40,10 @@ public class Bot extends Thread
         return calculator;
     }
 
-
     public void m_reset_tree()
     {
-        this.tree = new TreeHeader(depth, type, new Board());
+        this.tree = new TreeHeader(depth, new Board());
     }
-
-
-    public Type get_type()
-    {
-        return type;
-    }
-
 
     public TreeHeader get_tree()
     {

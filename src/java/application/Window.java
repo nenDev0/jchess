@@ -16,6 +16,7 @@ import javax.swing.JLabel;
 import javax.swing.KeyStroke;
 
 import src.java.engine.board.History;
+import src.java.engine.game.BotController;
 
 
 public class Window extends JFrame
@@ -26,6 +27,8 @@ public class Window extends JFrame
     private static JLabel keybindings = new JLabel();
     private Container pane;
     private JLabel evaluation;
+    //TODO: this needs a better place
+    private BotController bot_controller;
 
     public Window()
     {
@@ -37,11 +40,12 @@ public class Window extends JFrame
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
+        this.bot_controller = new BotController();
         this.pane = getContentPane();
         pane.setLayout(new FlowLayout());
         pane.setBackground(new Color(20, 22 , 25));
 
-        this.grid = new BoardGrid(dimension, this);
+        this.grid = new BoardGrid(dimension, this, bot_controller);
         pane.add(grid.get_panel());
         //JButton bot_1 = new JButton("activate bot_1");
         //JButton bot_2 = new JButton("activate bot_2");
@@ -87,10 +91,10 @@ public class Window extends JFrame
 
     public void bot_play()
     {
-        Thread t = grid.get_game();
-        t.setPriority(1);
+        Thread t = bot_controller;
+        BotController.activate_bot(0);
+        BotController.activate_bot(1);
         t.start();
-        //grid.get_game().bot_turn();
 
     }
 
@@ -120,7 +124,6 @@ public class Window extends JFrame
         @Override
         public void actionPerformed(ActionEvent e)
         {
-            System.out.println("AAAAAAAAAAAAAA");
             history.m_reverse();
         }
     }

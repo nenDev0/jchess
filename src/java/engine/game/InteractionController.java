@@ -3,6 +3,7 @@ package src.java.engine.game;
 import src.java.application.BoardGrid;
 import src.java.application.Window;
 import src.java.engine.board.Position;
+import src.java.engine.board.Board.GameState;
 import src.java.engine.board.piecelib.Piece;
 
 /**
@@ -87,8 +88,16 @@ public class InteractionController
         {
             visual_state = VisualState.NOMINAL;
             grid.m_remove_all_highlights();
-            window.m_set_eval(game.get_eval());
+            //window.m_set_eval(game.get_eval());
         }
+    }
+
+    public GameState m_bot_input(Position position_from, Position position_to)
+    {
+        game.m_select_piece(position_from.get_x(), position_from.get_y());
+        game.m_select_position(position_to.get_x(), position_to.get_y());
+        //window.m_set_eval(game.get_eval());
+        return game.get_board().get_state();
     }
 
 
@@ -96,8 +105,6 @@ public class InteractionController
     {
         grid.m_set_grid_position_eval(position.get_x(), position.get_y(), eval);
     }
-
-
 
     /**
      * @param position
@@ -113,5 +120,11 @@ public class InteractionController
 
         grid.m_update_piece(position.get_x(), position.get_y(), piece.get_type(), piece.get_piece_type());
     }
+
+    public void m_reset()
+    {
+        game.m_reset();
+    }
+
 
 }

@@ -35,7 +35,7 @@ public class TreeHeader
 
     // TODO: figure out the fix for this outcry 
     @SuppressWarnings("unchecked")
-    public TreeHeader(int depth, Type type, Board board)
+    public TreeHeader(int depth, Board board)
     {
         moves = 0;
         
@@ -183,11 +183,6 @@ public class TreeHeader
         {
             //System.out.println("current nodes ended: "+ nodes_ended / shown_executions + "  *  " + shown_executions);
         }
-    }
-
-    public Type get_type()
-    {
-        return this.type;
     }
 
     public Move get_best_move()

@@ -17,13 +17,11 @@ public class Calculator
     private Configuration configuration;
     private int white_piececount;
     private int black_piececount;
-    private Type[] types;
     private float[] values;
 
     public Calculator(Configuration configuration)
     {
         this.configuration = configuration;
-        this.types = Type.values();
         this.values = new float[2];
         values[0] = 0;
         values[1] = 0;
@@ -57,6 +55,7 @@ public class Calculator
                 return 0;
         }
 
+        Type[] types = Type.values();
         for (int i = 0; i < 2; i++)
         {
             values[i] += piececount(types[i])                * configuration.coefficient(EvalType.PIECECOUNT,      piececount(types[i]))
