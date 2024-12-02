@@ -16,19 +16,15 @@ public class BotController extends Thread
     private static boolean bot1_active;
     private Bot bot2;
     private static boolean bot2_active;
-    private boolean lost;
 
 
     public BotController()
     {
-        lost = false;
         if (bot1 == null)
         {
             bot1 = new Bot(Type.WHITE, false);
             bot2 = new Bot(Type.BLACK, true);
         }
-        System.out.println("bot1: "+ Type.WHITE + ", is randomized, if : " + bot1.get_calculator().get_configuration().is_randomized());
-        System.out.println("bot2: "+ Type.BLACK + ", is randomized, if : " + bot2.get_calculator().get_configuration().is_randomized());
     }
 
     public void set_interaction_controller(InteractionController interaction_controller)
@@ -108,6 +104,7 @@ public class BotController extends Thread
     {
         Bot bot = get_bot(type);
         Move move = bot.calculate_best_move();
+        System.out.println("move_weight: "+move.get_weight() + ", type: " + type);
         boolean is_final;
         //System.out.println(move);
         try
@@ -115,10 +112,7 @@ public class BotController extends Thread
             GameState state = interaction_controller.m_bot_input(move.position_from(), move.position_to());
             switch (state)
             {
-                case CHECKMATE:
-                    is_final = true;
-                    break;
-                case DRAW:
+                case CHECKMATE: case DRAW:
                     is_final = true;
                     break;
                 default:
@@ -145,7 +139,8 @@ public class BotController extends Thread
     }
 
     @Override
-    public void run() {
+    public void run()
+    {
         Type type = Type.WHITE;
         activate_bot(0);
         activate_bot(1);
@@ -154,9 +149,11 @@ public class BotController extends Thread
         {
             for(int j = 0; j < 2; j++)
             {
+                System.out.println("bot1: "+ Type.WHITE + ", is randomized, if : " + bot1.get_calculator().get_configuration().is_randomized());
+                System.out.println("bot2: "+ Type.BLACK + ", is randomized, if : " + bot2.get_calculator().get_configuration().is_randomized());
                 while (!bot_turn_loop(type))
                 {
-                   Type.get_opposite(type);
+                   type = Type.get_opposite(type);
                 }
                 interaction_controller.m_reset();
                 m_bots_to_start();

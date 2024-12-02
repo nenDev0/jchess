@@ -1,6 +1,5 @@
 package src.java.application;
 
-import src.java.engine.board.piecelib.Piece.Type;
 import src.java.intelligence.evaluation.JsonHandler;
 
 public class Config {

@@ -27,7 +27,7 @@ public class InteractionController
 
     private Game game;
     private BoardGrid grid;
-    private Window window;
+    private Window window; // lost eval on window
     private VisualState visual_state;
 
     public InteractionController(BoardGrid grid, Game game, Window window)
