@@ -2,186 +2,77 @@ package src.java.engine.game;
 
 
 
-import java.util.HashMap;
 import java.util.LinkedList;
 
-import src.java.application.Config;
 import src.java.engine.board.Board;
-import src.java.engine.board.Board.GameState;
 import src.java.engine.board.Move;
 import src.java.engine.board.Position;
 import src.java.engine.board.piecelib.Piece;
 import src.java.engine.board.piecelib.Piece.Type;
-import src.java.intelligence.Bot;
 
-public class Game extends Thread {
+public class Game {
     
     private Board board;
-    private InteractionController interaction_controller; 
     private SoundEngine sound_engine;
     private Piece selected_piece;
-    private Bot bot1;
-    private Bot bot2;
-    //private int movecount;
-    //private float black_total;
-    //private float white_total;
-    private HashMap<Type, Integer> piececount;
-    private boolean player_interaction;
-    //private boolean player;
 
     public Game()
     {
         this.board = new Board();
         this.sound_engine = new SoundEngine();
-        this.player_interaction = true;
         m_reset();
     }
 
+
+    /**
+     *  initializes all visual updates to the front-end PositionListeners for each position at the beginning to make the pieces to be visible.
+     * 
+     *  <p> interaction_controller is not saved in the Game class, but simply passed over to the NotificationCollector.
+     * 
+     * @param interaction_controller
+     */
     public void m_set_interaction_controller(InteractionController interaction_controller)
     {
-        this.interaction_controller = interaction_controller;
         board.m_set_interaction_controller(interaction_controller);
-        for (Piece piece : board.get_collection(Type.WHITE).get_active_pieces()) {
+        for (Piece piece : board.get_collection(Type.WHITE).get_active_pieces())
+        {
             interaction_controller.m_update_grid_position(piece.get_position());
         }
-        for (Piece piece : board.get_collection(Type.BLACK).get_active_pieces()) {
+        for (Piece piece : board.get_collection(Type.BLACK).get_active_pieces())
+        {
             interaction_controller.m_update_grid_position(piece.get_position());
         }
     }
 
+
+    /**
+     * 
+     */
     public void m_reset()
     {
-
-        this.piececount = new HashMap<Type, Integer>();
-        for (Type type : Type.values())
-        {
-            piececount.put(type, board.get_collection(type).get_active_pieces().size());
-        }
-        if (bot1 != null)
-        {
-            if (board.get_state() == GameState.CHECKMATE
-             && get_bot(Type.get_opposite(get_turn())).get_calculator().get_configuration().is_randomized())
-            {
-                rounds_won++;
-                System.out.println(Config.get_loser() + ", is currently on round: " + rounds_won);
-                if (rounds_won == 14)
-                {
-                    let_bot_write_config(get_bot(Type.get_opposite(get_turn())));
-                    Config.m_add_loss(get_turn());
-                    System.out.println("WRITING TO CONFIG!");
-                    this.bot1 = new Bot(Type.WHITE, !bot1.get_calculator().get_configuration().is_randomized());
-                    this.bot2 = new Bot(Type.BLACK, !bot2.get_calculator().get_configuration().is_randomized());
-                    rounds_won = 0;
-                }
-                else
-                {
-                    this.bot1.m_reset_tree();
-                    this.bot2.m_reset_tree();
-                }
-            }
-            else
-            {
-                Config.m_add_loss();
-                rounds_won = 0;
-                System.out.println(Config.get_loser() + ", did not win, back to: " + rounds_won);
-                this.bot1 = new Bot(Type.WHITE, bot1.get_calculator().get_configuration().is_randomized());
-                this.bot2 = new Bot(Type.BLACK, bot2.get_calculator().get_configuration().is_randomized());
-            }
-        }
-        if (bot1 == null)
-        {
-            bot1 = new Bot(Type.WHITE, false);
-            bot2 = new Bot(Type.BLACK, true);
-        }
-
         board.m_to_start();
         board.m_set_normal();
 
-        System.out.println("bot1: "+ Type.WHITE + ", is randomized, if : " + bot1.get_calculator().get_configuration().is_randomized());
-        System.out.println("bot2: "+ Type.BLACK + ", is randomized, if : " + bot2.get_calculator().get_configuration().is_randomized());
-        selected_piece = null;
+       selected_piece = null;
         /*movecount = 0;
         black_total = 0;
         white_total = 0;*/
     }
 
 
-
-    public Bot get_bot(Type type)
-    {
-        if (type == Type.WHITE) {
-            return bot1;
-        }
-        return bot2;
-    }
-
-    public void let_bot_write_config(Bot bot)
-    {
-            bot.write_config();
-
-    }
-
-    public void bot_turn()
-    {
-        bot_turn(get_bot(get_turn()));
-    }
-
-    public boolean bot_turn(Bot bot)
-    {
-        Thread.yield();
-        //float previous_eval = bot.get_calculator().evaluate(board);
-        Move move;
-        if (board.is_final())
-        {
-            if (board.get_state() == GameState.CHECKMATE)
-            {
-                System.out.println(board.get_state());
-                System.out.println("\n//////////////////////////\n//////////////////////////\n//////////////////////////\n");
-                return false;
-            }
-            if (board.get_state() == GameState.DRAW)
-            {
-                System.out.println(board.get_state());
-                System.out.println("\n//////////////////////////\n//////////////////////////\n//////////////////////////\n");
-                return false;
-            }
-        }
-        move = bot.calculate_best_move();
-        //System.out.println(move);
-        move = move.convert(board);
-        try
-        {
-            m_select_piece(move.position_from().get_x(), move.position_from().get_y());
-            Thread.yield();
-            //Thread.sleep(150);
-            m_select_position(move.position_to().get_x(), move.position_to().get_y());
-            Thread.yield();
-        }
-        catch (Exception e)
-        {
-            throw new IllegalArgumentException("Something went vewwy wong");
-        }
-
-        //float eval = bot.get_calculator().evaluate(board);
-        if (bot.get_type() == Type.WHITE) {
-            /*movecount++;
-            System.out.println("///// ##### MOVECOUNT : " + movecount);
-            white_total += eval - previous_eval;
-            System.out.println("average improvement for:" + bot.get_type() + ", is :" + (white_total/movecount) );
-            */
-        }
-        if (bot.get_type()== Type.BLACK) {
-            /*System.out.println("///// ##### MOVECOUNT : " + movecount);
-            black_total += previous_eval - eval;
-            System.out.println("average improvement for:" + bot.get_type() + ", is :" + (black_total/movecount) );
-            */
-        }
-        //previous_eval = eval;
-
-        return true;
-    }
-
-
+    /**
+     *  Sets the selected_piece, if the input is valid. Allows requests for the legal moves of the selected piece
+     * 
+     *  <p> Used by the user and bots through the InteractionController
+     * 
+     *  <p> A valid piece is a non-null piece, who's user's turn it currently is
+     * 
+     *  @param x
+     *  @param y
+     * 
+     *  @return ({@code true}, if valid piece
+     *           {@code false}, else )
+     */
     public boolean m_select_piece(int x, int y)
     {
         Piece piece = board.get_position(x, y).get_piece();
@@ -194,24 +85,40 @@ public class Game extends Thread {
             return false;
         }
         this.selected_piece = piece;
-        if (player_interaction)
+        Board clone = board.clone();
+        for (Position position : selected_piece.get_legal_moves())
         {
-            Board clone = board.clone();
-            for (Position position : selected_piece.get_legal_moves())
-            {
-                clone.m_commit(new Move(selected_piece.get_position(), position).convert(clone));
-                interaction_controller.m_set_move_eval(position, get_bot(get_turn()).get_calculator().evaluate(clone));
-                clone.m_revert();
-            }
+            clone.m_commit(new Move(selected_piece.get_position(), position).convert(clone));
+            clone.m_revert();
         }
         return true;
     }
 
+
+    /**
+     * 
+     */
     private void m_deselect_piece()
     {
         this.selected_piece = null;
     }
 
+
+    /**
+     *  Sets the selected_piece, if the input is valid. Allows requests for the legal moves of the selected piece
+     * 
+     *  <p> Used by the user and bots through the InteractionController
+     * 
+     *  <p> A valid position is one of the currently selected piece's legal moves.
+     *  <p> alternatively it can be a position, which currently has a piece of the same type(WHITE/BLACK)
+     * 
+     *  @param x
+     *  @param y
+     * 
+     *  @return ({@code true}, if a new piece was selected instead,
+     *           {@code false}, if the move is either invalid or has been played out )
+     * 
+     */
     public boolean m_select_position(int x, int y)
     {
         Position position = board.get_position(x, y);
@@ -233,199 +140,51 @@ public class Game extends Thread {
         m_deselect_piece();
         board.m_commit(piece.get_position(), position);
         // TODO: adjust tree crashes after reverse, while botplay is disabled.
-        bot1.m_adjust_tree(board.get_history().get_move(board.get_history().get_length() - 1));
-        bot2.m_adjust_tree(board.get_history().get_move(board.get_history().get_length() - 1));
-        //System.out.println(bot1.get_calculator().evaluate(board));
         /*if (board.get_collection(get_turn()).get_active_pieces().size() < piececount.get(get_turn()))
         {
-
             sound_engine.play_take();
         }
         else
         {*/
         sound_engine.play_move();
         //}
-        piececount.put(get_turn(), board.get_collection(get_turn()).get_active_pieces().size());
-
-        
-        //print_state();
         return false;
     }
 
-    public float get_eval()
-    {
-        return get_bot(get_turn()).get_calculator().evaluate(board);
-    }
 
+    /**
+     *  returns the legal moves of the selected piece
+     * 
+     *  @return ({@code null}, if no piece is selected,
+     *           {@code LinkedList<Position>}, legal moves of the selected piece)
+     */
     public LinkedList<Position> get_legal_moves()
     {
+        if (selected_piece == null)
+        {
+            return null;
+        }
         return selected_piece.get_legal_moves();
     }
 
+
+    /**
+     * 
+     * @return
+     */
     public Board get_board()
     {
         return board;
     }
 
+
+    /**
+     *  Currently #unused 
+     *  
+     * @return
+     */
     public Type get_turn() {
         return board.get_type();
     }
 
-    private void m_bots_catchup()
-    {
-        for (int i = 0; i < board.get_history().get_length(); i++)
-        {
-            bot1.m_adjust_tree(board.get_history().get_move(i));
-            bot2.m_adjust_tree(board.get_history().get_move(i));
-        }
-    }
-
-
-    public void m_london()
-    {
-        System.out.println(">>>>>>> LONDON");
-        board.m_commit(board.get_position(3, 1), board.get_position(3, 3));
-        board.m_commit(board.get_position(3, 6), board.get_position(3, 4));
-        board.m_commit(board.get_position(2, 0), board.get_position(5, 3));
-        board.m_commit(board.get_position(6, 7), board.get_position(5, 5));
-        board.m_commit(board.get_position(4, 1), board.get_position(4, 2));
-        board.m_commit(board.get_position(4, 6), board.get_position(4, 5));
-    }
-
-    public void m_sicilian_najdorf()
-    {
-        System.out.println(">>>>>>> SICILIAN NAJDORF");
-        // white pawn e2-e4
-        board.m_commit(board.get_position(4, 1), board.get_position(4, 3));
-        // black pawn c7-c5
-        board.m_commit(board.get_position(2, 6), board.get_position(2, 4));
-        // white knight g2-f3
-        board.m_commit(board.get_position(6, 0), board.get_position(5, 2));
-        // black pawn d7-d6
-        board.m_commit(board.get_position(3, 6), board.get_position(3, 5));
-        // white pawn d2-d4
-        board.m_commit(board.get_position(3, 1), board.get_position(3, 3));
-        // black pawn c5-d4
-        board.m_commit(board.get_position(2, 4), board.get_position(3, 3));
-        // white knight f3-d4
-        board.m_commit(board.get_position(5, 2), board.get_position(3, 3));
-        // black knight g8-f6
-        board.m_commit(board.get_position(6, 7), board.get_position(5, 5));
-        // white knight b1-c3
-        board.m_commit(board.get_position(1, 0), board.get_position(2, 2));
-        // black pawn a7-a6
-        board.m_commit(board.get_position(0, 6), board.get_position(0, 5));
-    }
-
-    public void m_vienna()
-    {
-        System.out.println(">>>>>>> VIENNA");
-        // white pawn e2-e4
-        board.m_commit(board.get_position(4, 1), board.get_position(4, 3));
-        // black pawn e7-e5
-        board.m_commit(board.get_position(4, 6), board.get_position(4, 4));
-        // white bishop f1-c4
-        board.m_commit(board.get_position(5, 0), board.get_position(2, 3));
-        // black knight g8-f6
-        board.m_commit(board.get_position(6, 7), board.get_position(5, 5));
-        // white pawn d2-d3
-        board.m_commit(board.get_position(3, 1), board.get_position(3, 2));
-        // black pawn c7-c6
-        board.m_commit(board.get_position(2, 6), board.get_position(2, 5));
-
-    }
-
-    public void m_caro_kann()
-    {
-        System.out.println(">>>>>>> CARO KANN");
-        board.m_commit(board.get_position(4, 1), board.get_position(4, 3));
-        board.m_commit(board.get_position(2, 6), board.get_position(2, 5));
-        board.m_commit(board.get_position(3, 1), board.get_position(3, 3));
-        board.m_commit(board.get_position(3, 6), board.get_position(3, 4));
-        board.m_commit(board.get_position(4, 3), board.get_position(4, 4));
-        board.m_commit(board.get_position(2, 7), board.get_position(5, 4));
-        board.m_commit(board.get_position(6, 0), board.get_position(5, 2));
-        board.m_commit(board.get_position(4, 6), board.get_position(4, 5));
-    }    
-
-    public void m_catalan()
-    {
-        System.out.println(">>>>>>> CATALAN");
-        board.m_commit(board.get_position(3, 1), board.get_position(3, 3));
-        board.m_commit(board.get_position(3, 6), board.get_position(3, 4));
-        board.m_commit(board.get_position(2, 1), board.get_position(2, 3));
-        board.m_commit(board.get_position(4, 6), board.get_position(4, 5));
-        board.m_commit(board.get_position(6, 0), board.get_position(5, 2));
-        board.m_commit(board.get_position(6, 7), board.get_position(5, 5));
-
-    }
-
-    private void m_reverse_bot_color()
-    {
-        Bot bot_temp = bot1;
-        bot1 = bot2;
-        bot2 = bot_temp;
-    }
-    
-
-   private int rounds_won;
-    
-    @Override
-    public void run()
-    {
-        player_interaction = false;
-        rounds_won = 0;
-        //this.player = false;
-        System.out.println("Bot play enabled!");
-        for (int i = 0; i < 4000; i++)
-        {
-            switch (rounds_won) {
-                case 0: case 7:
-                    m_caro_kann();
-                    break;
-                case 1: case 8:
-                    m_sicilian_najdorf();
-                    break;
-                case 2: case 9:
-                    m_london();
-                    break;
-                case 3: case 10:
-                    m_vienna();
-                    break;
-                case 4: case 11:
-                    m_catalan();
-                    break;
-                case 5: case 12:
-                m_reverse_bot_color();
-                break;
-                case 6: case 13:
-
-                default:
-                    break;
-            }
-            m_bots_catchup();
-            try {
-            while (bot_turn(get_bot(get_turn())))
-            {}
-            } catch (Exception e)
-            {
-                e.printStackTrace();   
-                System.out.println("ERROR");
-                System.out.println("ERROR");
-                System.out.println("ERROR");
-                System.out.println("ERROR");
-                System.out.println("ERROR");
-                try {
-                    //Thread.sleep(4000);
-                } catch (Exception y)
-                {
-                }
-            }
-
-            m_reset();
-        }
-        //while (bot_turn(get_bot(get_turn())))
-        //{}
-        System.out.println("Bot play disabled!");
-    }
 }

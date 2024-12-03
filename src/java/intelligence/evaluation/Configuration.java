@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import src.java.application.Config;
 import src.java.engine.board.piecelib.Piece.Type;
+import src.java.intelligence.datastructures.Setting;
 import src.java.engine.board.piecelib.Piece.PieceType;
 
 import java.util.Random;
@@ -48,12 +49,12 @@ public class Configuration
 
     public float coefficient(EvalType eval_type, PieceType piece_implementation, int piececount)
     {
-        return setting(eval_type, piece_implementation).get(piececount);
+        return setting(eval_type, piece_implementation).get_value(piececount);
     }
 
     public float coefficient(EvalType eval_type, int piececount)
     {
-        return setting(eval_type).get(piececount);
+        return setting(eval_type).get_value(piececount);
     }
 
     public Setting setting(EvalType eval_type, PieceType piece_type)
@@ -179,6 +180,11 @@ public class Configuration
         }
     }
 
+    /**
+     *  
+     * @param eval_type
+     * @param piece_implementation
+     */
     private void m_add_config(EvalType eval_type, PieceType piece_implementation)
     {
 
@@ -224,6 +230,11 @@ public class Configuration
         }
     }
 
+    /**
+     * 
+     * @param values
+     * @return
+     */
     private float[] m_randomize(float[] values)
     {
         Random rand = new Random();

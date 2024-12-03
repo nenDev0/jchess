@@ -12,6 +12,7 @@ import src.java.engine.board.piecelib.Piece.PieceType;
 import src.java.engine.board.piecelib.Piece.Type;
 import src.java.engine.game.Game;
 import src.java.engine.game.InteractionController;
+import src.java.intelligence.BotController;
 
 
 public class BoardGrid {
@@ -25,7 +26,7 @@ public class BoardGrid {
     private PositionListener highlighted_piece;
     private InteractionController interaction_controller;
 
-    public BoardGrid(Dimension dimension, Window window)
+    public BoardGrid(Dimension dimension, Window window, BotController bot_controller)
     {
         m_update_dimension(dimension);
         this.imagefinder = new ImageFinder((int)get_dimension().getWidth(), (int)get_dimension().getHeight());
@@ -46,13 +47,13 @@ public class BoardGrid {
         this.game = new Game();
         this.game.get_board().m_initialise();
         this.interaction_controller = new InteractionController(this, game, window);
+        bot_controller.set_interaction_controller(interaction_controller);
         game.m_set_interaction_controller(interaction_controller);
         panel.setLayout(new GridLayout(8, 8));
         panel.setVisible(true);
         panel.setPreferredSize(this.dimension);
     
     }
-
 
     /// ### getters ### ///
 
@@ -74,7 +75,6 @@ public class BoardGrid {
     {
         return game;
     }
-
 
     public void m_send_input(int x, int y)
     {

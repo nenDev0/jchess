@@ -1,4 +1,4 @@
-package src.java.intelligence;
+package src.java.intelligence.datastructures;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -24,6 +24,7 @@ public class MoveNode extends Move implements Comparable<MoveNode>
     private boolean children_requested;
     private float actual_weight;
 
+
     public MoveNode(Position position1, Position position2 , TreeHeader header)
     {
         super(position1, position2);
@@ -35,10 +36,14 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         //this.dad = dad;
     }
 
-    //
-    //  Alternate Constructor
-    //  only used for the top node
-    //
+
+    /**
+     *  Alternative Constructor
+     *  only used for the top node, as it requires no positions to be saved.
+     * 
+     * @param header
+     * 
+     */
     public MoveNode(TreeHeader header)
     {
         super();
@@ -49,35 +54,59 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         this.children_requested = false;
     }
 
+
+    /**
+     * 
+     * 
+     * @param iteration
+     * 
+     * @return {@code int} // maximum amount of children, this node should have
+     */
     public int max_children(int iteration)
     {
-        return (header.get_depth() - iteration)/2 + 2;
-        //return Integer.MAX_VALUE;
+        //return (header.get_depth() - iteration)/2 + 2;
+        return Integer.MAX_VALUE;
     }
 
-    public TreeSet<MoveNode> children()
+
+    /**
+     * 
+     * 
+     * @return {@link #set_children}
+     */
+    public TreeSet<MoveNode> get_children()
     {
         this.children_requested = true;
         return set_children;
     }
 
-    public TreeSet<MoveNode> abandoned()
+
+    /**
+     * 
+     * 
+     * @return {@link #set_abandoned}
+     */
+    public TreeSet<MoveNode> get_abandoned()
     {
         return set_abandoned;
     }
 
+
+    /**
+     * 
+     * 
+     * @return {@link #map_history_vectors}
+     */
     public TreeMap<Integer, Integer> get_history_vectors()
     {
         return map_history_vectors;
     }
 
 
-    ///
-    /// ###               ### ///
-    /// ###   modifiers   ### ///
-    /// ###               ### ///
-    ///
-
+    /**
+     *  Tells all children to delete their data recursively, followed by this node doing so itself.
+     * 
+     */
     public void m_delete()
     {
         if (children_requested)
@@ -92,6 +121,19 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         set_abandoned.clear();
     }
 
+
+    /**
+     *  Used to find the node in the tree, which followed the move played in the current game.
+     * 
+     *  <p> {@code if} found, sets children of this node to the children of that node,
+     *      {@code else} sets children = null in order to restart calculation entirely.
+     *  
+     *  <p> Allows the algorithm to potentially reuse previously calculated moves.
+     * 
+     * @param move
+     * @param board
+     * 
+     */
     public void m_set_children(Move move, Board board)
     {
         TreeSet<MoveNode> new_set = null;
@@ -110,9 +152,8 @@ public class MoveNode extends Move implements Comparable<MoveNode>
             }
             if (move.equals(child))
             {
-                new_set = child.children();
-                new_set_abandoned = child.abandoned();
-                //System.out.println("Found move!");
+                new_set = child.get_children();
+                new_set_abandoned = child.get_abandoned();
                 continue;
             }
             child.m_delete();
@@ -124,17 +165,18 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         }
     }
 
+
     /**
-     *  Node is first created -> used to determine the state of the node
-     * <p>
-     *       -> {@code is_final : boolean}
+     *  Only executed upon node creation. Determines, whether this node is final (a leaf).
+     * 
+     *  <p> ->  {@link #is_final} 
      *           (true: This node has no children)
      * 
      * @param board
      * @param calculator
      * @param iteration
      * 
-     * @return
+     * @return boolean currently #unused
      */
     public boolean create_node(Board board, Calculator calculator, int iteration)
     {
@@ -154,8 +196,13 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         return true;
     }
 
+
     /**
-     *  compares the vectors, which lead to this board state, with vectors of all currently existing move orders in this iteration
+     *  compares the vectors, which lead to this board state,
+     *  with vectors of all currently existing nodes in this iteration
+     * 
+     *  <p> sets the children of this node to the children of the node,
+     *      which has the same children to avoid duplicate, redundant calculations
      * 
      * @param board
      * @param iteration
@@ -183,8 +230,8 @@ public class MoveNode extends Move implements Comparable<MoveNode>
             MoveNode older_cousin = header.m_add_history_to_cache(this, iteration/2 - 2);
             if (older_cousin != null)
             {
-                this.set_children = older_cousin.children();
-                this.set_abandoned = older_cousin.abandoned();
+                this.set_children = older_cousin.get_children();
+                this.set_abandoned = older_cousin.get_abandoned();
                 //System.out.println("we are at iteration: "+ iteration +"\n and cutoff 2:\n"+ board.get_history().get_last_4_as_vec());
                 //long time_stop = System.nanoTime();
                 //header.time += (time_stop - time_start)/1000000;
@@ -197,6 +244,7 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         }
         return false;
     }
+
 
     /**
      *  continues down this node
@@ -238,6 +286,7 @@ public class MoveNode extends Move implements Comparable<MoveNode>
             board.m_revert();
         }
     }
+
 
     /**
      *  Create children recursively
@@ -303,6 +352,14 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         }
     }
     
+
+    /**
+     * 
+     * 
+     * @param board
+     * @param iteration
+     * 
+     */
     private void m_reunite_children(Board board, int iteration)
     {
         if (board.get_type() == Type.WHITE)
@@ -322,6 +379,13 @@ public class MoveNode extends Move implements Comparable<MoveNode>
 
     }
 
+
+    /**
+     * 
+     * @param board
+     * @param iteration
+     * 
+     */
     private void m_abandon_children(Board board, int iteration)
     {
         /*
@@ -344,6 +408,7 @@ public class MoveNode extends Move implements Comparable<MoveNode>
             }
         }
     }
+
 
     /**
      *  Find the best move
@@ -384,6 +449,13 @@ public class MoveNode extends Move implements Comparable<MoveNode>
     }
 
 
+    /**
+     *  
+     * 
+     * @param iteration
+     * 
+     * @return
+     */
     private boolean m_is_depth(int iteration)
     {
         if (iteration == header.get_depth())
@@ -393,6 +465,7 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         }
         return false;
     }
+
 
     /**
      *  determines, whether there will be any more nodes coming after this
@@ -426,7 +499,7 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         return false;
     }
 
-    
+
     /**
      *  necessary to sort set_children
      *  
@@ -451,4 +524,5 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         }
         throw new IllegalArgumentException("AAAA");
     }
+
 }
