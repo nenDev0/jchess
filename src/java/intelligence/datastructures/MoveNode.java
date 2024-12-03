@@ -422,16 +422,21 @@ public class MoveNode extends Move implements Comparable<MoveNode>
     //TODO cut off every 3+n boards
     public Move get_best_move_recursive(Type type)
     {
-
+        /// This node is a leaf
         if (set_children.isEmpty())
         {
             return this;
         }
-        // TODO: any way to make this safer?
+        ///
+        /// Separate array required, to enable resorting of the set
+        /// TODO: Do we need to reorder the set or can we simply find min, max here?
+        /// TODO: any way to not use ugly Objects here?
+        /// 
         Object[] arr_children = set_children.toArray();
         set_children.clear();
-        Float max = null;
-        Float min = null;
+        ///
+        /// Recursively find the best move
+        /// Every iteration will use a different type
         for (Object object : arr_children)
         {
             if (object instanceof MoveNode)
@@ -439,31 +444,16 @@ public class MoveNode extends Move implements Comparable<MoveNode>
                 MoveNode move = (MoveNode)object;
                 move.get_best_move_recursive(Type.get_opposite(type));
                 set_children.add(move);
-                if (max == null)
-                {
-                    max = move.get_weight();
-                }
-                else {
-                    if (max < move.get_weight())
-                    {
-                        max = move.get_weight();
-                    }
-                }
-                if (min == null)
-                {
-                    min = move.get_weight();
-                }
-                else {
-                    if (min > move.get_weight())
-                    {
-                        min = move.get_weight();
-                    }
-                }
-            } // object instance of Movenode
+           } // object instance of Movenode
             else {
                 throw new IllegalArgumentException("Object is not a MoveNode.");
             }
         }
+        /// 
+        /// Choose the best move for either side
+        /// ->  calculating your next best move requires anticipating
+        ///     your oponent's best move, therefore this is not specific
+        ///     to the type of the player
         Move move;
         if (type == Type.WHITE)
         {
@@ -473,16 +463,13 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         {
             move = set_children.first();
         }
-        // This fails with the previous algorithm
-        if (0 != Float.compare(max, move.get_weight()) && 0 != Float.compare(min, move.get_weight()))
-        {
-            System.out.println("type: " + type);
-            System.out.println("maximum move value here:" + max);
-            System.out.println("minimum move value here:" + min);
-            System.out.println("returned move value" + move.get_weight());
-        }
+        /// 
+        /// This move now has the weight of it's own 'best' child
+        /// This change is reverted later
         m_add_weight(move.get_weight());
         //header.m_add_children_to_average(set_children.size());
+        ///
+        /// return value is only used to hand the move over to the TreeHeader by the top_node
         return move;
     }
 
