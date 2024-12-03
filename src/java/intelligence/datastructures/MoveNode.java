@@ -182,7 +182,7 @@ public class MoveNode extends Move implements Comparable<MoveNode>
     {
         header.m_add_total_executions();
 
-        this.is_final = m_set_final_state(board, calculator, iteration);
+        this.is_final = set_final_state(board, calculator, iteration);
         m_add_weight(calculator.evaluate(board));
         this.actual_weight = super.get_weight();
 
@@ -303,7 +303,7 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         {
             return;
         }
-        if (m_is_depth(iteration))
+        if (is_depth(iteration))
         {
             return;
         }
@@ -427,11 +427,42 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         {
             return this;
         }
-        Iterator<MoveNode> iterator = set_children.iterator();
-        while (iterator.hasNext())
+        // TODO: any way to make this safer?
+        Object[] arr_children = set_children.toArray();
+        set_children.clear();
+        Float max = null;
+        Float min = null;
+        for (Object object : arr_children)
         {
-            MoveNode move = iterator.next();
-            move.get_best_move_recursive(Type.get_opposite(type));
+            if (object instanceof MoveNode)
+            {
+                MoveNode move = (MoveNode)object;
+                move.get_best_move_recursive(Type.get_opposite(type));
+                set_children.add(move);
+                if (max == null)
+                {
+                    max = move.get_weight();
+                }
+                else {
+                    if (max < move.get_weight())
+                    {
+                        max = move.get_weight();
+                    }
+                }
+                if (min == null)
+                {
+                    min = move.get_weight();
+                }
+                else {
+                    if (min > move.get_weight())
+                    {
+                        min = move.get_weight();
+                    }
+                }
+            } // object instance of Movenode
+            else {
+                throw new IllegalArgumentException("Object is not a MoveNode.");
+            }
         }
         Move move;
         if (type == Type.WHITE)
@@ -442,7 +473,14 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         {
             move = set_children.first();
         }
-
+        // This fails with the previous algorithm
+        if (0 != Float.compare(max, move.get_weight()) && 0 != Float.compare(min, move.get_weight()))
+        {
+            System.out.println("type: " + type);
+            System.out.println("maximum move value here:" + max);
+            System.out.println("minimum move value here:" + min);
+            System.out.println("returned move value" + move.get_weight());
+        }
         m_add_weight(move.get_weight());
         //header.m_add_children_to_average(set_children.size());
         return move;
@@ -456,7 +494,7 @@ public class MoveNode extends Move implements Comparable<MoveNode>
      * 
      * @return
      */
-    private boolean m_is_depth(int iteration)
+    private boolean is_depth(int iteration)
     {
         if (iteration == header.get_depth())
         {
@@ -477,7 +515,7 @@ public class MoveNode extends Move implements Comparable<MoveNode>
      * 
      * @return boolean (replaces is_final)
      */
-    private boolean m_set_final_state(Board board, Calculator calculator, int iteration)
+    private boolean set_final_state(Board board, Calculator calculator, int iteration)
     {
 
         if (board.get_state().equals(GameState.CHECKMATE))
