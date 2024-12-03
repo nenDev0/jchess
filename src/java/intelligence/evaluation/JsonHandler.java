@@ -5,8 +5,13 @@ import java.io.File;
 import java.util.Scanner;
 
 import src.java.engine.board.piecelib.Piece.Type;
+import src.java.intelligence.datastructures.Setting;
 import src.java.engine.board.piecelib.Piece.PieceType;
 
+/**
+ * Handles all data coming from and going to the config files, written in json.
+ * 
+ */
 public class JsonHandler
 {
     

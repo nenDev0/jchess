@@ -23,6 +23,14 @@ public class Game {
         m_reset();
     }
 
+
+    /**
+     *  initializes all visual updates to the front-end PositionListeners for each position at the beginning to make the pieces to be visible.
+     * 
+     *  <p> interaction_controller is not saved in the Game class, but simply passed over to the NotificationCollector.
+     * 
+     * @param interaction_controller
+     */
     public void m_set_interaction_controller(InteractionController interaction_controller)
     {
         board.m_set_interaction_controller(interaction_controller);
@@ -36,9 +44,13 @@ public class Game {
         }
     }
 
+
+    /**
+     * 
+     */
     public void m_reset()
     {
-       board.m_to_start();
+        board.m_to_start();
         board.m_set_normal();
 
        selected_piece = null;
@@ -47,6 +59,20 @@ public class Game {
         white_total = 0;*/
     }
 
+
+    /**
+     *  Sets the selected_piece, if the input is valid. Allows requests for the legal moves of the selected piece
+     * 
+     *  <p> Used by the user and bots through the InteractionController
+     * 
+     *  <p> A valid piece is a non-null piece, who's user's turn it currently is
+     * 
+     *  @param x
+     *  @param y
+     * 
+     *  @return ({@code true}, if valid piece
+     *           {@code false}, else )
+     */
     public boolean m_select_piece(int x, int y)
     {
         Piece piece = board.get_position(x, y).get_piece();
@@ -68,11 +94,31 @@ public class Game {
         return true;
     }
 
+
+    /**
+     * 
+     */
     private void m_deselect_piece()
     {
         this.selected_piece = null;
     }
 
+
+    /**
+     *  Sets the selected_piece, if the input is valid. Allows requests for the legal moves of the selected piece
+     * 
+     *  <p> Used by the user and bots through the InteractionController
+     * 
+     *  <p> A valid position is one of the currently selected piece's legal moves.
+     *  <p> alternatively it can be a position, which currently has a piece of the same type(WHITE/BLACK)
+     * 
+     *  @param x
+     *  @param y
+     * 
+     *  @return ({@code true}, if a new piece was selected instead,
+     *           {@code false}, if the move is either invalid or has been played out )
+     * 
+     */
     public boolean m_select_position(int x, int y)
     {
         Position position = board.get_position(x, y);
@@ -94,10 +140,8 @@ public class Game {
         m_deselect_piece();
         board.m_commit(piece.get_position(), position);
         // TODO: adjust tree crashes after reverse, while botplay is disabled.
-       //System.out.println(bot1.get_calculator().evaluate(board));
         /*if (board.get_collection(get_turn()).get_active_pieces().size() < piececount.get(get_turn()))
         {
-
             sound_engine.play_take();
         }
         else
@@ -107,16 +151,38 @@ public class Game {
         return false;
     }
 
+
+    /**
+     *  returns the legal moves of the selected piece
+     * 
+     *  @return ({@code null}, if no piece is selected,
+     *           {@code LinkedList<Position>}, legal moves of the selected piece)
+     */
     public LinkedList<Position> get_legal_moves()
     {
+        if (selected_piece == null)
+        {
+            return null;
+        }
         return selected_piece.get_legal_moves();
     }
 
+
+    /**
+     * 
+     * @return
+     */
     public Board get_board()
     {
         return board;
     }
 
+
+    /**
+     *  Currently #unused 
+     *  
+     * @return
+     */
     public Type get_turn() {
         return board.get_type();
     }
