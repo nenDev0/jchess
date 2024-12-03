@@ -1,59 +1,107 @@
-package src.java.engine.game;
+package src.java.intelligence;
 
 import src.java.application.Config;
 import src.java.engine.board.Board;
 import src.java.engine.board.Move;
 import src.java.engine.board.Board.GameState;
 import src.java.engine.board.piecelib.Piece.Type;
-import src.java.intelligence.Bot;
+import src.java.engine.game.InteractionController;
 
 
+/**
+ *  This class manages the Bots.
+ *  This includes their: construction, activation, updates, inputs, learning and writing configs.
+ * 
+ */
 public class BotController extends Thread
 {
     
     private InteractionController interaction_controller;
     private Bot bot1;
-    private static boolean bot1_active;
     private Bot bot2;
+    private static boolean bot1_active;
     private static boolean bot2_active;
 
 
+    /**
+     * 
+     * 
+     */
     public BotController()
     {
-        if (bot1 == null)
-        {
-            bot1 = new Bot(Type.WHITE, false);
-            bot2 = new Bot(Type.BLACK, true);
-        }
+        bot1 = new Bot(Type.WHITE, false);
+        bot2 = new Bot(Type.BLACK, true);
+        bot1_active = false;
+        bot2_active = false;
     }
 
+
+    /**
+     *  The interaction Controller is needed for bots to input moves.
+     * 
+     * @param interaction_controller
+     */
     public void set_interaction_controller(InteractionController interaction_controller)
     {
         this.interaction_controller = interaction_controller;
     }
+
+
+    /**
+     * 
+     * 
+     * @param type
+     * @param board
+     * 
+     * @return {@code float}: evaluation
+     */
+    // TODO: frontend currently has no evals
     public float get_eval(Type type, Board board)
     {
         return get_bot(type).get_calculator().evaluate(board);
     }
 
+
+    /**
+     * 
+     */
     private void m_reset_bots()
     {
         bot1 = new Bot(Type.WHITE, false);
         bot2 = new Bot(Type.BLACK, true);
     }
 
+
+    /**
+     * 
+     */
     private void m_bots_to_start()
     {
         bot1.m_reset_tree();
         bot2.m_reset_tree();
     }
 
-    public void m_adjust_bots(Move move)
+
+    /**
+     *  Adjusts the trees of the bots by the handed position. 
+     * 
+     * @param move
+     * 
+     */
+    private void m_adjust_bots(Move move)
     {
         bot1.m_adjust_tree(move);
         bot2.m_adjust_tree(move);
     }
 
+
+    /**
+     *  returns bot with specified type.
+     * 
+     * @param type
+     * 
+     * @return {@code WHITE:} {@link #bot1}, {@code BLACK:} {@link #bot2}
+     */
     public Bot get_bot(Type type)
     {
         if (type == Type.WHITE)
@@ -63,14 +111,18 @@ public class BotController extends Thread
         return bot2;
     }
 
-    public void let_bot_write_config(Bot bot)
-    {
-            bot.write_config();
-    }
 
+    /**
+     *  This is currently irreversible
+     * 
+     *  <p> Currently static to allow the Frontend to call this method, without needing access to the class itself.
+     * 
+     * @param i ({@code 1 =}{@link #bot1} , {@code 2 =}{@link #bot2})
+     */
     public static void activate_bot(int i)
     {
-        switch (i) {
+        switch (i)
+        {
             case 1:
                 bot1_active = true;
                 break;
@@ -80,6 +132,17 @@ public class BotController extends Thread
         }
     }
 
+
+    /**
+     * This would be the method to call for a bot's turn, if the player had only one active.
+     * 
+     *  <p> not called, while bot-training mode is active.
+     *  <p> currently #unused
+     *  
+     * @param type
+     * 
+     * @return
+     */
     public boolean bot_turn(Type type)
     {
         switch (type) {
@@ -100,7 +163,16 @@ public class BotController extends Thread
         return true;
     }
 
-   private boolean bot_turn_loop(Type type)
+
+    /**
+     * Only used by the BotController, if the program is currently running in Bot-Training mode.
+     * 
+     * @param type (of the bot playing)
+     * 
+     * @return ({@code true}, if the board is final
+     *          {@code false}, else)
+     */
+    private boolean bot_turn_loop(Type type)
     {
         Bot bot = get_bot(type);
         Move move = bot.calculate_best_move();
@@ -131,6 +203,11 @@ public class BotController extends Thread
         return is_final;
     }
 
+
+    /**
+     * 
+     * 
+     */
     private void m_reverse_bot_color()
     {
         Bot bot_temp = bot1;
@@ -138,6 +215,11 @@ public class BotController extends Thread
         bot2 = bot_temp;
     }
 
+
+    /**
+     *  This is currently the place to train the bots on themselves. Runs as a thread.
+     * 
+     */
     @Override
     public void run()
     {

@@ -5,6 +5,7 @@ import src.java.application.Config;
 import src.java.engine.board.Board;
 import src.java.engine.board.Move;
 import src.java.engine.board.piecelib.Piece.Type;
+import src.java.intelligence.datastructures.TreeHeader;
 import src.java.intelligence.evaluation.Calculator;
 import src.java.intelligence.evaluation.Configuration;
 
@@ -21,6 +22,7 @@ public class Bot extends Thread
     //private long time_taken;
     //private long moves_total;
 
+    //TODO: enable better method for resetting the bot (includes setting new Config, new Calculator etc...)
     public Bot(Type type, boolean randomized)
     {
         this.type = type;
@@ -43,11 +45,6 @@ public class Bot extends Thread
     public void m_reset_tree()
     {
         this.tree = new TreeHeader(depth, new Board());
-    }
-
-    public TreeHeader get_tree()
-    {
-        return tree;
     }
 
     public void write_config()

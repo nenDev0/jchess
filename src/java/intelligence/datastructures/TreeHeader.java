@@ -1,4 +1,4 @@
-package src.java.intelligence;
+package src.java.intelligence.datastructures;
 
 
 import java.util.Iterator;
@@ -67,7 +67,6 @@ public class TreeHeader
     }
 
 
-
     public void m_rm_cache()
     {
         for (int i = 0; i < history_cache.length; i++)
@@ -75,6 +74,7 @@ public class TreeHeader
             history_cache[i] = new LinkedList<MoveNode>();
         }
     }
+
 
     public MoveNode m_add_history_to_cache(MoveNode new_node, int iteration)
     {
@@ -90,6 +90,7 @@ public class TreeHeader
         history_cache[iteration].add(new_node);
         return null;
     }
+
 
     private boolean compare(TreeMap<Integer, Integer> map_moves_1, TreeMap<Integer, Integer> map_moves_2)
     {
@@ -112,17 +113,18 @@ public class TreeHeader
         return true;
     }
 
- 
 
     public int get_depth()
     {
         return this.depth;
     }
 
+
     public Board get_board()
     {
         return board;
     }
+
 
     public float get_weight()
     {
@@ -135,6 +137,7 @@ public class TreeHeader
         total = 0;
         values_added = 0;
     }
+
 
     public void m_clear()
     {
@@ -165,6 +168,7 @@ public class TreeHeader
         }
     }
 
+
     public void m_add_total_executions()
     {
         total_executions++;
@@ -175,6 +179,7 @@ public class TreeHeader
         }
     }
 
+
     public void m_add_total_nodes_ended()
     {
         nodes_ended++;
@@ -184,6 +189,7 @@ public class TreeHeader
             //System.out.println("current nodes ended: "+ nodes_ended / shown_executions + "  *  " + shown_executions);
         }
     }
+
 
     public Move get_best_move()
     {
@@ -203,10 +209,12 @@ public class TreeHeader
         return move;
     }
 
+
     public float get_average()
     {
         return total / values_added;
     }
+
 
     public void m_add_value_to_average(float value)
     {
@@ -226,6 +234,7 @@ public class TreeHeader
         }
     }
 
+
     public void m_adjust(Move move)
     {
         moves++;
@@ -243,4 +252,6 @@ public class TreeHeader
         }
         history_cache[history_cache.length - 1] = new LinkedList<MoveNode>();
     }
+
+
 }

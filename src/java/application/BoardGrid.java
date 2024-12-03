@@ -10,9 +10,9 @@ import javax.swing.JPanel;
 import src.java.engine.board.Board;
 import src.java.engine.board.piecelib.Piece.PieceType;
 import src.java.engine.board.piecelib.Piece.Type;
-import src.java.engine.game.BotController;
 import src.java.engine.game.Game;
 import src.java.engine.game.InteractionController;
+import src.java.intelligence.BotController;
 
 
 public class BoardGrid {

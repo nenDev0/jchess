@@ -16,7 +16,7 @@ import javax.swing.JLabel;
 import javax.swing.KeyStroke;
 
 import src.java.engine.board.History;
-import src.java.engine.game.BotController;
+import src.java.intelligence.BotController;
 
 
 public class Window extends JFrame
