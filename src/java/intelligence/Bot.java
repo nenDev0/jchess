@@ -18,9 +18,6 @@ public class Bot extends Thread
     private String gen_path;
     private Type type;
 
-    // Telemetry
-    //private long time_taken;
-    //private long moves_total;
 
     //TODO: enable better method for resetting the bot (includes setting new Config, new Calculator etc...)
     public Bot(Type type, boolean randomized)
@@ -31,7 +28,7 @@ public class Bot extends Thread
         this.calculator = new Calculator(config);
         //System.out.println(info_handler.info("DEPTH"));
         this.depth = Integer.parseInt(Config.cfg_handler.info("DEPTH")) * 2 + 1;
-        tree = new TreeHeader(this.depth, new Board());
+        tree = new TreeHeader(this.depth, new Board(), type);
 
         //this.time_taken = 0;
         //this.moves_total = 0;
@@ -44,7 +41,7 @@ public class Bot extends Thread
 
     public void m_reset_tree()
     {
-        this.tree = new TreeHeader(depth, new Board());
+        this.tree = new TreeHeader(depth, new Board(), type);
     }
 
     public void write_config()
@@ -64,13 +61,8 @@ public class Bot extends Thread
 
     public Move calculate_best_move()
     {
-        //moves_total++;
-        //long start = System.nanoTime() / 1000000;
         tree.create_tree(calculator, depth);
         Move move = tree.get_best_move();
-        //long stop = System.nanoTime() / 1000000;
-        //time_taken += stop - start;
-        //System.out.println("Bot average calculation time: " + (time_taken / moves_total));
         return move;
     }
 }
