@@ -1,17 +1,11 @@
 package src.java.intelligence.datastructures;
 
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.TreeMap;
-import java.util.Map.Entry;
-
 import src.java.engine.board.Board;
 import src.java.engine.board.Move;
 import src.java.engine.board.piecelib.Piece.Type;
 import src.java.intelligence.evaluation.Calculator;
 
-import java.util.Set;
 
 public class TreeHeader
 {
@@ -19,10 +13,10 @@ public class TreeHeader
     private MoveNode top_node;
     private Board board;
     private float weight;
-    private LinkedList<MoveNode>[] history_cache;
     private int depth;
     private int moves;
     private Type type;
+    private CacheNode[] cache;
 
     // telemetry
     private int total_executions;
@@ -33,8 +27,6 @@ public class TreeHeader
     private int nodes_ended;
 
 
-    // TODO: figure out the fix for this outcry 
-    @SuppressWarnings("unchecked")
     public TreeHeader(int depth, Board board, Type type)
     {
         moves = 0;
@@ -44,12 +36,11 @@ public class TreeHeader
         {
             cache_size = 0;
         }
-        history_cache = new LinkedList[cache_size];
-        for (int i = 0 ; i < cache_size; i++)
+        cache = new CacheNode[cache_size];
+        for (int i = 0; i < cache_size; i++)
         {
-            history_cache[i] = new LinkedList<MoveNode>();
+            cache[i] = new CacheNode();
         }
-        
         
         total_executions = 0;
         total_executions_saved = 0;
@@ -67,18 +58,17 @@ public class TreeHeader
     }
 
 
-    public int get_move_count()
-    {
-        return moves;
+    public void m_rm_cache() {
+        for (CacheNode cache_node : cache)
+        {
+            cache_node.m_delete(); 
+        }
     }
 
 
-    public void m_rm_cache()
+    public int get_move_count()
     {
-        for (int i = 0; i < history_cache.length; i++)
-        {
-            history_cache[i].clear();
-        }
+        return moves;
     }
 
 
@@ -86,40 +76,9 @@ public class TreeHeader
     {
 
         long time = System.nanoTime();
-        TreeMap<Integer, Integer> new_history = new_node.get_history_vectors();
-        for (MoveNode cached_node : history_cache[iteration]/*.get(new_history.size())*/)
-        {
-            if (compare(cached_node.get_history_vectors(), new_history))
-            {
-                time_compare += System.nanoTime() - time;
-                return cached_node;
-            }
-        }
-        history_cache[iteration].add(new_node);
+        MoveNode move = cache[iteration].m_add_value(new_node.get_history_vectors().entrySet().iterator(), new_node);
         time_compare += System.nanoTime() - time;
-        return null;
-    }
-
-
-    private boolean compare(TreeMap<Integer, Integer> map_moves_1, TreeMap<Integer, Integer> map_moves_2)
-    {
-        Set<Entry<Integer, Integer>> map_set_2 = map_moves_2.entrySet();
-        Iterator<Entry<Integer, Integer>> iterator = map_set_2.iterator();
-        for (Entry<Integer, Integer> entry : map_moves_1.entrySet())
-        {
-            /*
-             * iterator has ran out, before foreach loop has
-             */
-            if (!iterator.hasNext())
-            {
-                return false;
-            }
-            if (!entry.equals(iterator.next()))
-            {
-                return false;
-            }
-        }
-        return true;
+        return move;
     }
 
 
@@ -157,9 +116,7 @@ public class TreeHeader
         this.type = board.get_type();
         top_node.m_create_tree(board, calculator, 0);
         this.time_total = System.nanoTime() - time_total;
-        for (LinkedList<MoveNode> linkedList : history_cache) {
-            linkedList.clear();
-        }
+        m_rm_cache();
     }
 
     
@@ -219,39 +176,6 @@ public class TreeHeader
         move = move.convert(board);
         board.m_commit(move);
         top_node.m_set_children(move, board);
-        /// 
-        /// To reduce unnecessary move, this will only be done every 2 moves,
-        /// which requires extra thought in the following code
-        /// TODO: this can be replaced by a boolean
-        if (type == Type.WHITE && moves % 2 != 0 || type == Type.BLACK && moves % 2 != 1)
-        {
-            return;
-        }
-        System.out.println("adjusting history cache for :"+type);
-        for (LinkedList<MoveNode> linkedList : history_cache) {
-            System.out.println(linkedList.size());
-        }
-        ///
-        /// The size of the cache is different, depending on the depth of the calculations
-        /// This deals with the edge cases
-        /*switch (history_cache.length) {
-            case 0:
-                break;
-            case 1:
-                history_cache[0].clear();
-                break;
-            default:
-                ///
-                /// reduced GC usage by reusing the initialized lists
-                LinkedList<MoveNode> ll_first  = history_cache[0];
-                ll_first.clear();
-                for (int i = 0; i < history_cache.length - 1 ; i++)
-                {
-                    history_cache[i] = history_cache[i + 1];
-                }
-                history_cache[history_cache.length - 1] = ll_first; 
-                break;
-        }*/
    }
 
 
