@@ -81,6 +81,7 @@ public class TreeHeader
 
         long time = System.nanoTime();
         MoveNode move = cache[iteration].m_add_value(new_node.get_history_vectors().entrySet().iterator(), new_node);
+        
         time_compare += System.nanoTime() - time;
         return move;
     }

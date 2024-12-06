@@ -5,7 +5,6 @@ import java.util.LinkedList;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 import java.util.TreeSet;
-import java.util.Map.Entry;
 
 import src.java.engine.board.Board;
 import src.java.engine.board.Board.GameState;
@@ -76,8 +75,9 @@ public class MoveNode extends Move implements Comparable<MoveNode>
      */
     public int max_children(int iteration)
     {
-        //return (header.get_depth() - iteration)/2 + 2;
-        return 8;
+        return (header.get_depth() - iteration)/2 + 2;
+        //return 8;
+        
         //return Integer.MAX_VALUE;
     }
 
@@ -207,10 +207,10 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         clone = board.clone();
         this.is_final = set_final_state(board, calculator, iteration);
 
-        if (is_dead(board, iteration))
+        /*if (is_dead(board, iteration))
         {
             return false;
-        }
+        }*/
 
         m_add_weight(calculator.evaluate(board));
         this.actual_weight = super.get_weight();
@@ -255,27 +255,19 @@ public class MoveNode extends Move implements Comparable<MoveNode>
             {
                 this.set_children.addAll(older_cousin.get_children());
                 this.set_abandoned.addAll(older_cousin.get_abandoned());
-                Object o = clone.continuity_check(older_cousin.clone);
-                if (o != null)
+                /*for (Entry<Integer, Integer> entry : older_cousin.get_history_vectors().entrySet())
                 {
-                    System.out.println("BEGIN-------------------------------");
-                    System.out.println(clone.get_history());
-                    System.out.println(older_cousin.clone.get_history());
-                        System.out.println(get_history_vectors());
-                        System.out.println(older_cousin.get_history_vectors());
-                    System.out.println("END-------------------------------");
-                }
-                Iterator<Entry<Integer, Integer>> iterator = get_history_vectors().entrySet().iterator();
-                for (Entry<Integer, Integer> entry : older_cousin.get_history_vectors().entrySet())
-                {
-                    Entry<Integer, Integer> entry2 = iterator.next();
-                    if (entry.getKey().intValue() != entry2.getKey().intValue() || entry.getValue().intValue() != entry2.getValue().intValue())
+                    if (entry.getKey() > 63 || entry.getValue() > 63)
                     {
+                        for (Entry<Integer, Integer> entry_2 : older_cousin.get_history_vectors().entrySet())
+                        {
+                            System.out.println(Integer.rotateLeft(entry_2.getKey(), 9) + entry_2.getValue());
+                        }
+                        System.out.println(get_history_vectors());
                         break;
                     }
-                }
+                }*/
 
-                //System.out.println("we are at iteration: "+ iteration +"\n and cutoff 2:\n"+ board.get_history().get_last_4_as_vec());
                 m_add_weight(older_cousin.get_weight());
                 this.actual_weight = get_weight();
                 for (MoveNode child : set_children)
@@ -293,7 +285,6 @@ public class MoveNode extends Move implements Comparable<MoveNode>
             }
             long time_stop = System.nanoTime();
             header.time += (time_stop - time_start)/1000;
-            //System.out.println("we are at iteration: "+ iteration +"\n and did not cutoff 1:\n"+ board.get_history().get_last_4_as_vec());
         }
         return false;
     }

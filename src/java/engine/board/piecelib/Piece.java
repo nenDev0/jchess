@@ -2,7 +2,6 @@ package src.java.engine.board.piecelib;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Optional;
-import java.util.Map.Entry;
 
 import src.java.engine.board.PieceCollection;
 import src.java.engine.board.Position;
@@ -21,8 +20,7 @@ public abstract class Piece implements Comparable<Piece>{
         ROOK,
         BISHOP,
         KNIGHT,
-        PAWN
-
+        PAWN;
     }
 
     //TODO move this to PieceCollection?
@@ -194,7 +192,7 @@ public abstract class Piece implements Comparable<Piece>{
         {
             if (map_legal_moves.containsKey(position))
             {
-                map_legal_moves_new.put(position, map_legal_moves_new.get(position));
+                map_legal_moves_new.put(position, map_legal_moves.get(position));
             }
         }
         map_legal_moves = map_legal_moves_new;
@@ -413,7 +411,7 @@ public abstract class Piece implements Comparable<Piece>{
 
             if (future_position.get_piece() == null)
             {
-                map_legal_moves.put(future_position, new MoveType[]{MoveType.NORMAL});
+                map_legal_moves.put(future_position, new MoveType[0]);
                 return true;
             }
             if (!is_type(future_position.get_piece().get_type()))
@@ -431,7 +429,16 @@ public abstract class Piece implements Comparable<Piece>{
 
         if (future_position.get_piece() == null)
         {
-            map_legal_moves.put(future_position, new MoveType[]{MoveType.NORMAL});
+            if (future_position.get_y() == 7 && is_type(Type.WHITE) ||
+                future_position.get_y() == 0 && is_type(Type.BLACK))
+            {
+                /// add other movetypes
+                map_legal_moves.put(future_position, new MoveType[]{MoveType.PROMOTION_QUEEN});
+            }
+            else
+            {
+                map_legal_moves.put(future_position, new MoveType[0]);
+            }
             return true;
         }
         return false;

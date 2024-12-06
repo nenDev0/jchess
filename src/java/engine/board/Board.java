@@ -2,6 +2,7 @@ package src.java.engine.board;
 
 
 import java.util.Iterator;
+import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import src.java.engine.board.Move.MoveType;
@@ -297,6 +298,9 @@ public class Board extends NotificationCollector implements BoardAccess
         clone.m_dump_update_notifications();
         return clone;
     }
+
+    //public TreeMap<Integer, Integer> get_reduced()
+
 
     @Override
     public String toString()

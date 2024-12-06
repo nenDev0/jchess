@@ -56,7 +56,7 @@ public class CacheNode {
         }
         Entry<Integer, Integer> entry = values.next();
         CacheNode new_node = new CacheNode();
-        CacheNode node = map_nodes.putIfAbsent(Integer.rotateLeft(entry.getKey(), 6) + entry.getValue(), new_node);
+        CacheNode node = map_nodes.putIfAbsent(Integer.rotateLeft(entry.getKey(), 9) + entry.getValue(), new_node);
         if (node == null)
         {
             return new_node.m_add_value(values, move);

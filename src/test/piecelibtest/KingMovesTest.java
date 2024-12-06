@@ -31,7 +31,7 @@ public class KingMovesTest {
         board = new Board();
         white_king = board.get_collection(Type.WHITE).get_pieces_of_type(PieceType.KING).get(0);
         black_king = board.get_collection(Type.BLACK).get_pieces_of_type(PieceType.KING).get(0);
-        arr_types = new MoveType[]{MoveType.NORMAL};
+        arr_types = new MoveType[0];
 
         expected = new HashMap<Position, MoveType[]>();
         actual = new HashMap<Position, MoveType[]>();
