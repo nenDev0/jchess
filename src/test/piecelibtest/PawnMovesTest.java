@@ -52,7 +52,7 @@ public class PawnMovesTest {
         black_pawn.m_set_position(board.get_position(1, 4));
         board.m_dump_update_notifications();
 
-        assertTrue(white_pawn.is_legal_move(board.get_position(1, 5)));
+        assertTrue(white_pawn.get_legal_move(board.get_position(1, 5)).isPresent());
         
     }
 

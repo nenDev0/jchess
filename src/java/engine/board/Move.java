@@ -7,37 +7,53 @@ import src.java.engine.board.piecelib.Piece.PieceType;
 
 public class Move
 {
-
-    private Position position_from;
-    private Position position_to;
-    private PieceType implementation;
-    private Piece taken_piece;
-    private boolean improvement;
-    //private String move_info;
-
     // TODO fix move-test -> give moves an ID, so consistency is more clear
 
     /**
      *      Note that some of these can happen at the same time.
-     *      In those cases it prioritizes from bottom to top.
-     *  <p> In case of implementing the Chess Standard String Notation, one would have to avoid this.
+     * 
+     *  <p> All of theses states must be saved to ensure correct history reduction
+     *      for the bot algorithm.
+     * 
+     *  <p> In case the Chess Standard Notation were to be implemented,
+     *      they would all have to be saved correctly as well
      */
     public enum MoveType {
         NORMAL,
         TAKES,
         UPGRADE,
         CASTLING,
+        /// Note that, as it stands. A move, which is EN_PASSANT, is not considered TAKES
         EN_PASSANT,
     }
 
+    private final Position position_from;
+    private final Position position_to;
+    private PieceType implementation;
+    private Piece taken_piece;
+    private boolean improvement;
+    /// This should never change, as it is decided by the piece itself
+    /// If this ever were to not be final, arr_types would have to be cloned
+    /// on convert(board) calls
+    private final MoveType[] arr_types;
+
     private float weight;
     
-    public Move() {}
+    public Move()
+    {
+        arr_types = null;
+        position_from = null;
+        position_to = null;
+    }
 
-    public Move(Position position_from, Position position_to)
+    public Move(Position position_from, Position position_to, MoveType[] arr_types)
     {
         this.position_from = position_from;
         this.position_to = position_to;
+        this.arr_types = arr_types;
+        /// The move must receive this information.
+        /// new class to dictate, which piece is allowed to move where?
+        /// -> reduce class hierarchy to only include "piece" as an overall class?
 
         if (position_to() != null)
         {
@@ -95,6 +111,7 @@ public class Move
 
     public void m_commit()
     {
+        /// implement movetypes here
         Piece piece = position_from.get_piece();
         piece.m_set_position(position_to);
         piece.m_increase_move();
@@ -102,6 +119,7 @@ public class Move
 
     public void m_reverse()
     {
+        /// implement movetype reversion here.
         Piece piece = position_to.get_piece();
         piece.m_decrease_move();
         if (piece.get_piece_type() != PieceType.KING)
@@ -165,7 +183,7 @@ public class Move
     {
         Position pos1 = board.get_position(position_from.get_x(), position_from.get_y());
         Position pos2 = board.get_position(position_to.get_x(), position_to.get_y());
-        Move conversion = new Move(pos1, pos2);
+        Move conversion = new Move(pos1, pos2, arr_types);
         return conversion;
     }
 

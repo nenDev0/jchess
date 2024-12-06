@@ -423,7 +423,7 @@ public class Calculator
     private float contested_positions(Board board, Piece piece)
     {
         float value = 0;
-        for (Position position : piece.get_legal_moves())
+        for (Position position : piece.get_legal_moves().keySet())
         {
             if (position.get_piece() != null)
             {
@@ -460,7 +460,7 @@ public class Calculator
     private float safe_moves(Board board, Piece piece)
     {
         float value = 0;
-        for (Position position : piece.get_legal_moves())
+        for (Position position : piece.get_legal_moves().keySet())
         {
             // take into account the weight of the pieces controlling?
             if (!position.has_opposing_pieces_observing(piece.get_type()))

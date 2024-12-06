@@ -30,11 +30,6 @@ public class History
         return ll_moves.size();
     }
 
-    public void m_register_move(Position position1, Position position2)
-    {
-        m_register_move(new Move(position1, position2));
-    }
-
     public void m_register_move(Move move)
     {
         ll_moves.add(move);
