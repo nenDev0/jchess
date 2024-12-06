@@ -43,7 +43,7 @@ public class CacheNode {
      * @return  // {@code MoveNode}, if there was already a MoveNode at the specified location
      *          // {@code null}, else
      */
-    public MoveNode m_add_value(Iterator<Entry<Integer, Integer>> values, MoveNode move)
+    public MoveNode m_add_value(Iterator<Entry<String, Integer>> values, MoveNode move)
     {
         if (!values.hasNext())
         {
@@ -54,9 +54,9 @@ public class CacheNode {
             this.move = move;
             return null;
         }
-        Entry<Integer, Integer> entry = values.next();
+        Entry<String, Integer> entry = values.next();
         CacheNode new_node = new CacheNode();
-        CacheNode node = map_nodes.putIfAbsent(Integer.rotateLeft(entry.getKey(), 9) + entry.getValue(), new_node);
+        CacheNode node = map_nodes.putIfAbsent((entry.getKey() + entry.getValue()).hashCode(), new_node);
         if (node == null)
         {
             return new_node.m_add_value(values, move);

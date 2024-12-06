@@ -20,6 +20,7 @@ public class PieceCollection implements Restrictor {
     private Board board;
     private boolean in_check;
 
+
     public PieceCollection(Type type, Board board) {
         this.type = type;
         this.board = board;

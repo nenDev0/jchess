@@ -80,7 +80,7 @@ public class TreeHeader
     {
 
         long time = System.nanoTime();
-        MoveNode move = cache[iteration].m_add_value(new_node.get_history_vectors().entrySet().iterator(), new_node);
+        MoveNode move = cache[iteration].m_add_value(board.get_reduced().entrySet().iterator(), new_node);
         
         time_compare += System.nanoTime() - time;
         return move;
@@ -116,7 +116,6 @@ public class TreeHeader
         this.time_total = System.nanoTime();
         this.weight = calculator.evaluate(board);
 
-        //System.out.println("eval before execution: " +this.weight);
         this.type = board.get_type();
         top_node.m_create_tree(board, calculator, 0);
         this.time_total = System.nanoTime() - time_total;

@@ -76,31 +76,31 @@ public class performanceTests
             //Openings.m_caro_kann(board);
 
             start = System.nanoTime();
-            board.get_history().get_as_vectors(0);
+            //board.get_history().get_as_vectors(0);
             time += System.nanoTime() - start;
             board.m_to_start();
 
             //Openings.m_catalan(board);
             start = System.nanoTime();
-            board.get_history().get_as_vectors(0);
+            //board.get_history().get_as_vectors(0);
             time += System.nanoTime() - start;
             board.m_to_start();
 
             //Openings.m_london(board);
             start = System.nanoTime();
-            board.get_history().get_as_vectors(0);
+            //board.get_history().get_as_vectors(0);
             time += System.nanoTime() - start;
             board.m_to_start();
 
             //Openings.m_sicilian_najdorf(board);
             start = System.nanoTime();
-            board.get_history().get_as_vectors(0);
+            //board.get_history().get_as_vectors(0);
             time += System.nanoTime() - start;
             board.m_to_start();
 
             //Openings.m_vienna(board);
             start = System.nanoTime();
-            board.get_history().get_as_vectors(0);
+            //board.get_history().get_as_vectors(0);
             time += System.nanoTime() - start;
             board.m_to_start();
         }

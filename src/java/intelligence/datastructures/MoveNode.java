@@ -2,7 +2,6 @@ package src.java.intelligence.datastructures;
 
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.TreeMap;
 import java.util.Map.Entry;
 import java.util.TreeSet;
 
@@ -25,7 +24,6 @@ public class MoveNode extends Move implements Comparable<MoveNode>
     private TreeSet<MoveNode> set_abandoned;
     private TreeHeader header;
     private boolean is_final;
-    private TreeMap<Integer, Integer> map_history_vectors;
     private float actual_weight;
     private int referenced;
     public Board clone;
@@ -75,7 +73,7 @@ public class MoveNode extends Move implements Comparable<MoveNode>
      */
     public int max_children(int iteration)
     {
-        return (header.get_depth() - iteration)/2 + 2;
+        return (header.get_depth() - iteration)/4 + 2;
         //return 8;
         
         //return Integer.MAX_VALUE;
@@ -108,18 +106,7 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         return set_abandoned;
     }
 
-
-    /**
-     * 
-     * 
-     * @return {@link #map_history_vectors}
-     */
-    public TreeMap<Integer, Integer> get_history_vectors()
-    {
-        return map_history_vectors;
-    }
-
-
+    
     /**
      *  Tells all children to delete their data recursively, followed by this node doing so itself.
      * 
@@ -207,10 +194,10 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         clone = board.clone();
         this.is_final = set_final_state(board, calculator, iteration);
 
-        /*if (is_dead(board, iteration))
+        if (is_dead(board, iteration))
         {
             return false;
-        }*/
+        }
 
         m_add_weight(calculator.evaluate(board));
         this.actual_weight = super.get_weight();
@@ -249,24 +236,11 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         if (iteration >= 3 && iteration % 2 == 1)
         {
             long time_start = System.nanoTime();
-            this.map_history_vectors = board.get_history().get_as_vectors(header.get_move_count());
             MoveNode older_cousin = header.m_add_history_to_cache(this, (iteration - 3)/2);
             if (older_cousin != null)
             {
                 this.set_children.addAll(older_cousin.get_children());
                 this.set_abandoned.addAll(older_cousin.get_abandoned());
-                /*for (Entry<Integer, Integer> entry : older_cousin.get_history_vectors().entrySet())
-                {
-                    if (entry.getKey() > 63 || entry.getValue() > 63)
-                    {
-                        for (Entry<Integer, Integer> entry_2 : older_cousin.get_history_vectors().entrySet())
-                        {
-                            System.out.println(Integer.rotateLeft(entry_2.getKey(), 9) + entry_2.getValue());
-                        }
-                        System.out.println(get_history_vectors());
-                        break;
-                    }
-                }*/
 
                 m_add_weight(older_cousin.get_weight());
                 this.actual_weight = get_weight();
