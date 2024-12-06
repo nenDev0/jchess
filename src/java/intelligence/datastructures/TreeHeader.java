@@ -1,6 +1,8 @@
 package src.java.intelligence.datastructures;
 
 
+import java.util.TreeMap;
+
 import src.java.engine.board.Board;
 import src.java.engine.board.Move;
 import src.java.engine.board.piecelib.Piece.Type;
@@ -76,11 +78,11 @@ public class TreeHeader
     }
 
 
-    public MoveNode m_add_history_to_cache(MoveNode new_node, int iteration)
+    public MoveNode m_add_history_to_cache(MoveNode new_node, TreeMap<Integer, Integer> map_vectors,  int iteration)
     {
 
         long time = System.nanoTime();
-        MoveNode move = cache[iteration].m_add_value(new_node.get_history_vectors().entrySet().iterator(), new_node);
+        MoveNode move = cache[iteration].m_add_value(map_vectors.entrySet().iterator(), new_node);
         
         time_compare += System.nanoTime() - time;
         return move;
@@ -116,7 +118,6 @@ public class TreeHeader
         this.time_total = System.nanoTime();
         this.weight = calculator.evaluate(board);
 
-        //System.out.println("eval before execution: " +this.weight);
         this.type = board.get_type();
         top_node.m_create_tree(board, calculator, 0);
         this.time_total = System.nanoTime() - time_total;
