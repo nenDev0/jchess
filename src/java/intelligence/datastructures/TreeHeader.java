@@ -21,6 +21,8 @@ public class TreeHeader
     // telemetry
     private int total_executions;
     private int total_executions_saved;
+    public long total_request_time;
+    public long total_requests;
     public long time;
     private long time_total;
     private long time_compare;
@@ -45,6 +47,8 @@ public class TreeHeader
         total_executions = 0;
         total_executions_saved = 0;
         time = 0;
+        total_request_time = 0;
+        total_requests = 0;
         time_compare = 0;
         time_total = 0;
         nodes_ended = 0;
@@ -103,7 +107,6 @@ public class TreeHeader
     public void m_clear()
     {
         top_node.m_delete();
-        m_rm_cache();
     }
 
 
@@ -116,6 +119,8 @@ public class TreeHeader
         this.type = board.get_type();
         top_node.m_create_tree(board, calculator, 0);
         this.time_total = System.nanoTime() - time_total;
+        this.total_request_time += time_total;
+        this.total_requests++;
         m_rm_cache();
     }
 
@@ -147,6 +152,7 @@ public class TreeHeader
         System.out.println("Average time per node: " + (float)(time_total/1000) / (float)(total_executions));
         System.out.println("Average time per node ended: " + (float)(time) / (float)(nodes_ended));
         System.out.println("Average time per comparison: " + (float)(time_compare/1000) / (float)(total_executions));
+        System.out.println("Average time per request: " + total_request_time/1000/total_requests);
         //System.out.println("Move's weight: " + move.get_weight());
         //System.out.println("<average: "+get_average()+" >");
         //System.out.println("<final: " + move.get_weight() + " >");
@@ -157,6 +163,7 @@ public class TreeHeader
         time_total = 0;
         return move;
     }
+
 
     public Type get_opposite(Type type)
     {

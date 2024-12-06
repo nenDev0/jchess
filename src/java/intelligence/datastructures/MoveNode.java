@@ -3,6 +3,7 @@ package src.java.intelligence.datastructures;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.TreeMap;
+import java.util.Map.Entry;
 import java.util.TreeSet;
 
 import src.java.engine.board.Board;
@@ -26,6 +27,8 @@ public class MoveNode extends Move implements Comparable<MoveNode>
     private boolean is_final;
     private TreeMap<Integer, Integer> map_history_vectors;
     private float actual_weight;
+    private int referenced;
+    public Board clone;
     ///
     /// If two parent nodes have this node as a child, this will prevent them from doing duplicate calculations
     private boolean best_move_calculated;
@@ -88,6 +91,11 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         return set_children;
     }
 
+    public void m_referenced()
+    {
+        referenced++;
+    }
+
 
     /**
      * 
@@ -117,7 +125,17 @@ public class MoveNode extends Move implements Comparable<MoveNode>
      */
     public void m_delete()
     {
+        if (referenced != 0)
+        {
+            referenced--;
+            return;
+        }
+        
         for (MoveNode child : set_children)
+        {
+            child.m_delete();
+        }
+        for (MoveNode child : set_abandoned)
         {
             child.m_delete();
         }
@@ -185,7 +203,7 @@ public class MoveNode extends Move implements Comparable<MoveNode>
     public boolean create_node(Board board, Calculator calculator, int iteration)
     {
         header.m_add_total_executions();
-
+        clone = board.clone();
         this.is_final = set_final_state(board, calculator, iteration);
 
         if (is_dead(board, iteration))
@@ -236,6 +254,26 @@ public class MoveNode extends Move implements Comparable<MoveNode>
             {
                 this.set_children.addAll(older_cousin.get_children());
                 this.set_abandoned.addAll(older_cousin.get_abandoned());
+                Object o = clone.continuity_check(older_cousin.clone);
+                if (o != null)
+                {
+                    System.out.println("BEGIN-------------------------------");
+                    System.out.println(clone.get_history());
+                    System.out.println(older_cousin.clone.get_history());
+                        System.out.println(get_history_vectors());
+                        System.out.println(older_cousin.get_history_vectors());
+                    System.out.println("END-------------------------------");
+                }
+                Iterator<Entry<Integer, Integer>> iterator = get_history_vectors().entrySet().iterator();
+                for (Entry<Integer, Integer> entry : older_cousin.get_history_vectors().entrySet())
+                {
+                    Entry<Integer, Integer> entry2 = iterator.next();
+                    if (entry.getKey().intValue() != entry2.getKey().intValue() || entry.getValue().intValue() != entry2.getValue().intValue())
+                    {
+                        break;
+                    }
+                }
+
                 //System.out.println("we are at iteration: "+ iteration +"\n and cutoff 2:\n"+ board.get_history().get_last_4_as_vec());
                 m_add_weight(older_cousin.get_weight());
                 this.actual_weight = get_weight();
