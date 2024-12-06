@@ -1,10 +1,9 @@
 package src.test;
 
-import src.java.engine.board.Board;
 
 public class Openings {
 
-
+/*
     public static void m_london(Board board)
     {
         //System.out.println(">>>>>>> LONDON");
@@ -20,6 +19,7 @@ public class Openings {
     {
         //System.out.println(">>>>>>> SICILIAN NAJDORF");
         // white pawn e2-e4
+        board.m_commit(board.get_position(4, 1), board.get_position(4, 3));
         board.m_commit(board.get_position(4, 1), board.get_position(4, 3));
         // black pawn c7-c5
         board.m_commit(board.get_position(2, 6), board.get_position(2, 4));
@@ -84,4 +84,5 @@ public class Openings {
     }
 
     
+    */
 }

@@ -1,6 +1,10 @@
 package src.java.engine.board;
 
 
+import java.util.Iterator;
+import java.util.Map.Entry;
+
+import src.java.engine.board.Move.MoveType;
 import src.java.engine.board.piecelib.Piece;
 import src.java.engine.board.piecelib.Piece.Type;
 import src.java.engine.board.piecelib.Piece.PieceType;
@@ -146,14 +150,6 @@ public class Board extends NotificationCollector implements BoardAccess
         this.type = Type.get_opposite(this.type);
     }
     
-
-
-    public void m_commit(Position position_from , Position position_to)
-    {
-        m_commit(new Move(position_from, position_to));
-        
-    }
-
     public void m_commit(Move move)
     {
         get_history().m_register_move(move);
@@ -215,13 +211,11 @@ public class Board extends NotificationCollector implements BoardAccess
                     return p1.ID() + p1.get_legal_moves() + "\n\\vvvvvv//\n" + p2.ID() + p2.get_legal_moves();
                 }
 
-                for (int j = 0; j < p1.get_legal_moves().size(); j++)
-                {
-                    Position pos1 = p1.get_legal_moves().get(j);
-                    Position pos2 = p2.get_legal_moves().get(j);
-                    if (pos1.equals(pos2))
-                    {
-                        return new Move(p1.get_position(), pos1);
+                Iterator<Entry<Position, MoveType[]>> iterator1 = p1.get_legal_moves().entrySet().iterator();  
+                for (Entry<Position, MoveType[]> entry : p2.get_legal_moves().entrySet()) {
+                    if (!iterator1.next().getKey().equals(entry.getKey())) {
+                        return new Move[]{new Move(p1.get_position(), entry.getKey(), entry.getValue()),
+                                          new Move(p2.get_position(), entry.getKey(), entry.getValue())};
                     }
                 }
             }

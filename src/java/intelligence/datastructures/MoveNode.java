@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 import java.util.TreeSet;
+import java.util.Map.Entry;
 
 import src.java.engine.board.Board;
 import src.java.engine.board.Board.GameState;
@@ -34,9 +35,9 @@ public class MoveNode extends Move implements Comparable<MoveNode>
     private boolean best_move_calculated;
 
 
-    public MoveNode(Position position1, Position position2 , TreeHeader header)
+    public MoveNode(Position position1, Position position2, MoveType[] arr_types, TreeHeader header)
     {
-        super(position1, position2);
+        super(position1, position2, arr_types);
         set_children = new TreeSet<MoveNode>();
         set_abandoned = new TreeSet<MoveNode>();
         this.header = header;
@@ -383,9 +384,9 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         LinkedList<MoveNode> ll_movetree = new LinkedList<MoveNode>();
         for     (Piece piece : board.get_collection(board.get_type()).get_active_pieces())
         {
-            for (Position position : piece.get_legal_moves())
+            for (Entry<Position, MoveType[]> entry : piece.get_legal_moves().entrySet())
             {
-                ll_movetree.add(new MoveNode(piece.get_position(), position, header));
+                ll_movetree.add(new MoveNode(piece.get_position(), entry.getKey(), entry.getValue(), header));
             }
         }
         ///
