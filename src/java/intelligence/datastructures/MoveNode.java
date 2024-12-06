@@ -107,6 +107,7 @@ public class MoveNode extends Move implements Comparable<MoveNode>
     }
 
     
+    
     /**
      *  Tells all children to delete their data recursively, followed by this node doing so itself.
      * 

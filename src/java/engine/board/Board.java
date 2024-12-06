@@ -2,8 +2,8 @@ package src.java.engine.board;
 
 
 import java.util.Iterator;
-import java.util.TreeMap;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import src.java.engine.board.Move.MoveType;
 import src.java.engine.board.piecelib.Piece;
