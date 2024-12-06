@@ -49,11 +49,6 @@ public class Bot extends Thread
         get_calculator().get_configuration().write_config(gen_path, type);
     }
 
-    public void clear_tree()
-    {
-        tree.m_clear();
-    }
-
     public void m_adjust_tree(Move move)
     {
         tree.m_adjust(move);

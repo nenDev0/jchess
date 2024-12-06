@@ -59,8 +59,6 @@ public class TreeHeader
         this.board = board;
         board.m_initialise();
 
-        m_clear();
-
     }
 
 
@@ -107,12 +105,6 @@ public class TreeHeader
     }
     
 
-    public void m_clear()
-    {
-        top_node.m_delete();
-    }
-
-
     public void create_tree(Calculator calculator, int depth)
     {
         this.time_total = System.nanoTime();
@@ -154,7 +146,7 @@ public class TreeHeader
         System.out.println("Average time per node: " + (float)(time_total/1000) / (float)(total_executions));
         System.out.println("Average time per node ended: " + (float)(time) / (float)(nodes_ended));
         System.out.println("Average time per comparison: " + (float)(time_compare/1000) / (float)(total_executions));
-        System.out.println("Average time per request: " + total_request_time/1000/total_requests);
+        System.out.println("Average time per request: " + (float)total_request_time/1000000/total_requests + "ms");
         //System.out.println("Move's weight: " + move.get_weight());
         //System.out.println("<average: "+get_average()+" >");
         //System.out.println("<final: " + move.get_weight() + " >");

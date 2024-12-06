@@ -56,7 +56,7 @@ public class CacheNode {
         }
         Entry<Integer, Integer> entry = values.next();
         CacheNode new_node = new CacheNode();
-        CacheNode node = map_nodes.putIfAbsent(Integer.rotateLeft(entry.getKey(), 9) + entry.getValue(), new_node);
+        CacheNode node = map_nodes.putIfAbsent(Integer.rotateLeft(entry.getKey(), 7) + entry.getValue(), new_node);
         if (node == null)
         {
             return new_node.m_add_value(values, move);
@@ -66,37 +66,13 @@ public class CacheNode {
 
 
     /**
-     *  Calls all childnodes to recursively delete the tree.
-     *  This nodes' {@link #map_nodes} will still be initialized
+     *  Relying on GC to clear all initialized CacheNodes
      * 
      * 
      */
     public void m_delete()
     {
-        for (CacheNode node : map_nodes.values())
-        {
-            node.m_recursive_delete();
-        }
         map_nodes.clear();
     }
-
-
-    /**
-     *  recursively delete all childnodes, followed by itself.
-     * 
-     * 
-     */
-    private void m_recursive_delete()
-    {
-        for (CacheNode node : map_nodes.values())
-        {
-            node.m_delete();
-        }
-        map_nodes.clear();
-        move = null;
-        map_nodes = null;
- 
-    }
-
 
 }

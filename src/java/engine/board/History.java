@@ -125,14 +125,14 @@ public class History
                         /// 
                         /// taken piece vector will end in -1,
                         /// representing it has been removed from the game
-                        map_reduced.put(hash_to, Integer.rotateLeft(1, 6));
+                        map_reduced.put(hash_to, 64);
                         break;
 
                     case PROMOTION:
                         /// 
                         /// pawn vector will end in -2
                         /// representing it has promoted
-                        map_reduced.put(hash_from, Integer.rotateLeft(2, 6));
+                        map_reduced.put(hash_from, 65);
                         break;
                     ///
                     /// current piece vector at it's from value will have a value
@@ -147,21 +147,25 @@ public class History
                     /// example: if the pieces were to be on the same position
                     /// at the end, they could have differing promotions (i.e. knight, bishop)
                     /// and be identified as the same board positions, even if they are not.
+                    /// 
+                    /// TODO: Problem: pieces, which originate from the same value, will be overwritten.
+                    /// Here we calculate the x_value * 6 + ..., in order to make this possibility vanishingly
+                    /// small. However, it will happen, so hopefully there is a better way.
 
                     case PROMOTION_QUEEN:
-                        m_combine_vectors(map_reduced, Integer.rotateLeft(3, 6), hash_to);
+                        m_combine_vectors(map_reduced, (move.position_from().get_x() + 1) * 6 + 66, hash_to);
                         break;
 
                     case PROMOTION_ROOK:
-                        m_combine_vectors(map_reduced, Integer.rotateLeft(4, 6), hash_to);
+                        m_combine_vectors(map_reduced, (move.position_from().get_x() + 1) * 6 + 67, hash_to);
                         break;
 
                     case PROMOTION_BISHOP:
-                        m_combine_vectors(map_reduced, Integer.rotateLeft(5, 6), hash_to);
+                        m_combine_vectors(map_reduced, (move.position_from().get_x() + 1) * 6 + 68, hash_to);
                         break;
 
                     case PROMOTION_KNIGHT:
-                        m_combine_vectors(map_reduced, Integer.rotateLeft(6, 6), hash_to);
+                        m_combine_vectors(map_reduced, (move.position_from().get_x() + 1) * 6 + 69, hash_to);
                         break;
                                        
                     /// This encapsulates a normal move

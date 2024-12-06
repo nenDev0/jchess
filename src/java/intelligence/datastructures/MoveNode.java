@@ -90,11 +90,6 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         return set_children;
     }
 
-    public void m_referenced()
-    {
-        referenced++;
-    }
-
 
     /**
      * 
@@ -107,32 +102,6 @@ public class MoveNode extends Move implements Comparable<MoveNode>
     }
 
     
-    
-    /**
-     *  Tells all children to delete their data recursively, followed by this node doing so itself.
-     * 
-     */
-    public void m_delete()
-    {
-        if (referenced != 0)
-        {
-            referenced--;
-            return;
-        }
-        
-        for (MoveNode child : set_children)
-        {
-            child.m_delete();
-        }
-        for (MoveNode child : set_abandoned)
-        {
-            child.m_delete();
-        }
-        set_children.clear();
-        set_abandoned.clear();
-    }
-
-
     /**
      *  Used to find the node in the tree, which followed the move played in the current game.
      * 
@@ -148,31 +117,23 @@ public class MoveNode extends Move implements Comparable<MoveNode>
      */
     public void m_set_children(Move move, Board board)
     {
-        TreeSet<MoveNode> new_set = null;
-        TreeSet<MoveNode> new_set_abandoned = null;
-        while(true)
+        for (MoveNode child : set_children)
         {
-            MoveNode child = set_children.pollLast();
-            if (child == null)
-            {
-                if (new_set == null)
-                {
-                    m_delete();
-                }
-                break;
-            }
             if (move.equals(child))
             {
-                new_set = child.get_children();
-                new_set_abandoned = child.get_abandoned();
-                continue;
+                this.set_children = child.get_children();
+                this.set_abandoned = child.get_abandoned();
+                return;
             }
-            child.m_delete();
         }
-        if (new_set != null)
+        for (MoveNode child : set_abandoned)
         {
-            this.set_children = new_set;
-            this.set_abandoned = new_set_abandoned;
+            if (move.equals(child))
+            {
+                this.set_children = child.get_children();
+                this.set_abandoned = child.get_abandoned();
+                return;
+            }
         }
     }
 
@@ -245,14 +206,6 @@ public class MoveNode extends Move implements Comparable<MoveNode>
 
                 m_add_weight(older_cousin.get_weight());
                 this.actual_weight = get_weight();
-                for (MoveNode child : set_children)
-                {
-                    child.m_referenced(); 
-                }
-                for (MoveNode child : set_abandoned)
-                {
-                    child.m_referenced(); 
-                }
                 long time_stop = System.nanoTime();
                 header.time += (time_stop - time_start)/1000;
                 header.m_add_total_nodes_ended();
