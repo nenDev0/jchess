@@ -25,8 +25,6 @@ public class MoveNode extends Move implements Comparable<MoveNode>
     private TreeHeader header;
     private boolean is_final;
     private float actual_weight;
-    private int referenced;
-    public Board clone;
     ///
     /// If two parent nodes have this node as a child, this will prevent them from doing duplicate calculations
     private boolean best_move_calculated;
@@ -40,7 +38,6 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         this.header = header;
         this.is_final = false;
         this.best_move_calculated = false;
-        this.referenced = 0;
         //this.dad = dad;
     }
 
@@ -60,7 +57,6 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         this.header = header;
         this.is_final = false;
         this.best_move_calculated = false;
-        this.referenced = 0;
     }
 
 
@@ -153,7 +149,6 @@ public class MoveNode extends Move implements Comparable<MoveNode>
     public boolean create_node(Board board, Calculator calculator, int iteration)
     {
         header.m_add_total_executions();
-        clone = board.clone();
         this.is_final = set_final_state(board, calculator, iteration);
 
         if (is_dead(board, iteration))
