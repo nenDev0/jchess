@@ -10,6 +10,13 @@ import src.java.engine.board.Position;
 import src.java.engine.board.piecelib.Piece;
 import src.java.engine.board.piecelib.Piece.Type;
 
+/**
+ *  Ensures, incoming interactions on the {@link #board} are valid.
+ * 
+ *      Currently handles the {@link #sound_engine}.
+ * 
+ *  <p> This is, where the information about the currently {@link #selected_piece} on the front-end GUI is saved.
+ */
 public class Game {
     
     private Board board;
