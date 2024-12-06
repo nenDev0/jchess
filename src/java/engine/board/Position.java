@@ -97,6 +97,6 @@ public class Position {
 
     @Override
     public int hashCode() {
-        return x * 8 + y;
+        return Integer.rotateLeft(x, 3) + y;
     }
 }

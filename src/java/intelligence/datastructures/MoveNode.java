@@ -13,9 +13,13 @@ import src.java.engine.board.piecelib.Piece;
 import src.java.engine.board.piecelib.Piece.Type;
 import src.java.intelligence.evaluation.Calculator;
 
+/**
+ *  Used to generate a tree of {@link #Move},
+ *  calculating the best possible move, based upon evaluations of future positions.
+ * 
+ */
 public class MoveNode extends Move implements Comparable<MoveNode>
 {
-
     private TreeSet<MoveNode> set_children;
     private TreeSet<MoveNode> set_abandoned;
     private TreeHeader header;
@@ -35,6 +39,7 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         this.header = header;
         this.is_final = false;
         this.best_move_calculated = false;
+        this.referenced = 0;
         //this.dad = dad;
     }
 
@@ -54,6 +59,7 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         this.header = header;
         this.is_final = false;
         this.best_move_calculated = false;
+        this.referenced = 0;
     }
 
 
@@ -144,7 +150,6 @@ public class MoveNode extends Move implements Comparable<MoveNode>
             {
                 if (new_set == null)
                 {
-                    header.m_rm_cache();
                     m_delete();
                 }
                 break;
@@ -182,15 +187,15 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         header.m_add_total_executions();
 
         this.is_final = set_final_state(board, calculator, iteration);
-        m_add_weight(calculator.evaluate(board));
-        this.actual_weight = super.get_weight();
 
-        // WHAT IS HAPPENING!=??=$")=?="§)$(§!=(?§"%(!"§$")))
-        // TODO WHY DOES THIS NOT WORK YOU.. {*I dont get angry, when coding*}
         if (is_dead(board, iteration))
         {
             return false;
         }
+
+        m_add_weight(calculator.evaluate(board));
+        this.actual_weight = super.get_weight();
+
 
         return true;
     }
@@ -232,6 +237,16 @@ public class MoveNode extends Move implements Comparable<MoveNode>
                 this.set_children.addAll(older_cousin.get_children());
                 this.set_abandoned.addAll(older_cousin.get_abandoned());
                 //System.out.println("we are at iteration: "+ iteration +"\n and cutoff 2:\n"+ board.get_history().get_last_4_as_vec());
+                m_add_weight(older_cousin.get_weight());
+                this.actual_weight = get_weight();
+                for (MoveNode child : set_children)
+                {
+                    child.m_referenced(); 
+                }
+                for (MoveNode child : set_abandoned)
+                {
+                    child.m_referenced(); 
+                }
                 long time_stop = System.nanoTime();
                 header.time += (time_stop - time_start)/1000;
                 header.m_add_total_nodes_ended();
@@ -282,15 +297,19 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         //  -> follows down the tree
         for (MoveNode child : set_children)
         {
-            try {
+            try
+            {
                 board.m_commit(child);
-            } catch (Exception e) {
+            
+                child.m_continue(board, calculator, iteration + 1);
+                board.m_revert();
+            }
+            catch (Exception e)
+            {
                 System.out.println(board);
-                System.out.println(child);
+                System.out.println(set_children);
                 throw e;
             }
-            child.m_continue(board, calculator, iteration + 1);
-            board.m_revert();
         }
     }
 
@@ -306,6 +325,7 @@ public class MoveNode extends Move implements Comparable<MoveNode>
      */
     public void m_create_tree(Board board, Calculator calculator, int iteration)
     {
+        /// termination conditions
         if (is_final)
         {
             return;
@@ -314,15 +334,14 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         {
             return;
         }
+        /// This node already has calculated children
+        /// This happens only to the top_node. Potentially could be pulled out?
         if (!set_children.isEmpty() || !set_abandoned.isEmpty())
         {
             m_continue(board, calculator, iteration);
             return;
         }
-
-        set_children.clear();
-        set_abandoned.clear();
-
+        /// each pieces legal moves get added as a possible future node
         LinkedList<MoveNode> ll_movetree = new LinkedList<MoveNode>();
         for     (Piece piece : board.get_collection(board.get_type()).get_active_pieces())
         {
@@ -331,23 +350,35 @@ public class MoveNode extends Move implements Comparable<MoveNode>
                 ll_movetree.add(new MoveNode(piece.get_position(), position, header));
             }
         }
-
+        ///
+        /// for each possible move, calculate their weight, final state
+        /// and compare with cached nodes.
+        /// 
+        /// If the childnode already exists,
+        /// the child node will clone the children of the cached node and return false.
+        /// This node will then add it to the abandoned nodes, as it is not necessary to calculate further
         Iterator<MoveNode> iterator = ll_movetree.iterator();
         while (iterator.hasNext())
         {
             MoveNode move = iterator.next();
-            board.m_commit(move);
-            if (!move.create_node(board, calculator, iteration + 1))
-            {
-                set_abandoned.add(move);
-                iterator.remove();
+            try {
+                board.m_commit(move);
+                if (!move.create_node(board, calculator, iteration + 1))
+                {
+                    set_abandoned.add(move);
+                    iterator.remove();
+                }
+                board.m_revert();
+            } catch (Exception e) {
+                System.out.println(board);
+                System.out.println(set_children);
+                throw e;
             }
-            board.m_revert();
+            
         }
 
         set_children.addAll(ll_movetree);
         ll_movetree.clear();
-        m_abandon_children(board, iteration);
 
         if (set_children.isEmpty())
         {
@@ -355,12 +386,19 @@ public class MoveNode extends Move implements Comparable<MoveNode>
             return;
         }
         
+        m_abandon_children(board, iteration);
 
         for (MoveNode move : set_children)
         {
-            board.m_commit(move);
-            move.m_create_tree(board, calculator, iteration + 1);
-            board.m_revert();
+            try {
+                board.m_commit(move);
+                move.m_create_tree(board, calculator, iteration + 1);
+                board.m_revert();   
+            } catch (Exception e) {
+                System.out.println(board);
+                System.out.println(set_children);
+                throw e;
+            }
         }
     }
     

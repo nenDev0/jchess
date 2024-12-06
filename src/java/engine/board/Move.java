@@ -180,6 +180,6 @@ public class Move
 
     @Override
     public int hashCode() {
-        return position_from.hashCode() * 8 + position_to.hashCode();
+        return Integer.rotateLeft(position_from.hashCode(), 6) + position_to.hashCode();
     }
 }

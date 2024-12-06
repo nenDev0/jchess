@@ -2,7 +2,6 @@ package src.java.engine.board;
 
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Map.Entry;
 import java.util.TreeMap;
 
 public class History
@@ -87,14 +86,20 @@ public class History
         
     }
 
+    /**
+     * REQUIRES REWORK
+     * 
+     * @param from
+     * @return
+     */
     public TreeMap<Integer, Integer> get_as_vectors(int from)
     {
 
         TreeMap<Integer, Integer> map_reduced = new TreeMap<Integer, Integer>();
         Iterator<Move> iterator = ll_moves.descendingIterator();
         
-        int i = get_length() - 1;
-        while (i != from - 1)
+        int i = get_length();
+        while (i != from)
         {
             Move move = iterator.next();
             int hash_from = move.position_from().hashCode();
@@ -113,34 +118,13 @@ public class History
         return map_reduced;
     }
 
-    public TreeMap<Integer, Integer> red(int from)
-    {
-        TreeMap<Integer, Integer> ll_moves_red = new TreeMap<Integer, Integer>();
-
-        for (Move move: ll_moves)
-        {
-            if (from > 0)
-            {
-                from--;
-                continue;
-            }
-            int hash_from = move.position_from().hashCode();
-            int hash_to = move.position_to().hashCode();
-            boolean flag = false; 
-            for (Entry<Integer, Integer> entry : ll_moves_red.entrySet())
-            {
-                if (entry.getValue() == hash_from)
-                {
-                    entry.setValue(hash_to);
-                    flag = true;
-                    break;
-                }
-            }
-            if (!flag)
-            {
-                ll_moves_red.put(hash_from, hash_to);
-            }
+    @Override
+    public String toString() {
+        String string = "";
+        for (Move move : ll_moves) {
+            string = string + move.toString() + ",\n";
         }
-        return ll_moves_red;
+        return string;
     }
+
 }

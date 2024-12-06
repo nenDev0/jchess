@@ -293,8 +293,7 @@ public class Board extends NotificationCollector implements BoardAccess
         clone.m_initialise();
         for (int i = 0; i < get_history().get_length(); i++)
         {
-            clone.get_history().m_register_move(get_history().get_move(i).convert(clone));
-            clone.get_history().get_move(i).m_commit();
+            clone.m_commit(get_history().get_move(i).convert(clone));
         }
 
         if (get_type() != Type.WHITE)
