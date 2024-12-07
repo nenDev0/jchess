@@ -193,7 +193,7 @@ public class KingMovesTest {
         black_rook.m_set_position(board.get_position(6, 1));
         board.m_dump_update_notifications();
 
-        set_actual = new HashSet<Position>(); set_actual.addAll(white_king.observer().get_observed_positions());
+        set_actual = new HashSet<Position>(); set_actual.addAll(white_king.get_observer().get_observed_positions());
         assertEquals(expected, actual);
 
 
@@ -215,7 +215,7 @@ public class KingMovesTest {
         actual = black_king.get_legal_moves();
         assertEquals(expected, actual);
 
-        set_actual = new HashSet<Position>(); set_actual.addAll(black_king.observer().get_observed_positions());
+        set_actual = new HashSet<Position>(); set_actual.addAll(black_king.get_observer().get_observed_positions());
         assertEquals(expected, actual);
     }
 
@@ -248,7 +248,7 @@ public class KingMovesTest {
         expected.put(board.get_position(0, 2), arr_types);
 
         // white king
-        set_actual.clear(); set_actual.addAll(white_king.observer().get_observed_positions());
+        set_actual.clear(); set_actual.addAll(white_king.get_observer().get_observed_positions());
         assertEquals(expected, actual);
 
         expected.remove(board.get_position(1, 0));
@@ -270,7 +270,7 @@ public class KingMovesTest {
         expected.put(board.get_position(3, 1), arr_types);
         expected.put(board.get_position(3, 2), arr_types);
 
-        set_actual.clear(); set_actual.addAll(black_king.observer().get_observed_positions());
+        set_actual.clear(); set_actual.addAll(black_king.get_observer().get_observed_positions());
         assertEquals(expected, actual);
         
         expected.remove(board.get_position(1, 0));
@@ -316,7 +316,7 @@ public class KingMovesTest {
         expected.put(board.get_position(4, 1), arr_types);
         expected.put(board.get_position(4, 0), arr_types);
 
-        set_actual.clear(); set_actual.addAll(white_king.observer().get_observed_positions());
+        set_actual.clear(); set_actual.addAll(white_king.get_observer().get_observed_positions());
         assertEquals(expected, actual);
 
         expected.remove(board.get_position(3, 1));
@@ -359,7 +359,7 @@ public class KingMovesTest {
         expected.put(board.get_position(4, 1), arr_types);
         expected.put(board.get_position(4, 0), arr_types);
 
-        set_actual.clear(); set_actual.addAll(white_king.observer().get_observed_positions());
+        set_actual.clear(); set_actual.addAll(white_king.get_observer().get_observed_positions());
         assertEquals(expected, actual);
 
         expected.clear();
@@ -415,7 +415,7 @@ public class KingMovesTest {
         expected.put(board.get_position(4, 1), arr_types);
         expected.put(board.get_position(4, 0), arr_types);
 
-        set_actual.clear() ; set_actual.addAll(white_king.observer().get_observed_positions());
+        set_actual.clear() ; set_actual.addAll(white_king.get_observer().get_observed_positions());
         assertEquals(expected, actual);
 
         expected.remove(board.get_position(3, 1));
@@ -457,7 +457,7 @@ public class KingMovesTest {
         expected.put(board.get_position(4, 1), arr_types);
         expected.put(board.get_position(4, 0), arr_types);
 
-        set_actual.clear(); set_actual.addAll(white_king.observer().get_observed_positions());
+        set_actual.clear(); set_actual.addAll(white_king.get_observer().get_observed_positions());
         assertEquals(expected, actual);
 
         expected.remove(board.get_position(4, 1));
