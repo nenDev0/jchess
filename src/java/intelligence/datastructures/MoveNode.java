@@ -174,14 +174,12 @@ public class MoveNode extends Move implements Comparable<MoveNode>
      * @param board
      * @param iteration
      * 
-     * 
      * @return boolean
      *  (
      *   {@code true}: current board position already calculated
      *   {@code false}: not calculated, continue calculation
      *  )
      */
-    //TODO once ignored, can't be added back, even if this line wasn't followed
     public boolean is_dead(Board board, int iteration)
     {
         /*
@@ -270,7 +268,7 @@ public class MoveNode extends Move implements Comparable<MoveNode>
     /**
      *  Create children recursively
      *  -> Depth First
-     *  
+     * 
      * @param board
      * @param calculator
      * @param iteration
@@ -278,6 +276,7 @@ public class MoveNode extends Move implements Comparable<MoveNode>
      */
     public void m_create_tree(Board board, Calculator calculator, int iteration)
     {
+        ///
         /// termination conditions
         if (is_final)
         {
@@ -287,6 +286,7 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         {
             return;
         }
+        ///
         /// This node already has calculated children
         /// This happens only to the top_node. Potentially could be pulled out?
         if (!set_children.isEmpty() || !set_abandoned.isEmpty())
@@ -294,6 +294,7 @@ public class MoveNode extends Move implements Comparable<MoveNode>
             m_continue(board, calculator, iteration);
             return;
         }
+        ///
         /// each pieces legal moves get added as a possible future node
         LinkedList<MoveNode> ll_movetree = new LinkedList<MoveNode>();
         for     (Piece piece : board.get_collection(board.get_type()).get_active_pieces())
@@ -303,6 +304,11 @@ public class MoveNode extends Move implements Comparable<MoveNode>
                 ll_movetree.add(new MoveNode(piece.get_position(), entry.getKey(), entry.getValue(), header));
             }
         }
+        ///
+        /// ended nodes are separated here and added back towards the end.
+        /// This allows for more accurate get_best_move results, while
+        /// reducing duplicated calculations
+        // LinkedList<MoveNode> ll_ended_nodes = new LinkedList<MoveNode>();
         ///
         /// for each possible move, calculate their weight, final state
         /// and compare with cached nodes.
@@ -318,6 +324,7 @@ public class MoveNode extends Move implements Comparable<MoveNode>
                 board.m_commit(move);
                 if (!move.create_node(board, calculator, iteration + 1))
                 {
+                    //ll_ended_nodes.add(move);
                     set_abandoned.add(move);
                     iterator.remove();
                 }
@@ -327,32 +334,42 @@ public class MoveNode extends Move implements Comparable<MoveNode>
                 System.out.println(set_children);
                 throw e;
             }
-            
         }
-
         set_children.addAll(ll_movetree);
         ll_movetree.clear();
-
-        if (set_children.isEmpty())
+        ///
+        if (set_children.isEmpty() /*&& ll_ended_nodes.isEmpty()*/)
         {
             is_final = true;
             return;
         }
-        
+        /// 
+        /// abandones the nodes, which currently don't have a
+        /// positive evaluation, massively reducing calculations,
+        /// however an inaccurate first evaluation leads to
+        /// worse results in the long run.
         m_abandon_children(board, iteration);
-
+        /// recursion
         for (MoveNode move : set_children)
         {
-            try {
+            try
+            {
                 board.m_commit(move);
                 move.m_create_tree(board, calculator, iteration + 1);
                 board.m_revert();   
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 System.out.println(board);
                 System.out.println(set_children);
                 throw e;
             }
         }
+        /// 
+        /// adds the nodes, which didn't require further calculations
+        /// back into the set, so they can be used for the get_best_move
+        /// calculation
+        //set_children.addAll(ll_ended_nodes);
     }
     
 
@@ -420,7 +437,7 @@ public class MoveNode extends Move implements Comparable<MoveNode>
      * 
      * @param type
      * 
-     * @return
+     * @return best {@code move} to play, based on evaluations
      */
     public Move get_best_move_recursive(Type type)
     {
@@ -482,7 +499,7 @@ public class MoveNode extends Move implements Comparable<MoveNode>
 
 
     /**
-     *  
+     * 
      * 
      * @param iteration
      * 
@@ -504,7 +521,6 @@ public class MoveNode extends Move implements Comparable<MoveNode>
      * @param board
      * @param calculator
      * @param iteration
-     * 
      * 
      * @return boolean (replaces is_final)
      */
@@ -536,9 +552,9 @@ public class MoveNode extends Move implements Comparable<MoveNode>
      *  implements no opportunity for 0, as this would remove the move from the set,
      *  which is not intended
      *  
-     *  @param MoveNode
+     * @param MoveNode
      * 
-     *  @return int
+     * @return int
      */
     @Override
     public int compareTo(MoveNode move)

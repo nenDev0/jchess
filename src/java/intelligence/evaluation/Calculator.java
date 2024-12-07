@@ -321,7 +321,7 @@ public class Calculator
      * @param board
      * @param piece
      * 
-     * @return {@code float value} 
+     * @return {@code float value}
      */
     private float protection(Board board, Piece piece)
     {
@@ -354,7 +354,7 @@ public class Calculator
      * 
      * @param piece
      * 
-     * @return {@code float value} 
+     * @return {@code float value}
      */
     private float likes_center(Piece piece)
     {
@@ -373,7 +373,7 @@ public class Calculator
      * 
      * @param piece
      * 
-     * @return {@code float value} 
+     * @return {@code float value}
      */
     private int likes_forward(Piece piece)
     {
@@ -393,7 +393,7 @@ public class Calculator
      * @param board
      * @param type
      * 
-     * @return {@code float value} 
+     * @return {@code float value}
      */
     private float pieceweight(Board board, Type type)
     {
@@ -418,7 +418,7 @@ public class Calculator
      * @param board
      * @param piece
      * 
-     * @return {@code float value} 
+     * @return {@code float value}
      */
     private float contested_positions(Board board, Piece piece)
     {
@@ -455,7 +455,7 @@ public class Calculator
      * @param board
      * @param piece
      * 
-     * @return {@code float value} 
+     * @return {@code float value}
      */
     private float safe_moves(Board board, Piece piece)
     {
@@ -485,7 +485,7 @@ public class Calculator
      * @param board
      * @param piece
      * 
-     * @return {@code float value} 
+     * @return {@code float value}
      */
     private float is_observed(Board board, Piece piece)
     {

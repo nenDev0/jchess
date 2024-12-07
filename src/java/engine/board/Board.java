@@ -172,8 +172,15 @@ public class Board extends NotificationCollector implements BoardAccess
         m_type();
         get_history().m_reverse();
         get_collection(get_type()).m_state();
-        //TODO do they need to be updated?
-        get_collection(get_type()).m_request_update(PieceType.PAWN);
+        /// Currently, it seems without this, the code can throw a NPE
+        /// Testing the code with it enabled for now, hoping there is no NPE,
+        /// however that would not exactly aim towards this being the issue, as
+        /// the bug occurred after a prolonged period of time 
+        /// 
+        /// Exception in thread "Thread-4" java.lang.NullPointerException:
+        /// Cannot invoke "src.java.engine.board.Position.get_x()"
+        /// because the return value of "src.java.engine.board.piecelib.Piece.get_position()" is null
+         get_collection(get_type()).m_request_update(PieceType.PAWN);
         m_dump_update_notifications();
     }
 

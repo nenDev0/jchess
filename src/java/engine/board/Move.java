@@ -93,7 +93,7 @@ public class Move
     {
         return weight;
     }
-
+ 
     public MoveType[] get_types()
     {
         return arr_types;

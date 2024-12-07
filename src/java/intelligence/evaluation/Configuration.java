@@ -120,7 +120,7 @@ public class Configuration
 
     /**
      *  Returns {@code Setting} of the given {@code EvalType}
-     *  
+     * 
      *  <p> Used for piece specific {@code EvalType}'s
      * 
      * @param eval_type

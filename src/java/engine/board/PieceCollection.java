@@ -75,21 +75,26 @@ public class PieceCollection implements Restrictor {
         piece.m_set_position(null);
     }
 
-    public void m_untake(Piece piece) {
+    public void m_untake(Piece piece)
+    {
         m_add_piece(piece);
         ll_taken_pieces.remove(piece);
     }
 
-    public void m_add_piece(Piece piece) {
+    public void m_add_piece(Piece piece)
+    {
         map_active_pieces.get(piece.get_piece_type()).add(piece);
         ll_active_pieces.add(piece);
-        if (ll_active_pieces.size() > 16) {
+        if (ll_active_pieces.size() > 16)
+        {
             throw new IllegalArgumentException("We duplicated a piece: " + piece + "\n" + get_board_access());
         }
     }
 
-    public void m_rm_piece(Piece piece) {
-        if (piece.get_piece_type() == PieceType.KING) {
+    public void m_rm_piece(Piece piece)
+    {
+        if (piece.get_piece_type() == PieceType.KING)
+        {
             throw new IllegalArgumentException("You were about to remove the King");
         }
         map_active_pieces.get(piece.get_piece_type()).remove(piece);

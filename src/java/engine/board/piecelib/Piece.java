@@ -62,7 +62,7 @@ public abstract class Piece implements Comparable<Piece>{
         this.ID = toString() + index;
         this.moves = 0;
     }
-    
+
 
     public String ID()
     {
@@ -88,7 +88,8 @@ public abstract class Piece implements Comparable<Piece>{
     }
 
 
-    public Type get_type() {
+    public Type get_type()
+    {
         return collection.get_type();
     }
 
@@ -216,7 +217,6 @@ public abstract class Piece implements Comparable<Piece>{
 
     public void m_vertical_moves()
     {
-
         int x = this.position.get_x();
         int y = this.position.get_y();
         for (int i_y = y + 1; i_y < 8; i_y++)
@@ -232,7 +232,8 @@ public abstract class Piece implements Comparable<Piece>{
     }
 
 
-    public void m_horizontal_moves() {
+    public void m_horizontal_moves()
+    {
         int x = this.position.get_x();
         int y = this.position.get_y();
         for (int i_x = x + 1; i_x < 8; i_x++)
@@ -293,7 +294,8 @@ public abstract class Piece implements Comparable<Piece>{
             m_check_move(x, y + 1);
         if (y > 0)
             m_check_move(x, y - 1);
-        if (x > 0) {
+        if (x > 0)
+        {
             m_check_move(x - 1, y);
             if (y < 7)
                 m_check_move(x - 1, y + 1);
