@@ -76,8 +76,9 @@ public class MoveNode extends Move implements Comparable<MoveNode>
      */
     public int max_children(int iteration)
     {
-        //return (header.get_depth() - iteration)/2 + 2;
-        return 8;
+        return (header.get_depth() - iteration)/5 + 2;
+        //return 8;
+        
         //return Integer.MAX_VALUE;
     }
 

@@ -27,14 +27,12 @@ public class Move
         EN_PASSANT,
     }
 
+    /// The fields should never change, as all information needed can be
+    /// initialized on initialization
     private final Position position_from;
     private final Position position_to;
-    private PieceType implementation;
+    private final PieceType implementation;
     private Piece taken_piece;
-    private boolean improvement;
-    /// This should never change, as it is decided by the piece itself
-    /// If this ever were to not be final, arr_types would have to be cloned
-    /// on convert(board) calls
     private final MoveType[] arr_types;
 
     private float weight;
@@ -44,8 +42,21 @@ public class Move
         arr_types = null;
         position_from = null;
         position_to = null;
+        implementation = null;
     }
 
+    /**
+     *  Constructor.
+     *  Pulls all data necessary to correctly execute the move.
+     * 
+     * @throws NullPointerException, if {@link #position_to} is null
+     *  and {@link #arr_types} contains {@code MoveType.TAKES}
+     * 
+     * @param position_from
+     * @param position_to
+     * @param arr_types
+     * 
+     */
     public Move(Position position_from, Position position_to, MoveType[] arr_types)
     {
         this.position_from = position_from;
@@ -54,40 +65,20 @@ public class Move
         /// The move must receive this information.
         /// new class to dictate, which piece is allowed to move where?
         /// -> reduce class hierarchy to only include "piece" as an overall class?
-
-        if (position_to() != null)
-        {
-            if (position_to().get_piece() != null)
-            {
-                taken_piece = position_to().get_piece();
+        for (MoveType move_type : arr_types) {
+            switch (move_type) {
+                case TAKES:
+                    taken_piece = position_to().get_piece();
+                    break;
+            
+                default:
+                    break;
             }
         }
+
         this.implementation = position_from.get_piece().get_piece_type();
-
-        /*
-         *  registers, if the current move is an improvement
-         *   -> necessary for 50 move-rule
-         *   -> gets checked by history
-         *   -> why not in history?
-         *       -> this allows for consistency across reversions
-         */
-        if (this.implementation == PieceType.PAWN)
-        {
-            improvement = true;
-            return;
-        }
-        if(position_to.get_piece() != null)
-        {
-            improvement = true;
-            return;
-        }
-        improvement = false;
     }
 
-    public boolean is_improvement()
-    {
-        return improvement;
-    }
 
     public void m_add_weight(float weight)
     {
@@ -111,7 +102,6 @@ public class Move
 
     public void m_commit()
     {
-        /// implement movetypes here
         Piece piece = position_from.get_piece();
         piece.m_set_position(position_to);
         piece.m_increase_move();
@@ -138,7 +128,7 @@ public class Move
         }
         if (piece.get_piece_type() != PieceType.KING)
         {
-        piece.m_set_position(position_from);
+            piece.m_set_position(position_from);
         }
 
         // promotion reversal -> demotion
@@ -163,6 +153,7 @@ public class Move
                 pawn.en_passant_position = null;
                 pawn.en_passant = null;
             }
+            
         }
     }
 

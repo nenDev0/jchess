@@ -4,6 +4,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.TreeMap;
 
+import src.java.engine.board.Move.MoveType;
+import src.java.engine.board.piecelib.Piece.PieceType;
+
 public class History
 {
 
@@ -32,17 +35,33 @@ public class History
     public void m_register_move(Move move)
     {
         ll_moves.add(move);
-        if (move.is_improvement())
+        /// checks, if this move is an improvement for the fifty-move rule
+        if (move.position_from().get_piece().get_piece_type() == PieceType.PAWN)
         {
             ll_fifty_move_rule.add(fifty_move_rule);
             fifty_move_rule = 0;
+            return;
         }
-        else
+        for (MoveType move_type : move.get_types())
         {
-            fifty_move_rule++;
+            if (move_type == MoveType.TAKES)
+            {
+                ll_fifty_move_rule.add(fifty_move_rule);
+                fifty_move_rule = 0;
+                return;
+            }
         }
+        fifty_move_rule++;
     }
 
+
+    /**
+     *  checks, if the current board is a draw, due to either:
+     *  <p> - repetition (both players played the same move twice)
+     *  <p> - {@link #fifty_move_rule} (both players had no improvement the past 50 moves)
+     * 
+     * @return {@code boolean} 
+     */
     public boolean is_draw_by_repetition()
     {
         if (get_length() < 5)
@@ -64,13 +83,20 @@ public class History
         return true;
     }
 
+
+    /**
+     *  Used to reverse the previous move.
+     *  The previous move will be removed from the {@link #ll_moves}
+     * 
+     *  <p> {@link #fifty_move_rule} will be updated
+     * 
+     */
     public void m_reverse()
     {
         Move move = ll_moves.removeLast();
         move.m_reverse();
 
-        //TODO if fifty-move-rule is 0 -> pollLast
-        if (move.is_improvement())
+        if (fifty_move_rule == 0)
         {
             fifty_move_rule = ll_fifty_move_rule.removeLast();
         }
