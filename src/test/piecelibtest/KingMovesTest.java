@@ -54,7 +54,7 @@ public class KingMovesTest {
         // TODO: solve this -> Castling? maybe a reversing issue
         assertTrue(expected.equals(actual));
 
-        set_actual.addAll(white_king.observer().get_observed_positions());
+        set_actual.addAll(white_king.get_observer().get_observed_positions());
         assertEquals(expected, set_actual);
     }
 
@@ -75,7 +75,7 @@ public class KingMovesTest {
         actual =white_king.get_legal_moves();
         assertEquals(expected, actual);
 
-        set_actual.addAll(white_king.observer().get_observed_positions());
+        set_actual.addAll(white_king.get_observer().get_observed_positions());
         assertEquals(expected, set_actual);
     }
 
@@ -108,7 +108,7 @@ public class KingMovesTest {
         expected.put(board.get_position(6, 7), arr_types);
         expected.put(board.get_position(6, 6), arr_types);
 
-        set_actual.addAll(white_king.observer().get_observed_positions());
+        set_actual.addAll(white_king.get_observer().get_observed_positions());
         assertEquals(expected, actual);
 
         expected.remove(board.get_position(7, 6));
@@ -142,7 +142,7 @@ public class KingMovesTest {
         expected.put(board.get_position(1, 7), arr_types);
 
 
-        set_actual.addAll(black_king.observer().get_observed_positions());
+        set_actual.addAll(black_king.get_observer().get_observed_positions());
         assertEquals(expected, set_actual);
 
         expected.remove(board.get_position(1, 7));
@@ -183,7 +183,7 @@ public class KingMovesTest {
         expected.put(board.get_position(6, 6), arr_types);
         expected.put(board.get_position(6, 5), arr_types);
 
-        set_actual.addAll(white_king.observer().get_observed_positions());
+        set_actual.addAll(white_king.get_observer().get_observed_positions());
         assertEquals(expected, set_actual);
 
         actual = white_king.get_legal_moves();

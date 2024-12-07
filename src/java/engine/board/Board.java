@@ -50,8 +50,8 @@ public class Board extends NotificationCollector implements BoardAccess
         this.black_pieces.m_standard_lineup();
         this.history = new History();
 
-        super.m_add_required_observers(this.white_pieces.get_pieces_of_type(PieceType.KING).get(0).observer());
-        super.m_add_required_observers(this.black_pieces.get_pieces_of_type(PieceType.KING).get(0).observer());
+        super.m_add_required_observers(this.white_pieces.get_pieces_of_type(PieceType.KING).get(0).get_observer());
+        super.m_add_required_observers(this.black_pieces.get_pieces_of_type(PieceType.KING).get(0).get_observer());
     }
 
     /// ### getters ### ///

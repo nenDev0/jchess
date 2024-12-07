@@ -20,7 +20,8 @@ public class Move
      */
     public enum MoveType {
         TAKES,
-        CASTLING,
+        CASTLING_QUEENSIDE,
+        CASTLING_KINGSIDE,
         /// Note that, as it stands. A move, which is EN_PASSANT, is not considered TAKES
         EN_PASSANT,
         PROMOTION,

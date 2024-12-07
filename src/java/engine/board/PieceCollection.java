@@ -201,7 +201,7 @@ public class PieceCollection implements Restrictor {
 
     private void m_request_update(Piece piece)
     {
-        board.m_receive_update_notification(piece.observer());
+        board.m_receive_update_notification(piece.get_observer());
     }
 
     public void m_request_update(PieceType piece_type)
@@ -209,7 +209,7 @@ public class PieceCollection implements Restrictor {
         for (Piece piece : map_active_pieces.get(piece_type))
         if (piece.get_position().get_y() == piece.pawn_directional(4, 3))
         {
-            board.m_receive_update_notification(piece.observer());
+            board.m_receive_update_notification(piece.get_observer());
         }
     }
 

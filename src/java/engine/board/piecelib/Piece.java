@@ -105,7 +105,7 @@ public abstract class Piece implements Comparable<Piece>{
     }
 
 
-    public Observer observer()
+    public Observer get_observer()
     {
         return (Observer) observer;
     }
@@ -202,7 +202,7 @@ public abstract class Piece implements Comparable<Piece>{
     public void m_update()
     {
         map_legal_moves.clear();
-        observer().m_clear_observations();
+        observer.m_clear_observations();
         if (position == null)
         {
             return;

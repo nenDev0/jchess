@@ -204,7 +204,7 @@ public class Calculator
     {
         float value = 0;
 
-        LinkedList<Position> positions = board.get_collection(type).get_active_pieces().get(0).observer().get_observed_positions();
+        LinkedList<Position> positions = board.get_collection(type).get_active_pieces().get(0).get_observer().get_observed_positions();
         for (Position position : positions)
         {
             for (ObserverStorage o : position.get_observers())
@@ -294,7 +294,7 @@ public class Calculator
     private float vision(Board board, Piece piece)
     {
         float value = 0;
-        for (Position position : piece.observer().get_observed_positions())
+        for (Position position : piece.get_observer().get_observed_positions())
         {
             for (ObserverStorage o : position.get_observers())
             {
