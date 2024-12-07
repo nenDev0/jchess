@@ -19,12 +19,15 @@ public class Move
      *      they would all have to be saved correctly as well
      */
     public enum MoveType {
-        NORMAL,
         TAKES,
-        UPGRADE,
         CASTLING,
         /// Note that, as it stands. A move, which is EN_PASSANT, is not considered TAKES
         EN_PASSANT,
+        PROMOTION,
+        PROMOTION_QUEEN,
+        PROMOTION_ROOK,
+        PROMOTION_BISHOP,
+        PROMOTION_KNIGHT,
     }
 
     /// The fields should never change, as all information needed can be
@@ -89,6 +92,12 @@ public class Move
     {
         return weight;
     }
+
+    public MoveType[] get_types()
+    {
+        return arr_types;
+    }
+
 
     public Position position_from()
     {
@@ -189,6 +198,8 @@ public class Move
 
     @Override
     public int hashCode() {
-        return Integer.rotateLeft(position_from.hashCode(), 6) + position_to.hashCode();
+       return Integer.rotateLeft(position_from.hashCode(), 6) + position_to.hashCode();
     }
+
+    
 }

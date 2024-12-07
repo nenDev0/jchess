@@ -3,6 +3,7 @@ package src.java.engine.board;
 
 import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import src.java.engine.board.Move.MoveType;
 import src.java.engine.board.piecelib.Piece;
@@ -19,7 +20,6 @@ public class Board extends NotificationCollector implements BoardAccess
         DRAW,
         CHECK,
         CHECKMATE
-        
     }
 
 
@@ -296,6 +296,20 @@ public class Board extends NotificationCollector implements BoardAccess
         }
         clone.m_dump_update_notifications();
         return clone;
+    }
+
+    public TreeMap<String, Integer> get_reduced()
+    {
+        TreeMap<String, Integer> map_pieces = new TreeMap<String, Integer>();
+        for (Type type : Type.values())
+        {
+            for (Piece piece : get_collection(type).get_active_pieces())
+            {
+                Position pos = piece.get_position();
+                map_pieces.put(piece.ID(), Integer.rotateLeft(pos.get_x(), 3) + pos.get_y());
+            }
+        }
+        return map_pieces;
     }
 
     @Override

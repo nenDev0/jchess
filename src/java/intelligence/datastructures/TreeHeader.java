@@ -1,6 +1,8 @@
 package src.java.intelligence.datastructures;
 
 
+import java.util.TreeMap;
+
 import src.java.engine.board.Board;
 import src.java.engine.board.Move;
 import src.java.engine.board.piecelib.Piece.Type;
@@ -57,8 +59,6 @@ public class TreeHeader
         this.board = board;
         board.m_initialise();
 
-        m_clear();
-
     }
 
 
@@ -76,11 +76,12 @@ public class TreeHeader
     }
 
 
-    public MoveNode m_add_history_to_cache(MoveNode new_node, int iteration)
+    public MoveNode m_add_history_to_cache(MoveNode new_node, TreeMap<Integer, Integer> map_vectors,  int iteration)
     {
 
         long time = System.nanoTime();
-        MoveNode move = cache[iteration].m_add_value(new_node.get_history_vectors().entrySet().iterator(), new_node);
+        MoveNode move = cache[iteration].m_add_value(map_vectors.entrySet().iterator(), new_node);
+        
         time_compare += System.nanoTime() - time;
         return move;
     }
@@ -104,18 +105,11 @@ public class TreeHeader
     }
     
 
-    public void m_clear()
-    {
-        top_node.m_delete();
-    }
-
-
     public void create_tree(Calculator calculator, int depth)
     {
         this.time_total = System.nanoTime();
         this.weight = calculator.evaluate(board);
 
-        //System.out.println("eval before execution: " +this.weight);
         this.type = board.get_type();
         top_node.m_create_tree(board, calculator, 0);
         this.time_total = System.nanoTime() - time_total;
@@ -152,7 +146,7 @@ public class TreeHeader
         System.out.println("Average time per node: " + (float)(time_total/1000) / (float)(total_executions));
         System.out.println("Average time per node ended: " + (float)(time) / (float)(nodes_ended));
         System.out.println("Average time per comparison: " + (float)(time_compare/1000) / (float)(total_executions));
-        System.out.println("Average time per request: " + total_request_time/1000/total_requests);
+        System.out.println("Average time per request: " + (float)total_request_time/1000000/total_requests + "ms");
         //System.out.println("Move's weight: " + move.get_weight());
         //System.out.println("<average: "+get_average()+" >");
         //System.out.println("<final: " + move.get_weight() + " >");
