@@ -140,6 +140,8 @@ public class History
             int hash_to = move.position_to().hashCode();
             m_combine_vectors(map_reduced, hash_from, hash_to);
             
+            /// required for castling.
+            int y;
             for (MoveType type : move.get_types())
             {
                 switch (type)
@@ -150,7 +152,7 @@ public class History
                         /// representing it has been removed from the game
                         map_reduced.put(hash_to, 64);
                         break;
-
+                    /// 
                     case PROMOTION:
                         /// 
                         /// pawn vector will end in -2
@@ -174,24 +176,36 @@ public class History
                     /// TODO: Problem: pieces, which originate from the same value, will be overwritten.
                     /// Here we calculate the x_value * 6 + ..., in order to make this possibility vanishingly
                     /// small. However, it will happen, so hopefully there is a better way.
-
+                    /// 
                     case PROMOTION_QUEEN:
                         m_combine_vectors(map_reduced, (move.position_from().get_x() + 1) * 6 + 66, hash_to);
                         break;
-
+                    /// 
                     case PROMOTION_ROOK:
                         m_combine_vectors(map_reduced, (move.position_from().get_x() + 1) * 6 + 67, hash_to);
                         break;
-
+                    /// 
                     case PROMOTION_BISHOP:
                         m_combine_vectors(map_reduced, (move.position_from().get_x() + 1) * 6 + 68, hash_to);
                         break;
-
+                    /// 
                     case PROMOTION_KNIGHT:
                         m_combine_vectors(map_reduced, (move.position_from().get_x() + 1) * 6 + 69, hash_to);
                         break;
-                                       
-                    /// This encapsulates a normal move
+                    /// 
+                    /// add the vector for the rook.
+                    /// These vectors are easily calculated and
+                    /// don't require any additional information
+                    case CASTLING_KINGSIDE:
+                        y = move.position_from().get_y();
+                        m_combine_vectors(map_reduced, y, 40 + y);
+                        break;
+                    /// 
+                    case CASTLING_QUEENSIDE:
+                        y = move.position_from().get_y();
+                        m_combine_vectors(map_reduced, y, 16 + y);
+                        break;
+                    /// 
                     /// No further information is required in this vector
                     default:
                         break;

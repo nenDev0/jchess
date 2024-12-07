@@ -345,7 +345,7 @@ public class King extends Piece
                         !get_collection().get_board_access().get_position(1, y).has_opposing_pieces_observing(get_type()) &&
                         !get_collection().get_board_access().get_position(2, y).has_opposing_pieces_observing(get_type()) &&
                         !get_collection().get_board_access().get_position(3, y).has_opposing_pieces_observing(get_type())) {
-                        get_legal_moves().put(get_collection().get_board_access().get_position(2, y), new MoveType[]{MoveType.CASTLING});
+                        get_legal_moves().put(get_collection().get_board_access().get_position(2, y), new MoveType[]{MoveType.CASTLING_QUEENSIDE});
                     }
                 }
             }
@@ -363,7 +363,7 @@ public class King extends Piece
                     if (!get_collection().get_board_access().get_position(4, y).has_opposing_pieces_observing(get_type()) &&
                         !get_collection().get_board_access().get_position(6, y).has_opposing_pieces_observing(get_type()) &&
                         !get_collection().get_board_access().get_position(6, y).has_opposing_pieces_observing(get_type())) {
-                        get_legal_moves().put(get_collection().get_board_access().get_position(6, y), new MoveType[]{MoveType.CASTLING});
+                        get_legal_moves().put(get_collection().get_board_access().get_position(6, y), new MoveType[]{MoveType.CASTLING_KINGSIDE});
                     }
                 }
             }
