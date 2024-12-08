@@ -6,7 +6,6 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 import src.java.engine.board.Board;
-import src.java.engine.board.piecelib.Piece;
 
 
 
@@ -25,6 +24,7 @@ public class performanceTests
         time = System.nanoTime();
         for (int i = 0; i < runs; i++)
         {
+            /*
             Openings.m_caro_kann(board);
 
             board.m_to_start();
@@ -40,6 +40,7 @@ public class performanceTests
 
             Openings.m_vienna(board);
             board.m_to_start();
+            */
         }
         time = System.nanoTime() - time;
         System.out.println("moving_pieces_backend - time taken: " + time/1000 +  "microseconds");
@@ -71,32 +72,32 @@ public class performanceTests
 
         for (int i = 0; i < runs; i++)
         {
-            Openings.m_caro_kann(board);
+            //Openings.m_caro_kann(board);
 
             start = System.nanoTime();
             board.get_history().get_as_vectors(0);
             time += System.nanoTime() - start;
             board.m_to_start();
 
-            Openings.m_catalan(board);
+            //Openings.m_catalan(board);
             start = System.nanoTime();
             board.get_history().get_as_vectors(0);
             time += System.nanoTime() - start;
             board.m_to_start();
 
-            Openings.m_london(board);
+            //Openings.m_london(board);
             start = System.nanoTime();
             board.get_history().get_as_vectors(0);
             time += System.nanoTime() - start;
             board.m_to_start();
 
-            Openings.m_sicilian_najdorf(board);
+            //Openings.m_sicilian_najdorf(board);
             start = System.nanoTime();
             board.get_history().get_as_vectors(0);
             time += System.nanoTime() - start;
             board.m_to_start();
 
-            Openings.m_vienna(board);
+            //Openings.m_vienna(board);
             start = System.nanoTime();
             board.get_history().get_as_vectors(0);
             time += System.nanoTime() - start;

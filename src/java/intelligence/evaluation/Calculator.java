@@ -204,7 +204,7 @@ public class Calculator
     {
         float value = 0;
 
-        LinkedList<Position> positions = board.get_collection(type).get_active_pieces().get(0).observer().get_observed_positions();
+        LinkedList<Position> positions = board.get_collection(type).get_active_pieces().get(0).get_observer().get_observed_positions();
         for (Position position : positions)
         {
             for (ObserverStorage o : position.get_observers())
@@ -294,7 +294,7 @@ public class Calculator
     private float vision(Board board, Piece piece)
     {
         float value = 0;
-        for (Position position : piece.observer().get_observed_positions())
+        for (Position position : piece.get_observer().get_observed_positions())
         {
             for (ObserverStorage o : position.get_observers())
             {
@@ -321,7 +321,7 @@ public class Calculator
      * @param board
      * @param piece
      * 
-     * @return {@code float value} 
+     * @return {@code float value}
      */
     private float protection(Board board, Piece piece)
     {
@@ -354,7 +354,7 @@ public class Calculator
      * 
      * @param piece
      * 
-     * @return {@code float value} 
+     * @return {@code float value}
      */
     private float likes_center(Piece piece)
     {
@@ -373,7 +373,7 @@ public class Calculator
      * 
      * @param piece
      * 
-     * @return {@code float value} 
+     * @return {@code float value}
      */
     private int likes_forward(Piece piece)
     {
@@ -393,7 +393,7 @@ public class Calculator
      * @param board
      * @param type
      * 
-     * @return {@code float value} 
+     * @return {@code float value}
      */
     private float pieceweight(Board board, Type type)
     {
@@ -418,12 +418,12 @@ public class Calculator
      * @param board
      * @param piece
      * 
-     * @return {@code float value} 
+     * @return {@code float value}
      */
     private float contested_positions(Board board, Piece piece)
     {
         float value = 0;
-        for (Position position : piece.get_legal_moves())
+        for (Position position : piece.get_legal_moves().keySet())
         {
             if (position.get_piece() != null)
             {
@@ -455,12 +455,12 @@ public class Calculator
      * @param board
      * @param piece
      * 
-     * @return {@code float value} 
+     * @return {@code float value}
      */
     private float safe_moves(Board board, Piece piece)
     {
         float value = 0;
-        for (Position position : piece.get_legal_moves())
+        for (Position position : piece.get_legal_moves().keySet())
         {
             // take into account the weight of the pieces controlling?
             if (!position.has_opposing_pieces_observing(piece.get_type()))
@@ -485,7 +485,7 @@ public class Calculator
      * @param board
      * @param piece
      * 
-     * @return {@code float value} 
+     * @return {@code float value}
      */
     private float is_observed(Board board, Piece piece)
     {

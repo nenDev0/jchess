@@ -1,6 +1,12 @@
 package src.java.engine.board;
 
 
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map.Entry;
+import java.util.TreeMap;
+
+import src.java.engine.board.Move.MoveType;
 import src.java.engine.board.piecelib.Piece;
 import src.java.engine.board.piecelib.Piece.Type;
 import src.java.engine.board.piecelib.Piece.PieceType;
@@ -15,7 +21,6 @@ public class Board extends NotificationCollector implements BoardAccess
         DRAW,
         CHECK,
         CHECKMATE
-        
     }
 
 
@@ -46,8 +51,8 @@ public class Board extends NotificationCollector implements BoardAccess
         this.black_pieces.m_standard_lineup();
         this.history = new History();
 
-        super.m_add_required_observers(this.white_pieces.get_pieces_of_type(PieceType.KING).get(0).observer());
-        super.m_add_required_observers(this.black_pieces.get_pieces_of_type(PieceType.KING).get(0).observer());
+        super.m_add_required_observers(this.white_pieces.get_pieces_of_type(PieceType.KING).get(0).get_observer());
+        super.m_add_required_observers(this.black_pieces.get_pieces_of_type(PieceType.KING).get(0).get_observer());
     }
 
     /// ### getters ### ///
@@ -146,19 +151,12 @@ public class Board extends NotificationCollector implements BoardAccess
         this.type = Type.get_opposite(this.type);
     }
     
-
-
-    public void m_commit(Position position_from , Position position_to)
-    {
-        m_commit(new Move(position_from, position_to));
-        
-    }
-
     public void m_commit(Move move)
     {
         get_history().m_register_move(move);
         move.m_commit();
         get_collection(get_type()).m_release_check();
+        get_collection(get_type()).m_request_update(PieceType.PAWN);
         m_type();
         m_dump_update_notifications();
         get_collection(get_type()).m_state();
@@ -176,7 +174,14 @@ public class Board extends NotificationCollector implements BoardAccess
         m_type();
         get_history().m_reverse();
         get_collection(get_type()).m_state();
-        //TODO do they need to be updated?
+        /// Currently, it seems without this, the code can throw a NPE
+        /// Testing the code with it enabled for now, hoping there is no NPE,
+        /// however that would not exactly aim towards this being the issue, as
+        /// the bug occurred after a prolonged period of time 
+        /// 
+        /// Exception in thread "Thread-4" java.lang.NullPointerException:
+        /// Cannot invoke "src.java.engine.board.Position.get_x()"
+        /// because the return value of "src.java.engine.board.piecelib.Piece.get_position()" is null
         get_collection(get_type()).m_request_update(PieceType.PAWN);
         m_dump_update_notifications();
     }
@@ -207,7 +212,7 @@ public class Board extends NotificationCollector implements BoardAccess
 
                 if (!p1.get_position().equals(p2.get_position().convert(this)))
                 {
-                    return p1.get_position();
+                    return p1.ID() + p1.get_position();
                 }
                 // legal positions
                 if (p1.get_legal_moves().size() != p2.get_legal_moves().size())
@@ -215,13 +220,13 @@ public class Board extends NotificationCollector implements BoardAccess
                     return p1.ID() + p1.get_legal_moves() + "\n\\vvvvvv//\n" + p2.ID() + p2.get_legal_moves();
                 }
 
-                for (int j = 0; j < p1.get_legal_moves().size(); j++)
-                {
-                    Position pos1 = p1.get_legal_moves().get(j);
-                    Position pos2 = p2.get_legal_moves().get(j);
-                    if (pos1.equals(pos2))
-                    {
-                        return new Move(p1.get_position(), pos1);
+                Iterator<Entry<Position, MoveType[]>> iterator1 = p1.get_legal_moves().entrySet().iterator();  
+                for (Entry<Position, MoveType[]> entry : p2.get_legal_moves().entrySet()) {
+                    if (!iterator1.next().getKey().equals(entry.getKey().convert(this))) {
+                        LinkedList<Move> ll_moves = new LinkedList<Move>();
+                        ll_moves.add(new Move(p1.get_position(), entry.getKey(), entry.getValue()));
+                        ll_moves.add(new Move(p2.get_position(), entry.getKey(), entry.getValue()));
+                        return ll_moves + ",\n" + p1.get_legal_moves() + "\n" + p2.get_legal_moves();
                     }
                 }
             }
@@ -293,8 +298,7 @@ public class Board extends NotificationCollector implements BoardAccess
         clone.m_initialise();
         for (int i = 0; i < get_history().get_length(); i++)
         {
-            clone.get_history().m_register_move(get_history().get_move(i).convert(clone));
-            clone.get_history().get_move(i).m_commit();
+            clone.m_commit(get_history().get_move(i).convert(clone));
         }
 
         if (get_type() != Type.WHITE)
@@ -303,6 +307,20 @@ public class Board extends NotificationCollector implements BoardAccess
         }
         clone.m_dump_update_notifications();
         return clone;
+    }
+
+    public TreeMap<String, Integer> get_reduced()
+    {
+        TreeMap<String, Integer> map_pieces = new TreeMap<String, Integer>();
+        for (Type type : Type.values())
+        {
+            for (Piece piece : get_collection(type).get_active_pieces())
+            {
+                Position pos = piece.get_position();
+                map_pieces.put(piece.ID(), Integer.rotateLeft(pos.get_x(), 3) + pos.get_y());
+            }
+        }
+        return map_pieces;
     }
 
     @Override

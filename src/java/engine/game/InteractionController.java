@@ -106,7 +106,7 @@ public class InteractionController
 
 
     /**
-     *  Used to visualize the evaluation of a legal move.
+     *  Used to visualize the evaluation of a legal move in the GUI.
      *  
      *  <p> currently not called #unused
      * 

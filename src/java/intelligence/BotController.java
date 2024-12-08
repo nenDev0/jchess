@@ -195,7 +195,7 @@ public class BotController extends Thread
         }
         catch (Exception e)
         {
-            throw new IllegalArgumentException("Something went vewwy wong");
+            throw e;
         }
 
         m_adjust_bots(move);

@@ -5,6 +5,7 @@ import java.util.LinkedList;
 
 import src.java.engine.board.PieceCollection;
 import src.java.engine.board.Position;
+import src.java.engine.board.Move.MoveType;
 import src.java.engine.board.updatesystem.ObserverStorage;
 
 
@@ -12,6 +13,7 @@ public class King extends Piece
 {
 
     private static final int weight = 0;
+    /// used for evaluations
     private int visible_from;
     
     public King(PieceCollection collection, int index)
@@ -45,7 +47,6 @@ public class King extends Piece
         }
         int y = pawn_directional(0, 7);
 
-        //System.out.println("Castling: queenside: " + queenside_castle + ", kingside: " + kingside_castle);
         Piece rook_queenside = get_collection().get_board_access().get_position(0, y).get_piece();
 
         if (rook_queenside != null)
@@ -82,10 +83,11 @@ public class King extends Piece
     {
         m_king_moves();
 
-        LinkedList<Position> ll_legal_moves = super.get_legal_moves();
-        for (int i = ll_legal_moves.size() - 1; i >= 0 ; i--)
+        Iterator<Position> position_iterator = super.get_legal_moves().keySet().iterator();
+        while (position_iterator.hasNext())
         {
-            Iterator<ObserverStorage> iterator = ll_legal_moves.get(i).get_observers().iterator();
+            Position position = position_iterator.next();
+            Iterator<ObserverStorage> iterator = position.get_observers().iterator();
             while (iterator.hasNext())
             {
                 ObserverStorage o = iterator.next();
@@ -93,7 +95,7 @@ public class King extends Piece
                 {
                     continue;
                 }
-                ll_legal_moves.remove(i);
+                position_iterator.remove();
                 break;
             }
         }
@@ -257,7 +259,6 @@ public class King extends Piece
                 continue;
             }
             else {
-                //System.out.println("Problem child found!" + i_x + ", " + i_y);
                 return ll_restrictions;
             }
         }
@@ -329,10 +330,10 @@ public class King extends Piece
         int y = pawn_directional(0, 7);
         if (can_castle_queenside()) {
             Piece rook_queenside = get_collection().get_board_access().get_position(0, y).get_piece();
-            //
-            //  
-            //  
-            //
+            ///
+            /// queenside castling
+            /// checks, if there are any pieces inbetween rook and king
+            /// checks, if any pieces of the opposing player can see the positions inbetween rook and king
             if (is_type(rook_queenside.get_type()) && rook_queenside.moves() == 0 )
             {
                 if (get_collection().get_board_access().get_position(1, y).get_piece() == null &&
@@ -342,17 +343,17 @@ public class King extends Piece
                         !get_collection().get_board_access().get_position(1, y).has_opposing_pieces_observing(get_type()) &&
                         !get_collection().get_board_access().get_position(2, y).has_opposing_pieces_observing(get_type()) &&
                         !get_collection().get_board_access().get_position(3, y).has_opposing_pieces_observing(get_type())) {
-                        get_legal_moves().add(get_collection().get_board_access().get_position(2, y));
+                        get_legal_moves().put(get_collection().get_board_access().get_position(2, y), new MoveType[]{MoveType.CASTLING_QUEENSIDE});
                     }
                 }
             }
         }
         if (can_castle_kingside()) {
             Piece rook_kingside = get_collection().get_board_access().get_position(7, y).get_piece();
-            //
-            //  
-            //  
-            //
+            ///
+            /// kingside castling
+            /// checks, if there are any pieces inbetween rook and king
+            /// checks, if any pieces of the opposing player can see the positions inbetween rook and king
             if (is_type(rook_kingside.get_type()) && rook_kingside.moves() < 1)
             {
                 if (get_collection().get_board_access().get_position(5, y).get_piece() == null &&
@@ -360,7 +361,7 @@ public class King extends Piece
                     if (!get_collection().get_board_access().get_position(4, y).has_opposing_pieces_observing(get_type()) &&
                         !get_collection().get_board_access().get_position(6, y).has_opposing_pieces_observing(get_type()) &&
                         !get_collection().get_board_access().get_position(6, y).has_opposing_pieces_observing(get_type())) {
-                        get_legal_moves().add(get_collection().get_board_access().get_position(6, y));
+                        get_legal_moves().put(get_collection().get_board_access().get_position(6, y), new MoveType[]{MoveType.CASTLING_KINGSIDE});
                     }
                 }
             }

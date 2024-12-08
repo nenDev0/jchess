@@ -2,7 +2,8 @@ package src.java.engine.game;
 
 
 
-import java.util.LinkedList;
+import java.util.Optional;
+import java.util.Set;
 
 import src.java.engine.board.Board;
 import src.java.engine.board.Move;
@@ -92,12 +93,6 @@ public class Game {
             return false;
         }
         this.selected_piece = piece;
-        Board clone = board.clone();
-        for (Position position : selected_piece.get_legal_moves())
-        {
-            clone.m_commit(new Move(selected_piece.get_position(), position).convert(clone));
-            clone.m_revert();
-        }
         return true;
     }
 
@@ -138,15 +133,14 @@ public class Game {
                 return true;
             }
         }
-        if(!selected_piece.is_legal_move(position))
+        Optional<Move> move = selected_piece.get_legal_move(position);
+        if(move.isEmpty())
         {
             m_deselect_piece();
             return false;
         }
-        Piece piece = selected_piece;
         m_deselect_piece();
-        board.m_commit(piece.get_position(), position);
-        // TODO: adjust tree crashes after reverse, while botplay is disabled.
+        board.m_commit(move.get());
         /*if (board.get_collection(get_turn()).get_active_pieces().size() < piececount.get(get_turn()))
         {
             sound_engine.play_take();
@@ -165,13 +159,13 @@ public class Game {
      *  @return ({@code null}, if no piece is selected,
      *           {@code LinkedList<Position>}, legal moves of the selected piece)
      */
-    public LinkedList<Position> get_legal_moves()
+    public Set<Position> get_legal_moves()
     {
         if (selected_piece == null)
         {
             return null;
         }
-        return selected_piece.get_legal_moves();
+        return selected_piece.get_legal_moves().keySet();
     }
 
 

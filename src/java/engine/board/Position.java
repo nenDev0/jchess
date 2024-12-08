@@ -9,7 +9,8 @@ import src.java.engine.board.updatesystem.Observer;
 import src.java.engine.board.updatesystem.ObserverSender;
 import src.java.engine.board.updatesystem.ObserverStorage;
 
-public class Position {
+public class Position 
+{
     private int x;
     private int y;
     private LinkedList<ObserverStorage> ll_observers;
@@ -97,6 +98,7 @@ public class Position {
 
     @Override
     public int hashCode() {
-        return x * 8 + y;
+        return (x << 3) + y;
     }
+
 }
