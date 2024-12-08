@@ -5,6 +5,7 @@ import java.util.TreeMap;
 
 import src.java.engine.board.Board;
 import src.java.engine.board.Move;
+import src.java.engine.board.Move.MoveType;
 import src.java.engine.board.piecelib.Piece.Type;
 import src.java.intelligence.evaluation.Calculator;
 
@@ -15,6 +16,7 @@ public class TreeHeader
     private MoveNode top_node;
     private Board board;
     private float weight;
+    private final int original_depth;
     private int depth;
     private int moves;
     private Type type;
@@ -56,6 +58,7 @@ public class TreeHeader
         nodes_ended = 0;
         top_node = new MoveNode(this);
         this.depth = depth;
+        this.original_depth = depth;
         this.board = board;
         board.m_initialise();
 
@@ -159,24 +162,54 @@ public class TreeHeader
     }
 
 
-    public Type get_opposite(Type type)
-    {
-        if (type == Type.WHITE)
-        {
-            return Type.BLACK;
-        }
-        else {
-            return Type.WHITE;
-        }
-    }
-
-
+    /**
+     *  {@code if (the tree has this move as a child)}
+     *      sets this tree to the subtree of that child,
+     *  {@code else}
+     *      clears the tree
+     * 
+     * 
+     *  <p> Note: this method also dictates the future depth of the tree
+     *      If the piececount has fallen low enough, the depth of the tree
+     *      will increase
+     * 
+     * @param move
+     * 
+     */
     public void m_adjust(Move move)
     {
         moves++;
         move = move.convert(board);
         board.m_commit(move);
         top_node.m_set_children(move, board);
+        int piececount = 0;
+        for (Type type : Type.values())
+        {
+            piececount += board.get_collection(type).get_active_pieces().size();
+        }
+        ///
+        /// increases depth, when the overall piececount decreased significantly enough
+        /// This hopefully allows the bot to find easy queen-king checkmates
+        /// This could be based off of possible moves per piece in future
+        /// 
+        for (MoveType move_type : move.get_types())
+        {
+            if (move_type.equals(MoveType.TAKES))
+            {
+                this.depth = original_depth + 2 *(int)(original_depth * ((float)32/piececount - 1)/32);
+                int cache_size = depth/2;
+                if (cache_size < 0)
+                {
+                    cache_size = 0;
+                }
+                cache = new CacheNode[cache_size];
+                for (int i = 0; i < cache_size; i++)
+                {
+                    cache[i] = new CacheNode();
+                }
+                System.out.println("depth is: "+depth);
+            }
+        }
    }
 
 
