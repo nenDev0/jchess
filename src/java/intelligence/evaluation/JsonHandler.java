@@ -20,6 +20,13 @@ public class JsonHandler
     public static final int NUMBER_OF_GLOBAL_VALUES = 8;
     public static final int NUMBER_OF_TOPICS = 2;
 
+
+    /**
+     * 
+     * 
+     * @param path
+     * 
+     */
     public JsonHandler(String path)
     {
         try
@@ -32,6 +39,15 @@ public class JsonHandler
         }
     }
 
+
+    /**
+     * 
+     * 
+     * @param file
+     * 
+     * @throws Exception
+     *
+     */
     private void read_file(File file) throws Exception
     {
         Scanner scanner = new Scanner(file);
@@ -45,6 +61,14 @@ public class JsonHandler
         scanner.close();
     }
 
+
+    /**
+     * 
+     * 
+     * @param segment
+     * 
+     * @return
+     */
     public float[] values(String segment)
     {
         String[] s_values = segment.split(",");
@@ -57,16 +81,42 @@ public class JsonHandler
 
     }
 
+
+    /**
+     * 
+     * 
+     * @param identification
+     * 
+     * @return
+     */
     public String info(String identification)
     {
         return extract(file_data, identification);
     }
 
+
+    /**
+     * 
+     * 
+     * @param topic
+     * @param identification
+     * 
+     * @return
+     */
     public String info(String topic, String identification)
     {
         return extract(extract(file_data, topic), identification);
     }
 
+
+    /**
+     * 
+     * 
+     * @param config
+     * @param file_path
+     * @param type
+     * 
+     */
     public void write_config(Configuration config, String file_path, Type type)
     {
         System.out.println("WIRTING CONFIG");
@@ -74,9 +124,7 @@ public class JsonHandler
         PieceType[] piece_types = PieceType.values();
         String json = "{\n"
                     + "    \"TYPE\": \"" + type.name() + "\",\n";
-
         json = json + "    \"" + EvalType.TIMELINE + "\":                                     " + config.state_setting() + ",\n";
-
         json = json + "    \""+ EvalType.GLOBAL +"\":\n    {\n";
         for (int i = NUMBER_OF_PIECE_SPECIFIC_VALUES; i < NUMBER_OF_PIECE_SPECIFIC_VALUES + NUMBER_OF_GLOBAL_VALUES; i++)
         {
@@ -111,9 +159,8 @@ public class JsonHandler
             json = json + "\n";
         }
         json = json + "}";
-
-        // TODO implement Changelog -> use in further iterations
-
+        ///
+        /// TODO implement Changelog -> use in further iterations
         try
         {
         FileWriter newgen = new FileWriter(file_path);
@@ -125,6 +172,7 @@ public class JsonHandler
             throw new IllegalArgumentException("couldn't write!");
         }
     }
+
 
     private String write_setting(EvalType eval, Setting setting, int i)
     {
@@ -143,6 +191,7 @@ public class JsonHandler
         s = s + "\n";
         return s;
     }
+
 
     private String extract(String data, String identification)
     {
@@ -168,6 +217,7 @@ public class JsonHandler
         return segment;
     }
 
+
     private int m_next_ender(String data)
     {
         int position = -1;
@@ -181,8 +231,8 @@ public class JsonHandler
             }
         }
         return position;
-
     }
+
 
     private String m_segment_finder(String data, char bracket, char bracket_end)
     {

@@ -24,7 +24,7 @@ public class BotController extends Thread
 
 
     /**
-     * 
+     * Constructor
      * 
      */
     public BotController()
@@ -64,6 +64,7 @@ public class BotController extends Thread
 
     /**
      * 
+     * 
      */
     private void m_reset_bots()
     {
@@ -73,6 +74,7 @@ public class BotController extends Thread
 
 
     /**
+     * 
      * 
      */
     private void m_bots_to_start()
@@ -197,9 +199,9 @@ public class BotController extends Thread
         {
             throw e;
         }
-
+        ///
         m_adjust_bots(move);
-
+        ///
         return is_final;
     }
 
@@ -237,9 +239,7 @@ public class BotController extends Thread
                 {
                    type = Type.get_opposite(type);
                 }
-                interaction_controller.m_reset();
-                m_bots_to_start();
-                if (get_bot(type).get_calculator().get_configuration().is_randomized())
+                if (get_bot(type).get_calculator().get_configuration().is_randomized() && interaction_controller.get_gamestate() == GameState.CHECKMATE)
                 {
                     m_reverse_bot_color();
                     if (j == 1)
@@ -253,6 +253,8 @@ public class BotController extends Thread
                     Config.m_add_loss();
                     j = 2;
                 }
+                interaction_controller.m_reset();
+                m_bots_to_start();
                 type = Type.WHITE;
             }
             m_reset_bots();

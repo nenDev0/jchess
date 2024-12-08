@@ -30,6 +30,15 @@ public class MoveNode extends Move implements Comparable<MoveNode>
     private boolean best_move_calculated;
 
 
+    /**
+     * Constructor
+     * 
+     * @param position1
+     * @param position2
+     * @param arr_types
+     * @param header
+     * 
+     */
     public MoveNode(Position position1, Position position2, MoveType[] arr_types, TreeHeader header)
     {
         super(position1, position2, arr_types);
@@ -331,6 +340,7 @@ public class MoveNode extends Move implements Comparable<MoveNode>
             } catch (Exception e) {
                 System.out.println(board);
                 System.out.println(set_children);
+                System.out.println("the problem: " +move);
                 throw e;
             }
         }
@@ -361,6 +371,7 @@ public class MoveNode extends Move implements Comparable<MoveNode>
             {
                 System.out.println(board);
                 System.out.println(set_children);
+                System.out.println("the problem: " +move);
                 throw e;
             }
         }
