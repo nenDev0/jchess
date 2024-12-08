@@ -57,11 +57,11 @@ public class CacheNode {
         Entry<Integer, Integer> entry = values.next();
         CacheNode new_node = new CacheNode();
         ///
-        /// Position_from values (Keys) need to be rotated by 10 bits. The final format is the following:
-        /// ###.    ###.    #.      ###.        ###.    ###
-        /// x_from. y_from. passant.movetypes.  x_to.   y_to
-        /// 0-7     0-7     0-1     0-5         0-7     0-7
-        CacheNode node = map_nodes.putIfAbsent((entry.getKey() << 10) + entry.getValue(), new_node);
+        /// Position_from values (Keys) need to be rotated by 11 bits. The final format is the following:
+        /// ###.    ###.    #.          ###.        #.      ###.    ###
+        /// x_from. y_from. passant.    promotions. pos64.  x_to.   y_to
+        /// 0-7     0-7     0-1         0-4         0-1     0-7     0-7
+        CacheNode node = map_nodes.putIfAbsent((entry.getKey() << 11) + entry.getValue(), new_node);
         if (node == null)
         {
             return new_node.m_add_value(values, move);

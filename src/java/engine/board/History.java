@@ -120,15 +120,36 @@ public class History
      *  represented using global vectors. This means, an entry of the map
      *  will define exactly, how a piece from position 1 moved to position 2
      * 
+     * <p> {@code <K: position_from(int), V: position_to(int)>}
+     * 
      *  <p> Important Note: Moves which have a movetype will modify the outcome.
      *      A piece which has been taken should not have a vector
      *      representing it's location on the board.
-     *      For this case, we use negative values.
+     *      For this case, we use additional bits leading the position_to value. 
      * 
-     * @param from
+     *  <p> The following values are always rotated by 6 bits left:
+     *      (In the code, trailing zeros are partially reduced for readability)
+     *   
+     *  <p> {@code (0b00001 (1))} -> no longer on the board (position 64)
+     *  <p> {@code (0b00010 (2))} -> promotion to queen
+     *  <p> {@code (0b00100 (3))} -> promotion to rook 
+     *  <p> {@code (0b00110 (4))} -> promotion to bishop 
+     *  <p> {@code (0b01000 (5))} -> promotion to knight 
+     *  <p> {@code (0b10000 (6))} -> last move is a pawn double forward
+     *      
+     *  <p> As some of these can happen at the same time, or leak into
+     *      surrounding bits, this seems to be the minimal amount of bits.
+     * 
+     *      There for sure are some steps one could take to reduce it by a single bit,
+     *      however it will most likely not get much better than that
+     * 
+     * 
+     * @param from // at which move this algorithm will start reducing
      * 
      * @return TreeMap<Integer, Integer> // each entry represents {@code<K:pos_from, V:pos_to>};
      *                                      pos_from, pos_to as Integers
+     *                                      note: pos_to has additional leading bits for the
+     *                                      described usecases 
      */
     public TreeMap<Integer, Integer> get_as_vectors(int from)
     {
@@ -165,7 +186,7 @@ public class History
                 move.position_to().get_piece().get_piece_type() == PieceType.PAWN &&
                 Math.abs(move.position_from().get_y() - move.position_to().get_y()) == 2)
             {
-                int last_move_bit_en_passant = (1 << 9);
+                int last_move_bit_en_passant = (1 << 10);
                 hash_to = move.position_to().hashCode() + last_move_bit_en_passant;
                 m_combine_vectors(map_reduced, hash_from, hash_to);
                 hash_to += -last_move_bit_en_passant;
@@ -201,19 +222,19 @@ public class History
                     /// and be identified as the same board positions, even if they are not.
                     /// 
                     case PROMOTION_QUEEN:
-                        map_reduced.put(hash_from, map_reduced.get(hash_from) + (2 << 6));
+                        map_reduced.put(hash_from, map_reduced.get(hash_from) + (1 << 7));
                         break;
                     /// 
                     case PROMOTION_ROOK:
-                        map_reduced.put(hash_from, map_reduced.get(hash_from) + (3 << 6));
+                        map_reduced.put(hash_from, map_reduced.get(hash_from) + (2 << 7));
                         break;
                     /// 
                     case PROMOTION_BISHOP:
-                        map_reduced.put(hash_from, map_reduced.get(hash_from) + (4 << 6));
+                        map_reduced.put(hash_from, map_reduced.get(hash_from) + (3 << 7));
                         break;
                     /// 
                     case PROMOTION_KNIGHT:
-                        map_reduced.put(hash_from, map_reduced.get(hash_from) + (5 << 6));
+                        map_reduced.put(hash_from, map_reduced.get(hash_from) + (4 << 7));
                         break;
                     /// 
                     /// add the vector for the rook.

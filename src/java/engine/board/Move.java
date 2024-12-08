@@ -7,7 +7,6 @@ import src.java.engine.board.piecelib.Piece.PieceType;
 
 public class Move
 {
-    // TODO fix move-test -> give moves an ID, so consistency is more clear
 
     /**
      *      Note that some of these can happen at the same time.
@@ -36,7 +35,7 @@ public class Move
     private final Position position_from;
     private final Position position_to;
     private final PieceType implementation;
-    private Piece taken_piece;
+    private final Piece taken_piece;
     private final MoveType[] arr_types;
 
     private float weight;
@@ -47,6 +46,7 @@ public class Move
         position_from = null;
         position_to = null;
         implementation = null;
+        taken_piece = null;
     }
 
     /**
@@ -69,16 +69,18 @@ public class Move
         /// The move must receive this information.
         /// new class to dictate, which piece is allowed to move where?
         /// -> reduce class hierarchy to only include "piece" as an overall class?
+        Piece taken_piece = null;
         for (MoveType move_type : arr_types) {
             switch (move_type) {
                 case TAKES:
                     taken_piece = position_to().get_piece();
                     break;
-            
+                ///
                 default:
                     break;
             }
         }
+        this.taken_piece = taken_piece;
 
         this.implementation = position_from.get_piece().get_piece_type();
     }

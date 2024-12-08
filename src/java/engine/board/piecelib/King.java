@@ -47,7 +47,6 @@ public class King extends Piece
         }
         int y = pawn_directional(0, 7);
 
-        //System.out.println("Castling: queenside: " + queenside_castle + ", kingside: " + kingside_castle);
         Piece rook_queenside = get_collection().get_board_access().get_position(0, y).get_piece();
 
         if (rook_queenside != null)
@@ -260,7 +259,6 @@ public class King extends Piece
                 continue;
             }
             else {
-                //System.out.println("Problem child found!" + i_x + ", " + i_y);
                 return ll_restrictions;
             }
         }
@@ -334,7 +332,7 @@ public class King extends Piece
             Piece rook_queenside = get_collection().get_board_access().get_position(0, y).get_piece();
             ///
             /// queenside castling
-            /// checks, if there is any pieces inbetween rook and king
+            /// checks, if there are any pieces inbetween rook and king
             /// checks, if any pieces of the opposing player can see the positions inbetween rook and king
             if (is_type(rook_queenside.get_type()) && rook_queenside.moves() == 0 )
             {
@@ -354,7 +352,7 @@ public class King extends Piece
             Piece rook_kingside = get_collection().get_board_access().get_position(7, y).get_piece();
             ///
             /// kingside castling
-            /// checks, if there is any pieces inbetween rook and king
+            /// checks, if there are any pieces inbetween rook and king
             /// checks, if any pieces of the opposing player can see the positions inbetween rook and king
             if (is_type(rook_kingside.get_type()) && rook_kingside.moves() < 1)
             {
