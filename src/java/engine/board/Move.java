@@ -23,8 +23,8 @@ public class Move
         CASTLING_QUEENSIDE,
         CASTLING_KINGSIDE,
         /// Note that, as it stands. A move, which is EN_PASSANT, is not considered TAKES
-        EN_PASSANT,
-        PROMOTION,
+        EN_PASSANT_LEFT,
+        EN_PASSANT_RIGHT,
         PROMOTION_QUEEN,
         PROMOTION_ROOK,
         PROMOTION_BISHOP,
@@ -182,10 +182,7 @@ public class Move
 
     public Move convert(Board board)
     {
-        Position pos1 = board.get_position(position_from.get_x(), position_from.get_y());
-        Position pos2 = board.get_position(position_to.get_x(), position_to.get_y());
-        Move conversion = new Move(pos1, pos2, arr_types);
-        return conversion;
+        return new Move(position_from.convert(board), position_to.convert(board), arr_types);
     }
 
     @Override
@@ -199,7 +196,7 @@ public class Move
 
     @Override
     public int hashCode() {
-       return Integer.rotateLeft(position_from.hashCode(), 6) + position_to.hashCode();
+       return (position_from.hashCode() << 6) + position_to.hashCode();
     }
 
     

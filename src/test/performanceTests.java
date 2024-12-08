@@ -6,7 +6,6 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 import src.java.engine.board.Board;
-import src.java.engine.board.piecelib.Piece;
 
 
 

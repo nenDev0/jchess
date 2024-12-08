@@ -25,6 +25,7 @@ public class MoveNode extends Move implements Comparable<MoveNode>
     private TreeHeader header;
     private boolean is_final;
     private float actual_weight;
+    public Board clone;
     ///
     /// If two parent nodes have this node as a child, this will prevent them from doing duplicate calculations
     private boolean best_move_calculated;
@@ -148,6 +149,7 @@ public class MoveNode extends Move implements Comparable<MoveNode>
      */
     public boolean create_node(Board board, Calculator calculator, int iteration)
     {
+        this.clone = board.clone();
         header.m_add_total_executions();
         this.is_final = set_final_state(board, calculator, iteration);
 
@@ -194,6 +196,18 @@ public class MoveNode extends Move implements Comparable<MoveNode>
             MoveNode older_cousin = header.m_add_history_to_cache(this, board.get_history().get_as_vectors(header.get_move_count()),(iteration - 3)/2);
             if (older_cousin != null)
             {
+                Object o = clone.continuity_check(older_cousin.clone);
+                if (o != null)
+                {
+                    System.out.println(clone.get_history().get_as_vectors((iteration - 3)/2));
+                    System.out.println(older_cousin.clone.get_history().get_as_vectors((iteration - 3)/2));
+                    System.out.println(clone);
+                    System.out.println(older_cousin.clone);
+                    System.out.println(clone.get_history());
+                    System.out.println("=============================================================");
+                    System.out.println(older_cousin.clone.get_history());
+                    throw new IllegalArgumentException(o.toString());
+                }
                 this.set_children.addAll(older_cousin.get_children());
                 this.set_abandoned.addAll(older_cousin.get_abandoned());
 
@@ -246,6 +260,7 @@ public class MoveNode extends Move implements Comparable<MoveNode>
 
         //  can continue
         //  -> follows down the tree
+        this.clone = board.clone();
         for (MoveNode child : set_children)
         {
             try
@@ -257,9 +272,18 @@ public class MoveNode extends Move implements Comparable<MoveNode>
             }
             catch (Exception e)
             {
-                System.out.println(board);
+                System.out.println(clone);
                 System.out.println(set_children);
                 throw e;
+            }
+            Object o = board.continuity_check(clone);
+            if (o != null)
+            {
+                System.out.println(o);
+                System.out.println(child);
+                System.out.println(clone);
+                System.out.println(board);
+                throw new IllegalArgumentException("AAAAAAAAAAAAAAAAAAAAAAAAAAAA");
             }
         }
     }

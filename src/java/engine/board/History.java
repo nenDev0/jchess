@@ -32,6 +32,11 @@ public class History
         return ll_moves.size();
     }
 
+    /**
+     * 
+     * @throws NullPointerException // {@code if move.position_from().get_piece() == null}
+     * @param move
+     */
     public void m_register_move(Move move)
     {
         ll_moves.add(move);
@@ -127,20 +132,51 @@ public class History
      */
     public TreeMap<Integer, Integer> get_as_vectors(int from)
     {
-
         TreeMap<Integer, Integer> map_reduced = new TreeMap<Integer, Integer>();
+        /// 
+        /// Note: the iterator is descending for two reasons:
+        /// 
+        ///     1. Descending is slightly faster, as it does not need to iterate
+        ///     over moves, which don't need to be considered.
+        /// 
+        ///     2. It allows us to work with the keys of the TreeMap, when we write
+        ///     the vectors as {key: from => value: to}
+        /// 
+        /// However this method comes with one massive Con:
+        /// 
+        ///     The maps can currently not be cached, unless the algorithm receives
+        ///     multiple changes.
+        /// 
         Iterator<Move> iterator = ll_moves.descendingIterator();
-        
         int i = get_length();
-        while (i != from)
+        while (i > from)
         {
-            i--;
             Move move = iterator.next();
             int hash_from = move.position_from().hashCode();
-            int hash_to = move.position_to().hashCode();
-            m_combine_vectors(map_reduced, hash_from, hash_to);
-            
-            /// required for castling.
+            int hash_to;
+            /// 
+            /// When a pawn enables en-passant on the last move
+            /// on one board, another board may be recognized as being the same,
+            /// although en-passant is not possible.
+            /// Adding an additional bit, in case en-passant is possible,
+            /// prevents this.
+            /// 
+            if (i == get_length() &&
+                move.position_to().get_piece().get_piece_type() == PieceType.PAWN &&
+                Math.abs(move.position_from().get_y() - move.position_to().get_y()) == 2)
+            {
+                int last_move_bit_en_passant = (1 << 9);
+                hash_to = move.position_to().hashCode() + last_move_bit_en_passant;
+                m_combine_vectors(map_reduced, hash_from, hash_to);
+                hash_to += -last_move_bit_en_passant;
+            }
+            else
+            {
+                hash_to = move.position_to().hashCode();
+                m_combine_vectors(map_reduced, hash_from, hash_to);
+            }
+            i--;
+            /// required for case CASTLING.
             int y;
             for (MoveType type : move.get_types())
             {
@@ -148,23 +184,14 @@ public class History
                 {
                     case TAKES:
                         /// 
-                        /// taken piece vector will end in -1,
+                        /// taken piece vector will end in 64,
                         /// representing it has been removed from the game
-                        map_reduced.put(hash_to, 64);
-                        break;
-                    /// 
-                    case PROMOTION:
                         /// 
-                        /// pawn vector will end in -2
-                        /// representing it has promoted
-                        map_reduced.put(hash_from, 65);
+                        map_reduced.put(hash_to, 1 << 6);
                         break;
-                    ///
-                    /// current piece vector at it's from value will have a value
-                    /// representing the promotion-type of the piece (inverted)
                     /// 
-                    /// This method separates the vector of the pawn from the vector
-                    /// of itself as a promoted piece
+                    /// vectors will gain additional bits on the position_to value
+                    /// in order to represent the promotion-type of the piece
                     /// 
                     /// This ensures, boards with the same vectors are also
                     /// compared by the correct promotions
@@ -173,37 +200,44 @@ public class History
                     /// at the end, they could have differing promotions (i.e. knight, bishop)
                     /// and be identified as the same board positions, even if they are not.
                     /// 
-                    /// TODO: Problem: pieces, which originate from the same value, will be overwritten.
-                    /// Here we calculate the x_value * 6 + ..., in order to make this possibility vanishingly
-                    /// small. However, it will happen, so hopefully there is a better way.
-                    /// 
                     case PROMOTION_QUEEN:
-                        m_combine_vectors(map_reduced, (move.position_from().get_x() + 1) * 6 + 66, hash_to);
+                        map_reduced.put(hash_from, map_reduced.get(hash_from) + (2 << 6));
                         break;
                     /// 
                     case PROMOTION_ROOK:
-                        m_combine_vectors(map_reduced, (move.position_from().get_x() + 1) * 6 + 67, hash_to);
+                        map_reduced.put(hash_from, map_reduced.get(hash_from) + (3 << 6));
                         break;
                     /// 
                     case PROMOTION_BISHOP:
-                        m_combine_vectors(map_reduced, (move.position_from().get_x() + 1) * 6 + 68, hash_to);
+                        map_reduced.put(hash_from, map_reduced.get(hash_from) + (4 << 6));
                         break;
                     /// 
                     case PROMOTION_KNIGHT:
-                        m_combine_vectors(map_reduced, (move.position_from().get_x() + 1) * 6 + 69, hash_to);
+                        map_reduced.put(hash_from, map_reduced.get(hash_from) + (5 << 6));
                         break;
                     /// 
                     /// add the vector for the rook.
+                    /// 
                     /// These vectors are easily calculated and
                     /// don't require any additional information
                     case CASTLING_KINGSIDE:
                         y = move.position_from().get_y();
-                        m_combine_vectors(map_reduced, y, 40 + y);
+                        m_combine_vectors(map_reduced,(7 << 3) + y, (5 << 3) + y);
                         break;
                     /// 
                     case CASTLING_QUEENSIDE:
                         y = move.position_from().get_y();
-                        m_combine_vectors(map_reduced, y, 16 + y);
+                        m_combine_vectors(map_reduced, y, (3 << 3) + y);
+                        break;
+                    /// 
+                    /// sets the vector for the piece taken
+                    /// 
+                    /// These vectors are easily calculated and
+                    /// don't require any additional information
+                    case EN_PASSANT_LEFT: case EN_PASSANT_RIGHT:
+                        m_combine_vectors(map_reduced,
+                                         (move.position_to().get_x() << 3) + move.position_from().get_y(),
+                                         (1 << 6));
                         break;
                     /// 
                     /// No further information is required in this vector
@@ -235,6 +269,11 @@ public class History
         Integer removed = map_reduced.remove(hash_to);
             if (removed != null)
             {
+                ///
+                /// Note that if a value points to itself one cannot remove it,
+                /// as in the case of a king or a rook, it provides the information,
+                /// castling is no longer allowed.
+                /// 
                 map_reduced.put(hash_from, removed);
             }
             else

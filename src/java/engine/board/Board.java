@@ -2,6 +2,7 @@ package src.java.engine.board;
 
 
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
@@ -155,6 +156,7 @@ public class Board extends NotificationCollector implements BoardAccess
         get_history().m_register_move(move);
         move.m_commit();
         get_collection(get_type()).m_release_check();
+        get_collection(get_type()).m_request_update(PieceType.PAWN);
         m_type();
         m_dump_update_notifications();
         get_collection(get_type()).m_state();
@@ -180,7 +182,7 @@ public class Board extends NotificationCollector implements BoardAccess
         /// Exception in thread "Thread-4" java.lang.NullPointerException:
         /// Cannot invoke "src.java.engine.board.Position.get_x()"
         /// because the return value of "src.java.engine.board.piecelib.Piece.get_position()" is null
-         get_collection(get_type()).m_request_update(PieceType.PAWN);
+        get_collection(get_type()).m_request_update(PieceType.PAWN);
         m_dump_update_notifications();
     }
 
@@ -210,7 +212,7 @@ public class Board extends NotificationCollector implements BoardAccess
 
                 if (!p1.get_position().equals(p2.get_position().convert(this)))
                 {
-                    return p1.get_position();
+                    return p1.ID() + p1.get_position();
                 }
                 // legal positions
                 if (p1.get_legal_moves().size() != p2.get_legal_moves().size())
@@ -220,9 +222,11 @@ public class Board extends NotificationCollector implements BoardAccess
 
                 Iterator<Entry<Position, MoveType[]>> iterator1 = p1.get_legal_moves().entrySet().iterator();  
                 for (Entry<Position, MoveType[]> entry : p2.get_legal_moves().entrySet()) {
-                    if (!iterator1.next().getKey().equals(entry.getKey())) {
-                        return new Move[]{new Move(p1.get_position(), entry.getKey(), entry.getValue()),
-                                          new Move(p2.get_position(), entry.getKey(), entry.getValue())};
+                    if (!iterator1.next().getKey().equals(entry.getKey().convert(this))) {
+                        LinkedList<Move> ll_moves = new LinkedList<Move>();
+                        ll_moves.add(new Move(p1.get_position(), entry.getKey(), entry.getValue()));
+                        ll_moves.add(new Move(p2.get_position(), entry.getKey(), entry.getValue()));
+                        return ll_moves + ",\n" + p1.get_legal_moves() + "\n" + p2.get_legal_moves();
                     }
                 }
             }

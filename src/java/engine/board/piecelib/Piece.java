@@ -1,5 +1,5 @@
 package src.java.engine.board.piecelib;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Optional;
 
@@ -46,7 +46,7 @@ public abstract class Piece implements Comparable<Piece>{
 
     private PieceCollection collection;
     private Position position;
-    private HashMap<Position, MoveType[]> map_legal_moves;
+    private LinkedHashMap<Position, MoveType[]> map_legal_moves;
     private ObserverReceiver observer;
     protected String ID;
     protected int INDEX;
@@ -57,7 +57,7 @@ public abstract class Piece implements Comparable<Piece>{
     {
         this.INDEX = index;
         this.collection = collection;
-        this.map_legal_moves = new HashMap<Position, MoveType[]>();
+        this.map_legal_moves = new LinkedHashMap<Position, MoveType[]>();
         this.observer = new Observer(this);
         this.ID = toString() + index;
         this.moves = 0;
@@ -82,7 +82,7 @@ public abstract class Piece implements Comparable<Piece>{
     }
 
 
-    public HashMap<Position, MoveType[]> get_legal_moves()
+    public LinkedHashMap<Position, MoveType[]> get_legal_moves()
     {
         return map_legal_moves;
     }
@@ -188,7 +188,7 @@ public abstract class Piece implements Comparable<Piece>{
 
     public void m_restrict(LinkedList<Position> ll_restrictions)
     {
-        HashMap<Position, MoveType[]> map_legal_moves_new = new HashMap<Position, MoveType[]>();
+        LinkedHashMap<Position, MoveType[]> map_legal_moves_new = new LinkedHashMap<Position, MoveType[]>();
         for (Position position : ll_restrictions)
         {
             if (map_legal_moves.containsKey(position))
@@ -455,7 +455,16 @@ public abstract class Piece implements Comparable<Piece>{
         if (future_position.get_piece() != null)
         {
             if (future_position.get_piece().get_type() != get_type())
-                map_legal_moves.put(future_position, new MoveType[]{MoveType.TAKES});
+                if (future_position.get_y() == 7 && is_type(Type.WHITE) ||
+                    future_position.get_y() == 0 && is_type(Type.BLACK))
+                {
+                    /// add other movetypes
+                    map_legal_moves.put(future_position, new MoveType[]{MoveType.TAKES, MoveType.PROMOTION_QUEEN});
+                }
+                else
+                {
+                    map_legal_moves.put(future_position, new MoveType[]{MoveType.TAKES});
+                }
                 return true;
         }
 
@@ -494,7 +503,14 @@ public abstract class Piece implements Comparable<Piece>{
 
         if (last_move[1].get_y() == this.position.get_y())
         {
-            map_legal_moves.put(future_position, new MoveType[]{MoveType.EN_PASSANT});
+            if (last_move[0].get_x() < this.position.get_x())
+            {
+                map_legal_moves.put(future_position, new MoveType[]{MoveType.EN_PASSANT_LEFT});
+            }
+            else
+            {
+                map_legal_moves.put(future_position, new MoveType[]{MoveType.EN_PASSANT_RIGHT});
+            }
             return true;
         }
 

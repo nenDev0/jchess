@@ -1,7 +1,7 @@
 package src.test.piecelibtest;
 
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.TreeSet;
 
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -20,9 +20,9 @@ public class KingMovesTest {
     private Board board;
     private Piece white_king;
     private Piece black_king;
-    private HashMap<Position, MoveType[]> expected;
-    private HashMap<Position, MoveType[]> actual;
-    private HashSet<Position> set_actual;
+    private LinkedHashMap<Position, MoveType[]> expected;
+    private LinkedHashMap<Position, MoveType[]> actual;
+    private TreeSet<Position> set_actual;
     private MoveType[] arr_types;
 
     
@@ -33,9 +33,9 @@ public class KingMovesTest {
         black_king = board.get_collection(Type.BLACK).get_pieces_of_type(PieceType.KING).get(0);
         arr_types = new MoveType[0];
 
-        expected = new HashMap<Position, MoveType[]>();
-        actual = new HashMap<Position, MoveType[]>();
-        set_actual = new HashSet<Position>();
+        expected = new LinkedHashMap<Position, MoveType[]>();
+        actual = new LinkedHashMap<Position, MoveType[]>();
+        set_actual = new TreeSet<Position>();
     }
     
     @Test
@@ -193,7 +193,7 @@ public class KingMovesTest {
         black_rook.m_set_position(board.get_position(6, 1));
         board.m_dump_update_notifications();
 
-        set_actual = new HashSet<Position>(); set_actual.addAll(white_king.get_observer().get_observed_positions());
+        set_actual.clear(); set_actual.addAll(white_king.get_observer().get_observed_positions());
         assertEquals(expected, actual);
 
 
@@ -215,7 +215,7 @@ public class KingMovesTest {
         actual = black_king.get_legal_moves();
         assertEquals(expected, actual);
 
-        set_actual = new HashSet<Position>(); set_actual.addAll(black_king.get_observer().get_observed_positions());
+        set_actual.clear(); set_actual.addAll(black_king.get_observer().get_observed_positions());
         assertEquals(expected, actual);
     }
 

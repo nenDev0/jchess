@@ -134,7 +134,6 @@ public class Game {
         }
         m_deselect_piece();
         board.m_commit(move.get());
-        // TODO: adjust tree crashes after reverse, while botplay is disabled.
         /*if (board.get_collection(get_turn()).get_active_pieces().size() < piececount.get(get_turn()))
         {
             sound_engine.play_take();
