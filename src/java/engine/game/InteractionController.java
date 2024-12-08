@@ -13,19 +13,40 @@ import src.java.engine.board.piecelib.Piece;
  */
 public class InteractionController
 {
-    
+
+
     private Game game;
     private BoardGrid grid;
     private Window window; // lost eval on window
     private boolean piece_selected;
 
 
+    /**
+     *  Constructor
+     *  sets internal parameters to the handed ones.
+     * 
+     * @param grid
+     * @param game
+     * @param window
+     * 
+     */
     public InteractionController(BoardGrid grid, Game game, Window window)
     {
         this.grid = grid;
         this.game = game;
         this.window = window;
         this.piece_selected = false;
+    }
+
+
+    /**
+     *  Returns an Enum, defining what state the game is in
+     * 
+     * @return
+     */
+    public GameState get_gamestate()
+    {
+        return game.get_board().get_state();
     }
 
 
@@ -121,7 +142,8 @@ public class InteractionController
 
 
     /**
-     *  Notifies the front-end PositionListeners about what visual update is necessary, after the piece of a {@link position} was altered.
+     *  Notifies the front-end PositionListeners about what visual update is necessary,
+     *  after the piece of a {@link position} was altered.
      * 
      *  <p> executed once with all positions by the Game class to initialize all visual updates at the start.
      *      Afterwards exclusively called by the NotificationCollector with specific positions.
@@ -137,13 +159,13 @@ public class InteractionController
             grid.m_update_piece(position.get_x(), position.get_y(), null, null);
             return;
         }
-
         grid.m_update_piece(position.get_x(), position.get_y(), piece.get_type(), piece.get_piece_type());
     }
 
 
     /**
-     * 
+     *  calls the {@link #game} to reset.
+     *  
      */
     public void m_reset()
     {

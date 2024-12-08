@@ -12,32 +12,36 @@ import src.java.engine.board.updatesystem.ObserverStorage;
 public class King extends Piece
 {
 
+
     private static final int weight = 0;
     /// used for evaluations
     private int visible_from;
-    
+
+
     public King(PieceCollection collection, int index)
     {
         super(collection, index);
         visible_from = 0;
     }
 
+
     public int get_visible_from()
     {
         return visible_from;
     }
-    
-    /// ### getters ### ///
+
 
     public int get_weight()
     {
         return weight;
     }
 
+
     public PieceType get_piece_type()
     {
         return PieceType.KING;
     }
+
 
     public boolean can_castle_queenside()
     {
@@ -45,10 +49,10 @@ public class King extends Piece
         {
             return false;
         }
-        int y = pawn_directional(0, 7);
-
+        int y = directonal_parameter(0, 7);
+        ///
         Piece rook_queenside = get_collection().get_board_access().get_position(0, y).get_piece();
-
+        ///
         if (rook_queenside != null)
         {
             if (is_type(rook_queenside.get_type()) && rook_queenside.moves() == 0)
@@ -59,14 +63,14 @@ public class King extends Piece
         return false;
     }
 
+
     public boolean can_castle_kingside()
     {
         if (moves() != 0)
         {
             return false;
         }
-        int y = pawn_directional(0, 7);
-
+        int y = directonal_parameter(0, 7);
         Piece rook_kingside = get_collection().get_board_access().get_position(7, y).get_piece();
         if (rook_kingside != null) {
             if (is_type(rook_kingside.get_type()) && rook_kingside.moves() == 0)
@@ -77,12 +81,10 @@ public class King extends Piece
         return false;
     }
 
-    /// ### modifiers ### ///
 
     public void m_legal_moves()
     {
         m_king_moves();
-
         Iterator<Position> position_iterator = super.get_legal_moves().keySet().iterator();
         while (position_iterator.hasNext())
         {
@@ -100,18 +102,29 @@ public class King extends Piece
             }
         }
         visible_from = 0;
-        m_check_all_directions();
+        m_check_all_directions_for_checks();
         m_check_castling();
     }
 
+
+    /**
+     *  The King shall not be restricted, as it restricts itself.
+     */
     @Override
     public void m_restrict(LinkedList<Position> ll_restrictions)
     {
         return;
     }
-    
 
 
+    /**
+     *  Shadows the m_set_position of the piece.
+     *  Ensures specific chess-rules are followed (Castling, Castling reverse) 
+     *  Ensures specific engine-rules are followed (King is not allowed to have no position)
+     * 
+     * @param position
+     * 
+     */
     public void m_set_position(Position position)
     {
         Position previous_position = get_position();
@@ -119,14 +132,13 @@ public class King extends Piece
         boolean kingside_castle = can_castle_kingside();
         super.m_set_position(position);
         get_collection().m_release_check();
-
+        ///
         if (previous_position == null)
         {
             return;
         }
-
-        int y = pawn_directional(0, 7);
-        
+        ///
+        int y = directonal_parameter(0, 7);
         // CASTLING
         if (position.get_y() != y) 
         {
@@ -136,7 +148,6 @@ public class King extends Piece
         {
             return;
         }
-
         if (queenside_castle)
         {
             if (position.get_x() == 2)
@@ -157,7 +168,6 @@ public class King extends Piece
                 return;
             }
         }
-
         // CASTLING REVERSAL
         if (super.moves() != 0)
         {
@@ -179,8 +189,17 @@ public class King extends Piece
         }
     }
 
-    // checks & pins
-    private void m_check_all_directions() {
+
+    /**
+     *  Determines, whether the pieces within this king's {@link #get_collection()} need to be restricted
+     *  If they do, it will send out the restrictions to the PieceCollection.
+     * 
+     *  <p> This includes the following:
+     *      1. A piece is pinned
+     *      2. The King is in check
+     * 
+     */
+    private void m_check_all_directions_for_checks() {
         LinkedList<PieceType> ll_implementations = new LinkedList<PieceType>();
         ll_implementations.add(PieceType.QUEEN);
         ll_implementations.add(PieceType.ROOK);
@@ -190,7 +209,7 @@ public class King extends Piece
         check_direction(0, -1, ll_implementations);
         ll_implementations.remove(PieceType.ROOK);
         ll_implementations.add(PieceType.BISHOP);
-
+        ///
         check_direction(1, 1, ll_implementations);
         check_direction(-1, 1, ll_implementations);
         check_direction(1, -1, ll_implementations);
@@ -199,14 +218,27 @@ public class King extends Piece
         check_pawn();
     }
 
+
+    /**
+     *  checks for any restrictions the King might have to make in order to prevent the enemy player
+     *  from being able to take the king.
+     * 
+     *  <p> Note: This method is only used for directional movement,
+     *      (i.e. horizontal, vertical, diagonal)
+     * 
+     * @param x_increment
+     * @param y_increment
+     * @param ll_implementations
+     * 
+     */
     private void check_direction(int x_increment, int y_increment, LinkedList<PieceType> ll_implementations) {
         int x = super.get_position().get_x();
         int y = super.get_position().get_y();
-
+        ///
         Piece previous_piece = null;
         Piece piece = null;
         int visible = 0;
-
+        ///
         for (int i_x = x + x_increment, i_y = y + y_increment; i_x >= 0 && i_x < 8 && i_y >= 0 && i_y < 8; i_x += x_increment, i_y += y_increment) {
             piece = super.get_collection().get_board_access().get_position(i_x, i_y).get_piece();
             if (piece == null) {
@@ -237,23 +269,34 @@ public class King extends Piece
         }
     }
 
+
+    /**
+     *  Used by {@link #check_direction(int, int, LinkedList)} in order to test certain directions
+     * 
+     *  <p> Note: This method is only used for directional movement,
+     *      (i.e. horizontal, vertical, diagonal)
+     * 
+     * @param x_increment
+     * @param y_increment
+     * 
+     * @return
+     */
     private LinkedList<Position> calculate_restrictions(int x_increment, int y_increment) {
         int x = super.get_position().get_x();
         int y = super.get_position().get_y();
-
+        ///
         LinkedList<Position> ll_restrictions = new LinkedList<Position>();
-
+        ///
         if (x - x_increment >= 0 && x - x_increment < 8 && y - y_increment >= 0 && y - y_increment < 8) {
             get_legal_moves().remove(super.get_collection().get_board_access().get_position(get_position().get_x() - x_increment, get_position().get_y() - y_increment));
         }
-
+        ///
         for (int i_x = x + x_increment, i_y = y + y_increment; i_x >= 0 && i_x < 8 && i_y >= 0 && i_y < 8; i_x += x_increment, i_y += y_increment) {
             Position p = get_collection().get_board_access().get_position(i_x, i_y);
             ll_restrictions.add(p);
             if (p.get_piece() == null) {
                 continue;
             }
-            
             if (p.get_piece().get_type() == get_type()) {
                 ll_restrictions.remove(p);
                 continue;
@@ -265,84 +308,119 @@ public class King extends Piece
         throw new NullPointerException("King.calculate_restrictions() - Never found opposing piece");
     }
 
-    private void check_knight() {
+
+    /**
+     *  Checks, if any knights are able to see the King.
+     * 
+     */
+    private void check_knight()
+    {
         int x = get_position().get_x();
         int y = get_position().get_y();
         PieceType knight = PieceType.KNIGHT;
-        if (x < 7) {
+        if (x < 7)
+        {
             if (y < 6)
-            m_check_move(x + 1, y + 2, knight);
+            m_check_for_check(x + 1, y + 2, knight);
             if (y > 1)
-            m_check_move(x + 1, y - 2, knight);
-
+            m_check_for_check(x + 1, y - 2, knight);
             if (x < 6) {
                 if (y < 7)
-                m_check_move(x + 2, y + 1, knight);
+                m_check_for_check(x + 2, y + 1, knight);
                 if (y > 0)
-                m_check_move(x + 2, y - 1, knight);
+                m_check_for_check(x + 2, y - 1, knight);
             }
         }
-        if (x > 0) {
+        if (x > 0)
+        {
             if (y < 6)
-            m_check_move(x - 1, y + 2, knight);
+            m_check_for_check(x - 1, y + 2, knight);
             if (y > 1)
-            m_check_move(x - 1, y - 2, knight);
-
-            if (x > 1) {
+            m_check_for_check(x - 1, y - 2, knight);
+            if (x > 1)
+            {
                 if (y < 7)
-                m_check_move(x - 2, y + 1, knight);
+                m_check_for_check(x - 2, y + 1, knight);
                 if (y > 0)
-                m_check_move(x - 2, y - 1, knight);
+                m_check_for_check(x - 2, y - 1, knight);
             }
         }
     }
 
-    private void check_pawn() {
+
+    /**
+     *  Checks, if any pawns are able to see the King.
+     * 
+     */
+    private void check_pawn()
+    {
         int x = get_position().get_x();
         int y = get_position().get_y();
         int directional_constant;
-        if (is_type(Type.WHITE)) {
+        if (is_type(Type.WHITE))
+        {
             directional_constant = 1;
         }
-        else {
+        else
+        {
             directional_constant = -1;
         }
         if (x < 7 && y + directional_constant < 8 && y + directional_constant >= 0)
-            m_check_move(x + 1, y + directional_constant, PieceType.PAWN);
+            m_check_for_check(x + 1, y + directional_constant, PieceType.PAWN);
         if (x > 0 && y + directional_constant < 8 && y + directional_constant >= 0)
-            m_check_move(x - 1, y + directional_constant, PieceType.PAWN);
+            m_check_for_check(x - 1, y + directional_constant, PieceType.PAWN);
     }
 
-    private void m_check_move(int x, int y, PieceType impl) {
+
+    /**
+     *  Checks, if the given position has a piece, which is "checking" the King.
+     *  
+     * @param x
+     * @param y
+     * @param impl the PieceType it would need to be, to be "checking" the King.
+     * 
+     */
+    private void m_check_for_check(int x, int y, PieceType impl)
+    {
         Position position = get_collection().get_board_access().get_position(x, y);
-        if (position.get_piece() == null) {
+        if (position.get_piece() == null)
+        {
             return;
         }
-        if (!(is_type(position.get_piece().get_type())) && position.get_piece().get_piece_type() == impl) {
+        if (!(is_type(position.get_piece().get_type())) && position.get_piece().get_piece_type() == impl)
+        {
             LinkedList<Position> ll_restrictions = new LinkedList<Position>();
             ll_restrictions.add(position);
             m_send_restrictions(ll_restrictions);
         }
-
     }
 
-    private void m_check_castling() {
-        int y = pawn_directional(0, 7);
-        if (can_castle_queenside()) {
+
+    /**
+     *  Checks for castling.
+     * 
+     */
+    private void m_check_castling()
+    {
+        int y = directonal_parameter(0, 7);
+        if (can_castle_queenside())
+        {
             Piece rook_queenside = get_collection().get_board_access().get_position(0, y).get_piece();
-            ///
-            /// queenside castling
-            /// checks, if there are any pieces inbetween rook and king
-            /// checks, if any pieces of the opposing player can see the positions inbetween rook and king
             if (is_type(rook_queenside.get_type()) && rook_queenside.moves() == 0 )
             {
+                ///
+                /// queenside castling
+                /// checks, if there are any pieces inbetween rook and king
+                /// checks, if any pieces of the opposing player can see the positions inbetween rook and king
                 if (get_collection().get_board_access().get_position(1, y).get_piece() == null &&
                     get_collection().get_board_access().get_position(2, y).get_piece() == null &&
-                    get_collection().get_board_access().get_position(3, y).get_piece() == null) {
+                    get_collection().get_board_access().get_position(3, y).get_piece() == null)
+                {
                     if (!get_collection().get_board_access().get_position(4, y).has_opposing_pieces_observing(get_type()) &&
                         !get_collection().get_board_access().get_position(1, y).has_opposing_pieces_observing(get_type()) &&
                         !get_collection().get_board_access().get_position(2, y).has_opposing_pieces_observing(get_type()) &&
-                        !get_collection().get_board_access().get_position(3, y).has_opposing_pieces_observing(get_type())) {
+                        !get_collection().get_board_access().get_position(3, y).has_opposing_pieces_observing(get_type()))
+                    {
                         get_legal_moves().put(get_collection().get_board_access().get_position(2, y), new MoveType[]{MoveType.CASTLING_QUEENSIDE});
                     }
                 }
@@ -350,17 +428,19 @@ public class King extends Piece
         }
         if (can_castle_kingside()) {
             Piece rook_kingside = get_collection().get_board_access().get_position(7, y).get_piece();
-            ///
-            /// kingside castling
-            /// checks, if there are any pieces inbetween rook and king
-            /// checks, if any pieces of the opposing player can see the positions inbetween rook and king
             if (is_type(rook_kingside.get_type()) && rook_kingside.moves() < 1)
             {
+                ///
+                /// kingside castling
+                /// checks, if there are any pieces inbetween rook and king
+                /// checks, if any pieces of the opposing player can see the positions inbetween rook and king
                 if (get_collection().get_board_access().get_position(5, y).get_piece() == null &&
-                    get_collection().get_board_access().get_position(6, y).get_piece() == null) {
+                    get_collection().get_board_access().get_position(6, y).get_piece() == null)
+                {
                     if (!get_collection().get_board_access().get_position(4, y).has_opposing_pieces_observing(get_type()) &&
                         !get_collection().get_board_access().get_position(6, y).has_opposing_pieces_observing(get_type()) &&
-                        !get_collection().get_board_access().get_position(6, y).has_opposing_pieces_observing(get_type())) {
+                        !get_collection().get_board_access().get_position(6, y).has_opposing_pieces_observing(get_type()))
+                    {
                         get_legal_moves().put(get_collection().get_board_access().get_position(6, y), new MoveType[]{MoveType.CASTLING_KINGSIDE});
                     }
                 }
@@ -369,17 +449,45 @@ public class King extends Piece
         
     }
 
-    private void m_send_restrictions(LinkedList<Position> ll_restrictions) {
+
+    /**
+     *  Sends out restrictions to the PieceCollection {@link #get_collection()}
+     *  This is used, whenever the King is in check. All pieces of it's collection must use one
+     *  of the positions sent in {@code ll_restrictions} to stop the check state.
+     * 
+     * @param ll_restrictions the only moves the pieces can do to disable the check.
+     * 
+     */
+    private void m_send_restrictions(LinkedList<Position> ll_restrictions)
+    {
         get_collection().m_restrict_all_to(ll_restrictions);
         get_collection().m_acknowledge_check();
     }
 
-    private void m_send_restrictions(Piece piece, LinkedList<Position> ll_restrictions) {
+
+    /**
+     *  Sends out restrictions to the PieceCollection {@link #get_collection()}
+     *  This is used, when a {@code piece} is pinned.
+     *  This means, when the King were to be in check, if the specified {@code piece} were to move.
+     * 
+     * @param piece
+     * @param ll_restrictions are the only moves the specified piece can do, without creating a check.
+     * 
+     */
+    private void m_send_restrictions(Piece piece, LinkedList<Position> ll_restrictions)
+    {
         super.get_collection().m_restrict(piece, ll_restrictions);
     }
 
+
+    /**
+     * 
+     */
     @Override
-    public String toString() {
+    public String toString()
+    {
         return super.toString() + "K";
     }
+
+
 }

@@ -2,7 +2,10 @@ package src.java.engine.board.piecelib;
 
 import src.java.engine.board.PieceCollection;
 
-public class Knight extends Piece {
+
+public class Knight extends Piece
+{
+
 
     private static final int weight = 3;
 
@@ -11,17 +14,21 @@ public class Knight extends Piece {
         super(collection, index);
     }
 
+
     public int get_weight() {
         return weight;
     }
+
 
     public PieceType get_piece_type() {
         return PieceType.KNIGHT;
     }
 
+
     public void m_legal_moves() {
         m_knight_moves();
     }
+
 
     @Override
     public String toString() {

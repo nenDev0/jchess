@@ -6,41 +6,50 @@ import java.util.LinkedList;
 import src.java.engine.board.Position;
 import src.java.engine.board.piecelib.Piece;
 
+
 public class Observer implements ObserverReceiver, ObserverSender, ObserverStorage
 {
     
-    private Piece piece;
-    // linked list -> no need for a bunch of list.get(i)
+
+    private final Piece piece;
+    /// linked list -> no need for a bunch of list.get(i)
     private LinkedList<Position> ll_observed_positions;
 
 
-    public Observer(Piece piece) {
+    /**
+     * 
+     * 
+     * @param piece
+     * 
+     */
+    public Observer(Piece piece)
+    {
         this.piece = piece;
         this.ll_observed_positions = new LinkedList<Position>();
     }
 
-    //
-    //
-    /////// ####### getters ####### ///////
-    //
-    //
 
-
+    /**
+     * 
+     * 
+     * @return Piece 
+     */
     public Piece get_piece()
     {
         return piece;
     }
 
+
+    /**
+     * 
+     * 
+     * @return
+     */
     public LinkedList<Position> get_observed_positions()
     {
         return ll_observed_positions;
     }
-    
-    //
-    //
-    /////// ####### modifiers ####### ///////
-    //
-    //
+
 
     /**
      * Observer will observe specified Position
@@ -56,6 +65,7 @@ public class Observer implements ObserverReceiver, ObserverSender, ObserverStora
         ll_observed_positions.add(position);
     }
 
+
     /**
      * Observer will observe specified Position
      *  -> Observer is hidden
@@ -69,7 +79,6 @@ public class Observer implements ObserverReceiver, ObserverSender, ObserverStora
         position.m_subscribe_silently(this);
         ll_observed_positions.add(position);
     }
-
 
 
     /**
@@ -88,7 +97,6 @@ public class Observer implements ObserverReceiver, ObserverSender, ObserverStora
     }
 
 
-
     /**
      * Observer will pass over specified restrictions to
      * it's designated Piece 
@@ -99,13 +107,17 @@ public class Observer implements ObserverReceiver, ObserverSender, ObserverStora
     public void m_restrict(LinkedList<Position> ll_restrictions)
     {
         piece.m_restrict(ll_restrictions);
-
     }
 
 
-
+    /**
+     * 
+     * 
+     */
     public void m_update()
     {
         piece.m_update();
     }
+
+
 }

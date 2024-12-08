@@ -10,9 +10,27 @@ import src.java.engine.board.Move.MoveType;
 import src.java.engine.board.updatesystem.Observer;
 import src.java.engine.board.updatesystem.ObserverReceiver;
 
-public abstract class Piece implements Comparable<Piece>{
-    
 
+/**
+ *  Piece, handles the legal moves of this piece.
+ * 
+ */
+public abstract class Piece implements Comparable<Piece>
+{
+
+
+    /**
+     *  PieceType determines, what rules this Piece follows and allows comparing Pieces easily,
+     *  without needing to compare classes.
+     *  
+     *  <p> KING,
+     *  <p> QUEEN,
+     *  <p> ROOK,
+     *  <p> BISHOP,
+     *  <p> KNIGHT,
+     *  <p> PAWN
+     * 
+     */
     public enum PieceType
     {
         KING,
@@ -23,12 +41,20 @@ public abstract class Piece implements Comparable<Piece>{
         PAWN;
     }
 
+
     //TODO move this to PieceCollection?
     public enum Type
     {
         WHITE,
         BLACK;
 
+
+        /**
+         * 
+         * @param type
+         * 
+         * @return
+         */
         public static Type get_opposite(Type type)
         {
             switch (type)
@@ -44,15 +70,22 @@ public abstract class Piece implements Comparable<Piece>{
     }
 
 
-    private PieceCollection collection;
+    private final PieceCollection collection;
     private Position position;
     private LinkedHashMap<Position, MoveType[]> map_legal_moves;
-    private ObserverReceiver observer;
-    protected String ID;
-    protected int INDEX;
+    private final ObserverReceiver observer;
+    protected final String ID;
+    protected final int INDEX;
     private int moves;
 
 
+    /**
+     *  Constructor
+     * 
+     * @param collection
+     * @param index
+     * 
+     */
     public Piece(PieceCollection collection, int index)
     {
         this.INDEX = index;
@@ -64,73 +97,136 @@ public abstract class Piece implements Comparable<Piece>{
     }
 
 
+    /**
+     * 
+     * 
+     * @return {@link #ID}
+     */
     public String ID()
     {
         return this.ID;
     }
 
 
+    /**
+     * 
+     * 
+     * @return {@link #INDEX}
+     */
     public int INDEX()
     {
         return INDEX;
     }
 
 
+    /**
+     * 
+     * 
+     * @return {@link #moves}
+     */
     public int moves()
     {
         return moves;
     }
 
 
+    /**
+     * 
+     * 
+     * @return {@link #map_legal_moves}
+     */
     public LinkedHashMap<Position, MoveType[]> get_legal_moves()
     {
         return map_legal_moves;
     }
 
 
+    /**
+     * 
+     * 
+     * @return {@code collection.get_type()}
+     */
     public Type get_type()
     {
         return collection.get_type();
     }
 
 
+    /**
+     * 
+     * 
+     * @return {@link #collection}
+     */
     public PieceCollection get_collection()
     {
         return collection;
     }
 
 
+    /**
+     * 
+     * 
+     * @return {@link #position}
+     */
     public Position get_position()
     {
         return position;
     }
 
 
+    /**
+     * 
+     * 
+     * @return {@link #observer} 
+     */
     public Observer get_observer()
     {
         return (Observer) observer;
     }
 
 
+    /**
+     * 
+     * 
+     * @return weight specified by PieceType
+     */
     public abstract int get_weight();
 
 
+    /**
+     * 
+     * 
+     * @return PieceType specified by class implementation
+     */
     public abstract PieceType get_piece_type();
 
 
+    /**
+     *  returns a legal move, if the piece has a legal move to the specified {@code Position}.
+     * 
+     * @param position
+     * 
+     * @return {@code Optional<Move>}
+     */
     public Optional<Move> get_legal_move(Position position)
     {
         MoveType[] move_types = map_legal_moves.get(position);
-
+        ///
         if (move_types == null)
         {
             return Optional.empty();
-
         }
         return Optional.of(new Move(this.get_position(), position, move_types));
     }
 
 
+    /**
+     * 
+     * 
+     * @param type
+     * 
+     * @return
+     */
     public boolean is_type(Type type)
     {
         return get_type() == type;
@@ -138,12 +234,27 @@ public abstract class Piece implements Comparable<Piece>{
 
 
     /**
-     * allows for modification of this (Piece)'s move count
+     *  allows for modification of this Piece's move count
      * 
-     *  ->  only strictly necessary for:
-     *       rook and king to allow
-     *       castling after reversing the history
-     *       (-> Possible to add them to all Piece Types?)
+     *  <p> only strictly necessary for rook and king to allow
+     *      castling after reversing the history
+     *      (-> Possible to add them to all Piece Types?)
+     *      (What does this mean exactly?)
+     * 
+     */
+    public void m_increase_move()
+    {
+        moves++;
+    }
+
+
+    /**
+     *  allows for modification of this Piece's move count
+     * 
+     *  <p> only strictly necessary for rook and king to allow
+     *      castling after reversing the history
+     *      (-> Possible to add them to all Piece Types?)
+     *      (What does this mean exactly?)
      * 
      */
     public void m_decrease_move()
@@ -152,16 +263,16 @@ public abstract class Piece implements Comparable<Piece>{
     }
 
 
-    public void m_increase_move()
-    {
-        moves++;
-    }
-
-
+    /**
+     * 
+     * 
+     * @param position
+     * 
+     */
     public void m_set_position(Position position)
     {
         observer.m_clear_observations();
-        
+        ///
         if(position == null)
         {
             map_legal_moves.clear();
@@ -169,23 +280,30 @@ public abstract class Piece implements Comparable<Piece>{
             this.position = null;
             return;
         }
-
+        ///
         if (this.position != null)
         {
             this.position.m_rm_piece();
         }
-        
+        ///
         if(position.get_piece() != null)
         {
             position.get_piece().get_collection().m_take(position.get_piece());
         }
-
+        ///
         this.position = position;
         position.m_set_piece(this);
         m_update();
     }
 
 
+    /**
+     *  Restricts this piece to exclusively consist of moves, which are also contained
+     *  in {@code ll_restrictions}
+     * 
+     * @param ll_restrictions
+     *
+     */
     public void m_restrict(LinkedList<Position> ll_restrictions)
     {
         LinkedHashMap<Position, MoveType[]> map_legal_moves_new = new LinkedHashMap<Position, MoveType[]>();
@@ -200,6 +318,10 @@ public abstract class Piece implements Comparable<Piece>{
     }
 
 
+    /**
+     *  Called by Observers to recalculate the legal moves.
+     * 
+     */
     public void m_update()
     {
         map_legal_moves.clear();
@@ -210,11 +332,20 @@ public abstract class Piece implements Comparable<Piece>{
         }
         m_legal_moves();
     }
-    
 
+
+    /**
+     *  Used to implement piecetype-specific.
+     *  adds all possible moves to {@link #map_legal_moves}
+     * 
+     */
     public abstract void m_legal_moves();
 
 
+    /**
+     *  adds all possible vertical moves to {@link #map_legal_moves}
+     * 
+     */
     public void m_vertical_moves()
     {
         int x = this.position.get_x();
@@ -232,6 +363,10 @@ public abstract class Piece implements Comparable<Piece>{
     }
 
 
+    /**
+     *  adds all possible horizontal moves to {@link #map_legal_moves}
+     * 
+     */
     public void m_horizontal_moves()
     {
         int x = this.position.get_x();
@@ -249,6 +384,10 @@ public abstract class Piece implements Comparable<Piece>{
     }
 
 
+    /**
+     *  adds all possible diagonal moves to {@link #map_legal_moves}
+     * 
+     */
     public void m_diagonal_moves()
     {
         int x = this.position.get_x();
@@ -268,7 +407,6 @@ public abstract class Piece implements Comparable<Piece>{
             if (!m_check_move(i_x, i_y))
                 break;
         }
-
         for (int i_x = x - 1, i_y = y - 1; i_x >= 0 && i_y >= 0; i_x--, i_y--)
         {
             if (!m_check_move(i_x, i_y))
@@ -277,11 +415,15 @@ public abstract class Piece implements Comparable<Piece>{
     }
 
 
+    /**
+     *  adds all possible king moves to {@link #map_legal_moves}
+     * 
+     */
     public void m_king_moves()
     {
         int x = this.position.get_x();
         int y = this.position.get_y();
-
+        ///
         if (x < 7)
         {
             m_check_move(x + 1, y);
@@ -305,13 +447,16 @@ public abstract class Piece implements Comparable<Piece>{
     }
 
 
+    /**
+     *  adds all possible pawn moves to {@link #map_legal_moves}
+     * 
+     */
     public void m_pawn_moves()
     {
         int x = get_position().get_x();
         int y = get_position().get_y();
-        int directional_constant = pawn_directional(1, -1);
-
-        // pawn forward
+        int directional_constant = directonal_parameter(1, -1);
+        /// pawn forward
         if (m_pawn_check_move(x, y + directional_constant))
         {
             if (is_type(Type.WHITE) && y == 1)
@@ -323,7 +468,7 @@ public abstract class Piece implements Comparable<Piece>{
                 m_pawn_check_move(x, y + 2 * directional_constant);
             }
         }
-        // pawn diagonal (takes)
+        /// pawn diagonal (takes)
         if (x < 7)
         {
             m_pawn_check_move_diagonal(x + 1, y + directional_constant);
@@ -332,7 +477,7 @@ public abstract class Piece implements Comparable<Piece>{
         {
             m_pawn_check_move_diagonal(x - 1, y + directional_constant);
         }
-        // en passant
+        /// en passant
         if (y == 4 && is_type(Type.WHITE) || y == 3 && is_type(Type.BLACK))
         {
             if (x < 7)
@@ -346,22 +491,24 @@ public abstract class Piece implements Comparable<Piece>{
                 observer.m_observe_silently(collection.get_board_access().get_position(x - 1, y + 2 * directional_constant));
             }
         }
+    }
 
-        }
 
-
+    /**
+     *  adds all possible knight moves to {@link #map_legal_moves}
+     * 
+     */
     public void m_knight_moves()
     {
         int x = this.position.get_x();
         int y = this.position.get_y();
-
+        ///
         if (x < 7)
         {
             if (y < 6)
             m_check_move(x + 1, y + 2);
             if (y > 1)
             m_check_move(x + 1, y - 2);
-
             if (x < 6)
             {
                 if (y < 7)
@@ -376,7 +523,6 @@ public abstract class Piece implements Comparable<Piece>{
             m_check_move(x - 1, y + 2);
             if (y > 1)
             m_check_move(x - 1, y - 2);
-
             if (x > 1)
             {
                 if (y < 7)
@@ -389,7 +535,16 @@ public abstract class Piece implements Comparable<Piece>{
     }
 
 
-    public int pawn_directional(int w, int b)
+    /**
+     *  Used for specific purposes, where an if-statement relies upon
+     *  the type of the piece. This method's sole purpose is code-readability.
+     * 
+     * @param w
+     * @param b
+     * 
+     * @return
+     */
+    public int directonal_parameter(int w, int b)
     {
         switch (get_type())
         {
@@ -403,32 +558,51 @@ public abstract class Piece implements Comparable<Piece>{
     }
 
 
-    // true -> continue checking, false -> end checking
+    /**
+     *  checks, if the given coordinates point towards are a legal move
+     *  return value is used to determine, if this direction needs to be checked further. 
+     * 
+     * @param x
+     * @param y
+     * 
+     * @return {@code true:  if (position.has_piece != null),
+     *                false: else}
+     */
     private boolean m_check_move(int x, int y)
     {
         Position future_position = collection.get_board_access().get_position(x, y);
         //System.out.println("observer : " + this + ", observing   : " + future_position);
-
-            observer.m_observe(future_position);
-
-            if (future_position.get_piece() == null)
-            {
-                map_legal_moves.put(future_position, new MoveType[0]);
-                return true;
-            }
-            if (!is_type(future_position.get_piece().get_type()))
-            {
-                map_legal_moves.put(future_position, new MoveType[]{MoveType.TAKES});
-            }
-            return false;
+        observer.m_observe(future_position);
+        if (future_position.get_piece() == null)
+        {
+            map_legal_moves.put(future_position, new MoveType[0]);
+            return true;
+        }
+        if (!is_type(future_position.get_piece().get_type()))
+        {
+            map_legal_moves.put(future_position, new MoveType[]{MoveType.TAKES});
+        }
+        return false;
     }
 
 
+    /**
+     *  pawns can only go forward, if there are no pieces.
+     * 
+     *  <p> This method returns a boolean, because that way the pawn knows,
+     *      whether it should calculate, if it can also go 2 moves forwards.
+     * 
+     * @param x
+     * @param y
+     * 
+     * @return {@code true:  if (pawn can go forwards),
+     *                false: else}
+     */
     private boolean m_pawn_check_move(int x, int y)
     {
         Position future_position = collection.get_board_access().get_position(x, y);
         observer.m_observe_silently(future_position);
-
+        ///
         if (future_position.get_piece() == null)
         {
             if (future_position.get_y() == 7 && is_type(Type.WHITE) ||
@@ -447,11 +621,23 @@ public abstract class Piece implements Comparable<Piece>{
     }
 
 
+    /**
+     *  pawns diagonal moves work very differently from normal moves or normal pawn moves.
+     *  
+     *  <p> If there is a piece, the pawn can take it
+     *  <p> If there is a pawn next to it, which enables en-passant, the pawn can take it
+     *  <p> else pawn can't go there
+     * 
+     * @param x
+     * @param y
+     * 
+     * @return
+     */
     private boolean m_pawn_check_move_diagonal(int x, int y)
     {
         Position future_position = collection.get_board_access().get_position(x, y);
         observer.m_observe(future_position);
-
+        ///
         if (future_position.get_piece() != null)
         {
             if (future_position.get_piece().get_type() != get_type())
@@ -467,40 +653,40 @@ public abstract class Piece implements Comparable<Piece>{
                 }
                 return true;
         }
-
-        // en passant
+        ///
+        /// en passant
         Position[] last_move = collection.get_board_access().get_last_move();
         if (last_move == null)
         {
             return false;
         }
-
+        ///
         if (last_move[1].get_piece() == null)
         {
             return false;
         }
-
+        ///
         if (last_move[1].get_piece().get_piece_type() != PieceType.PAWN)
         {
             return false;
         }
-        
+        ///
         if (is_type(last_move[1].get_piece().get_type()))
         {
             return false;
         }
-
+        ///
         int delta_y = last_move[0].get_y() - last_move[1].get_y();
-        if (delta_y != pawn_directional(2, -2))
+        if (delta_y != directonal_parameter(2, -2))
         {
             return false;
         }
-
+        ///
         if (last_move[1].get_x() != x)
         {
             return false;
         }
-
+        ///
         if (last_move[1].get_y() == this.position.get_y())
         {
             if (last_move[0].get_x() < this.position.get_x())
@@ -513,7 +699,6 @@ public abstract class Piece implements Comparable<Piece>{
             }
             return true;
         }
-
         return false;
     }
 

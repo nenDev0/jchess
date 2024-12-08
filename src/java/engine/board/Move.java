@@ -5,8 +5,16 @@ import src.java.engine.board.piecelib.Piece;
 import src.java.engine.board.piecelib.Piece.Type;
 import src.java.engine.board.piecelib.Piece.PieceType;
 
+
+/**
+ *  Contains all data needed to execute a Move on the board.
+ *  This class should be used to handle all the specific rules connected to the
+ *  {@code MoveType's} ({@link #arr_types})
+ *  
+ */
 public class Move
 {
+
 
     /**
      *      Note that some of these can happen at the same time.
@@ -17,11 +25,13 @@ public class Move
      *  <p> In case the Chess Standard Notation were to be implemented,
      *      they would all have to be saved correctly as well
      */
-    public enum MoveType {
+    public enum MoveType
+    {
         TAKES,
         CASTLING_QUEENSIDE,
         CASTLING_KINGSIDE,
-        /// Note that, as it stands. A move, which is EN_PASSANT, is not considered TAKES
+        /// Note that, as it stands right now. A move, which is EN_PASSANT, is not considered TAKES
+        /// This simply allows for more linear logic implementations.
         EN_PASSANT_LEFT,
         EN_PASSANT_RIGHT,
         PROMOTION_QUEEN,
@@ -30,6 +40,7 @@ public class Move
         PROMOTION_KNIGHT,
     }
 
+
     /// The fields should never change, as all information needed can be
     /// initialized on initialization
     private final Position position_from;
@@ -37,9 +48,19 @@ public class Move
     private final PieceType implementation;
     private final Piece taken_piece;
     private final MoveType[] arr_types;
-
+    ///
     private float weight;
-    
+
+
+    /**
+     *  Alternative Constructor
+     *  This is only used in a single instance:
+     *  Allows MoveNodes, which extend Nodes, to have no unnecessary random information.
+     *  Ensures none of the internal logic is processed.
+     * 
+     *  <p> Note: When this Constuctor is called,
+     *      any methods within this instance, besides weight related calls, throw Exceptions
+     */
     public Move()
     {
         arr_types = null;
@@ -48,6 +69,7 @@ public class Move
         implementation = null;
         taken_piece = null;
     }
+
 
     /**
      *  Constructor.
@@ -66,6 +88,7 @@ public class Move
         this.position_from = position_from;
         this.position_to = position_to;
         this.arr_types = arr_types;
+        /// 
         /// The move must receive this information.
         /// new class to dictate, which piece is allowed to move where?
         /// -> reduce class hierarchy to only include "piece" as an overall class?
@@ -76,42 +99,95 @@ public class Move
                     taken_piece = position_to().get_piece();
                     break;
                 ///
+                /// There currently is no better connection to enable this.
+                /*case EN_PASSANT_LEFT: 
+                    taken_piece = position_from.get_piece().
+                                                get_collection().
+                                                get_board_access().
+                                                get_position(position_from.get_x() + 1, position_from.get_y()).
+                                                get_piece();
+                    break;
+                case EN_PASSANT_RIGHT:
+                    taken_piece = position_from.get_piece().
+                                                get_collection().
+                                                get_board_access().
+                                                get_position(position_from.get_x() - 1, position_from.get_y()).
+                                                get_piece();
+                ///
+                */
                 default:
                     break;
             }
         }
         this.taken_piece = taken_piece;
-
         this.implementation = position_from.get_piece().get_piece_type();
     }
 
 
+    /**
+     *  Sets the weight of this move to the given value.
+     * 
+     * @param weight
+     * 
+     */
     public void m_add_weight(float weight)
     {
         this.weight = weight;
     }
 
+
+    /**
+     * 
+     * 
+     * @return {@link #weight}
+     */
     public float get_weight()
     {
         return weight;
     }
  
+
+    /**
+     * 
+     * 
+     * @return {@link #arr_types}
+     */
     public MoveType[] get_types()
     {
         return arr_types;
     }
 
 
+    /**
+     * 
+     * 
+     * @return {@link #position_from}
+     */
     public Position position_from()
     {
         return position_from;
     }
 
+
+    /**
+     * 
+     * 
+     * @return {@link #position_to}
+     */
     public Position position_to()
     {
         return position_to;
     }
 
+
+    /**
+     *  Commits this move on the board.
+     *  (Currently not true:) Handles all special rules.
+     * 
+     * @throws NullPointerException {@code if (position_from == null ||
+     *                                         position_to == null   ||
+     *                                         position_from.get_piece() == null)}
+     */
     public void m_commit()
     {
         Piece piece = position_from.get_piece();
@@ -119,9 +195,38 @@ public class Move
         piece.m_increase_move();
     }
 
+
+    /**
+     *  Reverses this move.
+     *  (Currently not true:) Ensures consistency and takes care of all special rules.
+     * 
+     * @throws NullPointerException {@code if (position_from == null ||
+     *                                         position_to == null   ||
+     *                                         position_to.get_piece() == null)}
+     */
     public void m_reverse()
     {
+
         /// implement movetype reversion here.
+        /*for (MoveType move_type : arr_types)
+        {
+            switch (move_type)
+            {
+                case TAKES:
+                case EN_PASSANT_LEFT: 
+                    taken_piece = position_from.get_piece().
+                                                get_collection().
+                                                get_board_access().
+                                                get_position(position_from.get_x() + 1, position_from.get_y()).
+                                                get_piece();
+                    break;
+                case EN_PASSANT_RIGHT:
+                    taken_piece = position_from.get_piece().
+                                                get_collection().
+                                                get_board_access().
+                                                get_position(position_from.get_x() - 1, position_from.get_y()).
+                                                get_piece();
+        }*/
         Piece piece = position_to.get_piece();
         piece.m_decrease_move();
         if (piece.get_piece_type() != PieceType.KING)
@@ -132,7 +237,7 @@ public class Move
         {
             piece.m_set_position(position_from);
         }
-
+        ///
         if (taken_piece != null)
         {
             taken_piece.get_collection().m_untake(taken_piece);
@@ -142,8 +247,8 @@ public class Move
         {
             piece.m_set_position(position_from);
         }
-
-        // promotion reversal -> demotion
+        ///
+        /// promotion reversal -> demotion
         if (implementation == PieceType.PAWN)
         {
             if (position_to.get_y() == 7 && piece.is_type(Type.WHITE) ||
@@ -152,7 +257,7 @@ public class Move
                 piece.get_collection().m_demote(piece);
                 return;
             }
-            // en passant reversal
+            /// en passant reversal
                 Pawn pawn = (Pawn) piece;
             if (pawn.en_passant != null)
             {
@@ -165,9 +270,9 @@ public class Move
                 pawn.en_passant_position = null;
                 pawn.en_passant = null;
             }
-            
         }
     }
+
 
     public boolean equals(Move move)
     {
@@ -182,22 +287,37 @@ public class Move
         return true;
     }
 
+
+    /**
+     *  Clones this {@code move}, with pointers adjusted to the board given
+     *  
+     * @throws NullPointerException {@code if (position_from == null ||
+     *                                         position_to == null   ||
+     *                                         board == null         ||
+     *                                         movetypes are wrong)}
+     * 
+     * @param board
+     * 
+     * @return
+     */
     public Move convert(Board board)
     {
         return new Move(position_from.convert(board), position_to.convert(board), arr_types);
     }
 
+
     @Override
     public String toString()
     {
         String s = "";
-        s = "\nMove : " + position_from + ", " + "\n";
-        s = s + " -> " + " " + position_to + ", ";
+        s = "\nMove :(" + position_from + ",  -> " + position_to + ")\n";
         return s;
     }
 
+
     @Override
-    public int hashCode() {
+    public int hashCode()
+    {
        return (position_from.hashCode() << 6) + position_to.hashCode();
     }
 

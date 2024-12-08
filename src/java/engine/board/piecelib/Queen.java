@@ -2,7 +2,10 @@ package src.java.engine.board.piecelib;
 
 import src.java.engine.board.PieceCollection;
 
-public class Queen extends Piece{
+
+public class Queen extends Piece
+{
+
 
     private static final int weight = 8;
 
@@ -11,11 +14,6 @@ public class Queen extends Piece{
         super(collection, index);
     }
 
-    //
-    //
-    /////// ####### getters ####### ///////
-    //
-    //
 
     public int get_weight()
     {
@@ -28,11 +26,6 @@ public class Queen extends Piece{
         return PieceType.QUEEN;
     }
 
-    //
-    //
-    /////// ####### modifiers ####### ///////
-    //
-    //
 
     public void m_legal_moves()
     {

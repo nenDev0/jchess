@@ -5,8 +5,7 @@
 This was a fun challenge to myself... I wanted to create a Chess-Bot and see, how good I could get it to be.
 Turns out, not very good.
 
-This project took me about 5 weeks full-time. And I mean full-time.
-I forgot to eat sometimes.
+This project took me about 5 weeks full-time to get running. And I mean full-time.
 
 ## Project
 
@@ -31,7 +30,7 @@ I forgot to eat sometimes.
 ### Requirements
 
 - Java
-- JUnit with Hamcrest-Core
+- JUnit with Hamcrest-Core (included in .lib)
 
 
 ### Future Development
@@ -51,3 +50,10 @@ feel free to assist me in my effort
 
 ## Authors
 @nenDev0
+
+## Code Notes
+
+Before you start reading or messing with the code, these notes may help you understand some things.
+
+- Exceptions are mostly not handled, as any errors in the code will lead to it being unplayable anyways.
+  

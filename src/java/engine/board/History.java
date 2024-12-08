@@ -1,5 +1,6 @@
 package src.java.engine.board;
 
+
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.TreeMap;
@@ -7,14 +8,29 @@ import java.util.TreeMap;
 import src.java.engine.board.Move.MoveType;
 import src.java.engine.board.piecelib.Piece.PieceType;
 
+
+/**
+ *  Handles the LinkedList {@link #ll_moves}, which holds all {@code Move's} played on
+ *  the {@code Board}, which contains this {@code History}
+ *  
+ *  <p> In addition it handles the {@link #fifty_move_rule}, which results in a draw, unrelated to the actual
+ *      state of the board
+ * 
+ */
 public class History
 {
 
+
     private LinkedList<Move> ll_moves;
-    private LinkedList<Integer> ll_fifty_move_rule;
+    /// necessary to keep consistency on reversion calls
+    private LinkedList<Integer> ll_fifty_move_rule; 
     private int fifty_move_rule;
 
 
+    /**
+     *  Constructor
+     *  
+     */
     public History()
     {
         ll_moves = new LinkedList<Move>();
@@ -22,20 +38,41 @@ public class History
         fifty_move_rule = 0;
     }
 
+
+    /**
+     *  returns the move at index {@code i}
+     * 
+     * @throws NullPointerException {@code if (i >= History.get_length())}
+     * 
+     * @param i
+     * 
+     * @return
+     */
     public Move get_move(int i)
     {
         return ll_moves.get(i);
     }
 
+
+    /**
+     *  Returns amount of moves played.
+     * 
+     * 
+     * @return int {@link #ll_moves}.size()
+     */
     public int get_length()
     {
         return ll_moves.size();
     }
 
+
     /**
      * 
-     * @throws NullPointerException // {@code if move.position_from().get_piece() == null}
+     * 
+     * @throws NullPointerException {@code if (move.position_from().get_piece() == null)}
+     * 
      * @param move
+     * 
      */
     public void m_register_move(Move move)
     {
@@ -65,6 +102,7 @@ public class History
      *  <p> - repetition (both players played the same move twice)
      *  <p> - {@link #fifty_move_rule} (both players had no improvement the past 50 moves)
      * 
+     * 
      * @return {@code boolean} 
      */
     public boolean is_draw_by_repetition()
@@ -90,7 +128,6 @@ public class History
     }
 
 
-
     /**
      *  Used to reverse the previous move.
      *  The previous move will be removed from the {@link #ll_moves}
@@ -102,7 +139,8 @@ public class History
     {
         Move move = ll_moves.removeLast();
         move.m_reverse();
-
+        /// 
+        /// backwards consistency fifty move rule reversal
         if (fifty_move_rule == 0)
         {
             fifty_move_rule = ll_fifty_move_rule.removeLast();
@@ -270,6 +308,7 @@ public class History
         return map_reduced;
     }
 
+
     /**
      *  Combines entries about multiple vectors together.
      *  This enables the reduction of specific move vectors
@@ -279,6 +318,8 @@ public class History
      * 
      *  <p> Important Note: This method only works, if the vectors are added
      *      in reverse order.
+     * 
+     * @throws NullPointerException {@code if (map_reduced == null)}
      * 
      * @param map_reduced // map with the entries, representing vectors
      * @param hash_from
@@ -303,6 +344,7 @@ public class History
             }
         }
 
+
     @Override
     public String toString()
     {
@@ -313,5 +355,6 @@ public class History
         }
         return string;
     }
+
 
 }

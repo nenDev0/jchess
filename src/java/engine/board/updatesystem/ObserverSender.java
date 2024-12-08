@@ -4,11 +4,13 @@ import java.util.LinkedList;
 
 import src.java.engine.board.Position;
 
-public interface ObserverSender {
-
+/**
+ *  Handles the ability to send updates to Pieces observing this Position.
+ * 
+ * 
+ */
+public interface ObserverSender
+{
     public void m_update();
-
     public void m_restrict(LinkedList<Position> ll_restrictions);
-
-    
 }

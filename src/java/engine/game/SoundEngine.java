@@ -1,5 +1,6 @@
 package src.java.engine.game;
 
+
 import java.io.File;
 
 import javax.sound.sampled.AudioFormat;
@@ -10,9 +11,15 @@ import javax.sound.sampled.DataLine;
 
 import src.java.application.Config;
 
+
+/**
+ * Handles the sounds during the game.
+ * 
+ */
 public class SoundEngine extends Thread
 {
-    
+
+
     private String path = Config.audios_path;
     private File move;
     //private File take;
@@ -22,6 +29,12 @@ public class SoundEngine extends Thread
     private Clip take_clip;
     private boolean is_open;
 
+
+    /**
+     *  Constructor
+     *  initializes clips for moves and takes
+     * 
+     */
     public SoundEngine()
     {
         is_open = false;
@@ -54,6 +67,8 @@ public class SoundEngine extends Thread
 
 
     /**
+     *  plays the sound, a moved piece makes.
+     * 
      * 
      */
     public void play_move()
@@ -80,7 +95,7 @@ public class SoundEngine extends Thread
 
 
     /**
-     * 
+     *  plays the sound, a taken piece makes.
      */
     /*public void play_take()
     {
@@ -105,6 +120,7 @@ public class SoundEngine extends Thread
 
 
     /**
+     *  closes clips.
      * 
      */
     public void s_stop()
@@ -112,4 +128,5 @@ public class SoundEngine extends Thread
         take_clip.close();
         move_clip.close();
     }
+
 }

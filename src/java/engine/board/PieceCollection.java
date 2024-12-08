@@ -9,18 +9,38 @@ import src.java.engine.board.updatesystem.Restrictor;
 
 import java.util.HashMap;
 
-public class PieceCollection implements Restrictor {
+
+/**
+ *  Contains all data related to pieces of a certain {@link #type}
+ *  Has a direct link to the board to enable pieces to calculate their legal moves.
+ *  (This may change)
+ * 
+ *  Contains information about the active and inactive pieces. It handles promotions and
+ *  implements the {@code Restrictor}, which handles any restrictions, which occur due to
+ *  pins or checks on this {@code PieceCollection's King}
+ * 
+ */
+public class PieceCollection implements Restrictor
+{
+
 
     private HashMap<PieceType, LinkedList<Piece>> map_active_pieces;
     private LinkedList<Piece> ll_active_pieces;
     private LinkedList<Piece> ll_taken_pieces; 
     //TODO: this can be removed, if piece class gets overhauled
     private LinkedList<Piece> ll_continuity;
-    private Type type;
-    private Board board;
+    private final Type type;
+    private final Board board;
     private boolean in_check;
 
 
+    /**
+     * 
+     * 
+     * @param type
+     * @param board
+     * 
+     */
     public PieceCollection(Type type, Board board) {
         this.type = type;
         this.board = board;
@@ -31,11 +51,16 @@ public class PieceCollection implements Restrictor {
         ll_continuity = new LinkedList<Piece>();
     }
 
-    /// ### getters ### ///
 
+    /**
+     * 
+     * 
+     * @return {@link #board}
+     */
     public BoardAccess get_board_access() {
         return board;
     }
+
 
     /*
      * INDEX 0 RESERVED FOR KING!
@@ -44,21 +69,23 @@ public class PieceCollection implements Restrictor {
         return ll_active_pieces;
     }
 
+
     public LinkedList<Piece> get_pieces_of_type(PieceType impl) {
         return map_active_pieces.get(impl);
     }
+
 
     public Type get_type() {
         return type;
     }
 
-    /// ### modifiers ### ///
 
     public void m_restrict(Piece piece, LinkedList<Position> ll_restrictions)
     {
         piece.m_restrict(ll_restrictions);
         m_request_update(piece);
     }
+
 
     public void m_restrict_all_to(LinkedList<Position> ll_restrictions)
     {
@@ -68,6 +95,7 @@ public class PieceCollection implements Restrictor {
         m_acknowledge_check();
     }
 
+
     public void m_take(Piece piece)
     {
         m_rm_piece(piece);
@@ -75,11 +103,13 @@ public class PieceCollection implements Restrictor {
         piece.m_set_position(null);
     }
 
+
     public void m_untake(Piece piece)
     {
         m_add_piece(piece);
         ll_taken_pieces.remove(piece);
     }
+
 
     public void m_add_piece(Piece piece)
     {
@@ -91,6 +121,7 @@ public class PieceCollection implements Restrictor {
         }
     }
 
+
     public void m_rm_piece(Piece piece)
     {
         if (piece.get_piece_type() == PieceType.KING)
@@ -99,21 +130,22 @@ public class PieceCollection implements Restrictor {
         }
         map_active_pieces.get(piece.get_piece_type()).remove(piece);
         boolean flag = ll_active_pieces.remove(piece);
-        if (flag == false) {
+        if (flag == false)
+        {
             throw new IllegalArgumentException("Piece couldn't be removed: " + piece + "<size: "+ll_active_pieces.size()+" >\n" +ll_active_pieces);
         }
     }
+
 
     public void m_promote(Piece pawn, Position pos) {
         // TODO get_upgrade()?!?!
         PieceType impl = PieceType.QUEEN;
         Piece piece;
-
         int index = pawn.INDEX();
         m_rm_piece(pawn);
         ll_continuity.add(pawn);
-
-        switch (impl) {
+        switch (impl)
+        {
             case QUEEN:
                 piece = new Queen(this, index);
                 break;
@@ -135,21 +167,23 @@ public class PieceCollection implements Restrictor {
         m_add_piece(piece);
     }
 
+
     public void m_demote(Piece piece)
     {
         Position position = piece.get_position();
         piece.m_set_position(null);
         m_rm_piece(piece);
-
         Piece piece_continuity = ll_continuity.pollLast();
         m_add_piece(piece_continuity);
         piece_continuity.m_set_position(position);
     }
 
+
     public void m_acknowledge_check()
     {
         this.in_check = true;   
     }
+
 
     public void m_state()
     {
@@ -178,11 +212,13 @@ public class PieceCollection implements Restrictor {
         }
     }
     
+
     public void m_release_check()
     {
         this.in_check = false;
     }
 
+    
     public boolean m_has_moves()
     {
         for (Piece p : get_active_pieces())
@@ -196,6 +232,7 @@ public class PieceCollection implements Restrictor {
         return false;
     }
 
+
     public void m_request_update()
     {
         for (Piece piece: ll_active_pieces)
@@ -204,22 +241,25 @@ public class PieceCollection implements Restrictor {
         }
     }
 
+
     private void m_request_update(Piece piece)
     {
         board.m_receive_update_notification(piece.get_observer());
     }
 
+
     public void m_request_update(PieceType piece_type)
     {
         for (Piece piece : map_active_pieces.get(piece_type))
-        if (piece.get_position().get_y() == piece.pawn_directional(4, 3))
+        if (piece.get_position().get_y() == piece.directonal_parameter(4, 3))
         {
             board.m_receive_update_notification(piece.get_observer());
         }
     }
 
-    public void m_standard_lineup() {
 
+    public void m_standard_lineup()
+    {
         ll_active_pieces.add(new King(this, 0));
         ll_active_pieces.add(new Queen(this, 1));
         ll_active_pieces.add(new Rook(this, 2));
@@ -228,7 +268,7 @@ public class PieceCollection implements Restrictor {
         ll_active_pieces.add(new Bishop(this, 5));
         ll_active_pieces.add(new Knight(this, 6));
         ll_active_pieces.add(new Knight(this, 7));
-
+        ///
         for (int i = 0; i < 8; i++)
         {
             ll_active_pieces.add(new Pawn(this, 8 + i));
@@ -239,4 +279,6 @@ public class PieceCollection implements Restrictor {
             map_active_pieces.get(piece.get_piece_type()).add(piece);
         }
     }
+
+
 }

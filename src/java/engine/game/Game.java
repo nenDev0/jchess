@@ -1,7 +1,6 @@
 package src.java.engine.game;
 
 
-
 import java.util.Optional;
 import java.util.Set;
 
@@ -11,6 +10,7 @@ import src.java.engine.board.Position;
 import src.java.engine.board.piecelib.Piece;
 import src.java.engine.board.piecelib.Piece.Type;
 
+
 /**
  *  Ensures, incoming interactions on the {@link #board} are valid.
  * 
@@ -18,12 +18,19 @@ import src.java.engine.board.piecelib.Piece.Type;
  * 
  *  <p> This is, where the information about the currently {@link #selected_piece} on the front-end GUI is saved.
  */
-public class Game {
+public class Game
+{
     
-    private Board board;
-    private SoundEngine sound_engine;
+
+    private final Board board;
+    private final SoundEngine sound_engine;
     private Piece selected_piece;
 
+
+    /**
+     * Constructor.
+     * Initializes {@link #board} and {@link #sound_engine}.
+     */
     public Game()
     {
         this.board = new Board();
@@ -33,11 +40,14 @@ public class Game {
 
 
     /**
-     *  initializes all visual updates to the front-end PositionListeners for each position at the beginning to make the pieces to be visible.
+     *  initializes all visual updates to the front-end PositionListeners
+     *  for each position at the beginning to make the pieces to be visible.
      * 
-     *  <p> interaction_controller is not saved in the Game class, but simply passed over to the NotificationCollector.
+     *  <p> interaction_controller is not saved in the Game class,
+     *      but simply passed over to the NotificationCollector.
      * 
      * @param interaction_controller
+     * 
      */
     public void m_set_interaction_controller(InteractionController interaction_controller)
     {
@@ -54,22 +64,22 @@ public class Game {
 
 
     /**
+     *  Sets the board to the beginning and resets {@link #selected_piece},
+     *  which handles user-inputs.
+     * 
      * 
      */
     public void m_reset()
     {
         board.m_to_start();
         board.m_set_normal();
-
-       selected_piece = null;
-        /*movecount = 0;
-        black_total = 0;
-        white_total = 0;*/
+        selected_piece = null;
     }
 
 
     /**
-     *  Sets the selected_piece, if the input is valid. Allows requests for the legal moves of the selected piece
+     *  Sets the selected_piece, if the input is valid.
+     *  Allows requests for the legal moves of the selected piece
      * 
      *  <p> Used by the user and bots through the InteractionController
      * 
@@ -98,16 +108,8 @@ public class Game {
 
 
     /**
-     * 
-     */
-    private void m_deselect_piece()
-    {
-        this.selected_piece = null;
-    }
-
-
-    /**
-     *  Sets the selected_piece, if the input is valid. Allows requests for the legal moves of the selected piece
+     *  Sets the selected_piece, if the input is valid.
+     *  Allows requests for the legal moves of the selected piece
      * 
      *  <p> Used by the user and bots through the InteractionController
      * 
@@ -119,7 +121,6 @@ public class Game {
      * 
      *  @return ({@code true}, if a new piece was selected instead,
      *           {@code false}, if the move is either invalid or has been played out )
-     * 
      */
     public boolean m_select_position(int x, int y)
     {
@@ -128,7 +129,7 @@ public class Game {
         {
             if (position.get_piece().is_type(get_turn()))
             {
-                m_deselect_piece();
+                this.selected_piece = null;
                 m_select_piece(position.get_x(), position.get_y());
                 return true;
             }
@@ -136,10 +137,10 @@ public class Game {
         Optional<Move> move = selected_piece.get_legal_move(position);
         if(move.isEmpty())
         {
-            m_deselect_piece();
+            this.selected_piece = null;
             return false;
         }
-        m_deselect_piece();
+        this.selected_piece = null;
         board.m_commit(move.get());
         /*if (board.get_collection(get_turn()).get_active_pieces().size() < piececount.get(get_turn()))
         {
@@ -171,7 +172,7 @@ public class Game {
 
     /**
      * 
-     * @return
+     * @return {@link #board}
      */
     public Board get_board()
     {
@@ -181,6 +182,7 @@ public class Game {
 
     /**
      *  Currently #unused 
+     *  May allow the Frontend in future to know, which player is playing next
      *  
      * @return
      */
