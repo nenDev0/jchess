@@ -16,7 +16,7 @@ public class TreeHeader
     private MoveNode top_node;
     private Board board;
     private float weight;
-    private final int original_depth;
+    private final int final_depth;
     private int depth;
     private int moves;
     private Type type;
@@ -37,17 +37,13 @@ public class TreeHeader
     {
         moves = 0;
         
-        int cache_size = depth/2; // ceil(depth/2) - 1 // ceil simplified to + 1
-        if (cache_size < 0)
-        {
-            cache_size = 0;
-        }
+        /// ceil(depth/2) - 1 // ceil simplified to + 1
+        int cache_size = depth/2;
         cache = new CacheNode[cache_size];
         for (int i = 0; i < cache_size; i++)
         {
             cache[i] = new CacheNode();
         }
-        
         total_executions = 0;
         total_executions_saved = 0;
         time = 0;
@@ -58,7 +54,7 @@ public class TreeHeader
         nodes_ended = 0;
         top_node = new MoveNode(this);
         this.depth = depth;
-        this.original_depth = depth;
+        this.final_depth = depth;
         this.board = board;
         board.m_initialise();
 
@@ -198,12 +194,12 @@ public class TreeHeader
                 {
                     piececount += board.get_collection(type).get_active_pieces().size();
                 }
-                this.depth = original_depth + 2 *(int)(original_depth * ((float)32/piececount - 1)/24);
+                this.depth = final_depth + 2 * (int)(final_depth * ((float)32/piececount - 1)/24);
                 System.out.println("depth is: "+depth);
             }
         }
         /// 
-        /// only needs to be adjusted every 2 moves, as this bot will only
+        /// The cache only needs to be adjusted every 2 moves, as this bot will only
         /// have a move requested every second move.
         /// 
         if (type == Type.WHITE && moves % 2 != 0 ||
@@ -212,10 +208,6 @@ public class TreeHeader
             return;
         }
         int new_cache_size = depth/2;
-        if (new_cache_size < 0)
-        {
-            new_cache_size = 0;
-        }
         ///
         /// Carry cached nodes over to still be usable after tree adjustion
         /// This is necessary if and only if the tree grows every iteration.
@@ -227,7 +219,7 @@ public class TreeHeader
         /// as future child nodes could still already exist in the cache.
         /// 
         CacheNode[] carried_nodes = cache;
-        CacheNode[] cache = new CacheNode[new_cache_size];
+        this.cache = new CacheNode[new_cache_size];
         int filled = 0;
         for (int i = 0; i < carried_nodes.length - 2 && i < new_cache_size; i++)
         {

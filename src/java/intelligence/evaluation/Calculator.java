@@ -19,14 +19,14 @@ import src.java.engine.board.updatesystem.ObserverStorage;
 public class Calculator
 {
 
-    private Configuration configuration;
+    private final Configuration configuration;
     private int white_piececount;
     private int black_piececount;
     private float[] values;
 
 
     /**
-     * 
+     *  Constructor
      * 
      * @param configuration
      */
@@ -53,8 +53,6 @@ public class Calculator
     /**
      *  Used to calculate the whole evaluation of a board.
      *  
-     *  <p> currently most methods get the evaluated piece passed over. This might often not be necessary and could be replaced.
-     * 
      * @param board // board to be evaluated
      * 
      * @return {@code float evaluated value} // return value is a delta, so a return value of 0 would be an even (board)position
