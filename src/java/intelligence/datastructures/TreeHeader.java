@@ -52,7 +52,7 @@ public class TreeHeader
         time_compare = 0;
         time_total = 0;
         nodes_ended = 0;
-        top_node = new MoveNode(this);
+        top_node = new MoveNode(null, this);
         this.depth = depth;
         this.final_depth = depth;
         this.board = board;
@@ -89,12 +89,6 @@ public class TreeHeader
     public int get_depth()
     {
         return this.depth;
-    }
-
-
-    public Board get_board()
-    {
-        return board;
     }
 
 
@@ -140,7 +134,8 @@ public class TreeHeader
     {
         System.out.println("NODES >>> [total|saved|ended]");
         System.out.println("NODES >>> [" + total_executions + "|" + total_executions_saved + "|" + nodes_ended + "]");
-       Move move = top_node.get_best_move_recursive(type);
+       Move move = top_node.get_best_move(type);
+        System.out.println("move_weight: "+top_node.get_weight() + ", type: " + type);
         System.out.println("Total time: " + time_total/1000);
         System.out.println("Average time per node: " + (float)(time_total/1000) / (float)(total_executions));
         System.out.println("Average time per node ended: " + (float)(time) / (float)(nodes_ended));

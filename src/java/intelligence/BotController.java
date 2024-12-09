@@ -178,7 +178,6 @@ public class BotController extends Thread
     {
         Bot bot = get_bot(type);
         Move move = bot.calculate_best_move();
-        System.out.println("move_weight: "+move.get_weight() + ", type: " + type);
         boolean is_final;
         //System.out.println(move);
         try

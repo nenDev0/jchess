@@ -8,6 +8,7 @@ import java.util.TreeSet;
 import src.java.engine.board.Board;
 import src.java.engine.board.Board.GameState;
 import src.java.engine.board.Move;
+import src.java.engine.board.Move.MoveType;
 import src.java.engine.board.Position;
 import src.java.engine.board.piecelib.Piece;
 import src.java.engine.board.piecelib.Piece.Type;
@@ -18,14 +19,21 @@ import src.java.intelligence.evaluation.Calculator;
  *  calculating the best possible move, based upon evaluations of future positions.
  * 
  */
-public class MoveNode extends Move implements Comparable<MoveNode>
+public class MoveNode implements Comparable<MoveNode>
 {
+
+
     private TreeSet<MoveNode> set_children;
     private TreeSet<MoveNode> set_abandoned;
     private TreeHeader header;
     private boolean is_final;
+    /// 
+    /// actual weight is the weight of the board this move generates specifically.
+    /// weight is partially used to pass on the weight of this tree branch overall.
     private float actual_weight;
-    ///
+    private float weight;
+    private Move move;
+    /// 
     /// If two parent nodes have this node as a child, this will prevent them from doing duplicate calculations
     private boolean best_move_calculated;
 
@@ -39,33 +47,34 @@ public class MoveNode extends Move implements Comparable<MoveNode>
      * @param header
      * 
      */
-    public MoveNode(Position position1, Position position2, MoveType[] arr_types, TreeHeader header)
+    public MoveNode(Move move, TreeHeader header)
     {
-        super(position1, position2, arr_types);
+        this.move = move; 
         set_children = new TreeSet<MoveNode>();
         set_abandoned = new TreeSet<MoveNode>();
         this.header = header;
         this.is_final = false;
         this.best_move_calculated = false;
-        //this.dad = dad;
     }
 
 
     /**
-     *  Alternative Constructor
-     *  only used for the top node, as it requires no positions to be saved.
      * 
-     * @param header
-     * 
+     * @return {@link #move}
      */
-    public MoveNode(TreeHeader header)
+    private Move get_move()
     {
-        super();
-        set_children = new TreeSet<MoveNode>();
-        set_abandoned = new TreeSet<MoveNode>();
-        this.header = header;
-        this.is_final = false;
-        this.best_move_calculated = false;
+        return move;
+    }
+
+
+    /**
+     * 
+     * @return {@code weight of this move}
+     */
+    public float get_weight()
+    {
+        return weight;
     }
 
 
@@ -76,7 +85,7 @@ public class MoveNode extends Move implements Comparable<MoveNode>
      * 
      * @return {@code int} // maximum amount of children, this node should have
      */
-    public int max_children(int iteration)
+    private int max_children(int iteration)
     {
         return (header.get_depth() - iteration)/5 + 2;
         //return 8;
@@ -90,7 +99,7 @@ public class MoveNode extends Move implements Comparable<MoveNode>
      * 
      * @return {@link #set_children}
      */
-    public TreeSet<MoveNode> get_children()
+    private TreeSet<MoveNode> get_children()
     {
         return set_children;
     }
@@ -101,12 +110,22 @@ public class MoveNode extends Move implements Comparable<MoveNode>
      * 
      * @return {@link #set_abandoned}
      */
-    public TreeSet<MoveNode> get_abandoned()
+    private TreeSet<MoveNode> get_abandoned()
     {
         return set_abandoned;
     }
 
+
+    /**
+     *  Enables the ability to give this MoveNode a weight
+     * 
+     */
+    private void m_set_weight(float weight)
+    {
+        this.weight = weight;
+    }
     
+
     /**
      *  Used to find the node in the tree, which followed the move played in the current game.
      * 
@@ -124,7 +143,7 @@ public class MoveNode extends Move implements Comparable<MoveNode>
     {
         for (MoveNode child : set_children)
         {
-            if (move.equals(child))
+            if (move.equals(child.get_move()))
             {
                 this.set_children = child.get_children();
                 this.set_abandoned = child.get_abandoned();
@@ -133,7 +152,7 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         }
         for (MoveNode child : set_abandoned)
         {
-            if (move.equals(child))
+            if (move.equals(child.get_move()))
             {
                 this.set_children = child.get_children();
                 this.set_abandoned = child.get_abandoned();
@@ -155,20 +174,16 @@ public class MoveNode extends Move implements Comparable<MoveNode>
      * 
      * @return boolean currently #unused
      */
-    public boolean create_node(Board board, Calculator calculator, int iteration)
+    private boolean create_node(Board board, Calculator calculator, int iteration)
     {
         header.m_add_total_executions();
         this.is_final = set_final_state(board, calculator, iteration);
-
         if (is_dead(board, iteration))
         {
             return false;
         }
-
-        m_add_weight(calculator.evaluate(board));
-        this.actual_weight = super.get_weight();
-
-
+        m_set_weight(calculator.evaluate(board));
+        this.actual_weight = weight;
         return true;
     }
 
@@ -189,7 +204,7 @@ public class MoveNode extends Move implements Comparable<MoveNode>
      *   {@code false}: not calculated, continue calculation
      *  )
      */
-    public boolean is_dead(Board board, int iteration)
+    private boolean is_dead(Board board, int iteration)
     {
         /*
          *  @int i
@@ -205,9 +220,8 @@ public class MoveNode extends Move implements Comparable<MoveNode>
             {
                 this.set_children.addAll(older_cousin.get_children());
                 this.set_abandoned.addAll(older_cousin.get_abandoned());
-
-                m_add_weight(older_cousin.get_weight());
-                this.actual_weight = get_weight();
+                m_set_weight(older_cousin.get_weight());
+                this.actual_weight = weight;
                 long time_stop = System.nanoTime();
                 header.time += (time_stop - time_start)/1000;
                 header.m_add_total_nodes_ended();
@@ -229,38 +243,33 @@ public class MoveNode extends Move implements Comparable<MoveNode>
      * @param iteration
      * 
      */
-    public void m_continue(Board board, Calculator calculator, int iteration)
+    private void m_continue(Board board, Calculator calculator, int iteration)
     {
         header.m_add_total_executions_saved();
-
         ///
         /// allows get_best_move_recursive to calculate
         this.best_move_calculated = false;
-
+        ///
+        /// The max amount of children may be overrun, since
+        /// Previously ended nodes may have been reconnected
+        m_abandon_children(board, iteration);
         m_reunite_children(board, iteration);
-        m_add_weight(this.actual_weight);
-
-        //  can't continue
-        //  -> create tree from here
-        //  stops if "is_final"
+        m_set_weight(this.actual_weight);
+        ///  can't continue
+        ///  -> create tree from here
+        /// "is_final" is already handled by m_create_tree
         if (set_children.isEmpty())
         {
-            if (is_final)
-            {
-                return;
-            }
             m_create_tree(board, calculator, iteration);
             return;
         }
-
         //  can continue
         //  -> follows down the tree
         for (MoveNode child : set_children)
         {
             try
             {
-                board.m_commit(child);
-            
+                board.m_commit(child.get_move());
                 child.m_continue(board, calculator, iteration + 1);
                 board.m_revert();
             }
@@ -309,14 +318,14 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         {
             for (Entry<Position, MoveType[]> entry : piece.get_legal_moves().entrySet())
             {
-                ll_movetree.add(new MoveNode(piece.get_position(), entry.getKey(), entry.getValue(), header));
+                ll_movetree.add(new MoveNode(new Move(piece.get_position(), entry.getKey(), entry.getValue()), header));
             }
         }
         ///
         /// ended nodes are separated here and added back towards the end.
         /// This allows for more accurate get_best_move results, while
         /// reducing duplicated calculations
-        // LinkedList<MoveNode> ll_ended_nodes = new LinkedList<MoveNode>();
+        LinkedList<MoveNode> ll_ended_nodes = new LinkedList<MoveNode>();
         ///
         /// for each possible move, calculate their weight, final state
         /// and compare with cached nodes.
@@ -327,27 +336,27 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         Iterator<MoveNode> iterator = ll_movetree.iterator();
         while (iterator.hasNext())
         {
-            MoveNode move = iterator.next();
+            MoveNode child = iterator.next();
             try {
-                board.m_commit(move);
-                if (!move.create_node(board, calculator, iteration + 1))
+                board.m_commit(child.move);
+                if (!child.create_node(board, calculator, iteration + 1))
                 {
-                    //ll_ended_nodes.add(move);
-                    set_abandoned.add(move);
+                    ll_ended_nodes.add(child);
+                    //set_abandoned.add(child);
                     iterator.remove();
                 }
                 board.m_revert();
             } catch (Exception e) {
                 System.out.println(board);
                 System.out.println(set_children);
-                System.out.println("the problem: " +move);
+                System.out.println("the problem: " + child);
                 throw e;
             }
         }
         set_children.addAll(ll_movetree);
         ll_movetree.clear();
         ///
-        if (set_children.isEmpty() /*&& ll_ended_nodes.isEmpty()*/)
+        if (set_children.isEmpty() && ll_ended_nodes.isEmpty())
         {
             is_final = true;
             return;
@@ -359,12 +368,12 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         /// worse results in the long run.
         m_abandon_children(board, iteration);
         /// recursion
-        for (MoveNode move : set_children)
+        for (MoveNode child : set_children)
         {
             try
             {
-                board.m_commit(move);
-                move.m_create_tree(board, calculator, iteration + 1);
+                board.m_commit(child.get_move());
+                child.m_create_tree(board, calculator, iteration + 1);
                 board.m_revert();   
             }
             catch (Exception e)
@@ -379,7 +388,7 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         /// adds the nodes, which didn't require further calculations
         /// back into the set, so they can be used for the get_best_move
         /// calculation
-        //set_children.addAll(ll_ended_nodes);
+        set_children.addAll(ll_ended_nodes);
     }
     
 
@@ -406,7 +415,6 @@ public class MoveNode extends Move implements Comparable<MoveNode>
                 set_children.add(set_abandoned.pollFirst());
             }
         }
-
     }
 
 
@@ -441,6 +449,17 @@ public class MoveNode extends Move implements Comparable<MoveNode>
 
 
     /**
+     * 
+     * @param type
+     * @return
+     */
+    public Move get_best_move(Type type)
+    {
+        return get_best_move_recursive(type).get_move();
+    }
+
+
+    /**
      *  Find the best move
      *  -> Depth First
      * 
@@ -449,7 +468,7 @@ public class MoveNode extends Move implements Comparable<MoveNode>
      * 
      * @return best {@code move} to play, based on evaluations
      */
-    public Move get_best_move_recursive(Type type)
+    private MoveNode get_best_move_recursive(Type type)
     {
         /// This node is a leaf
         if (set_children.isEmpty())
@@ -488,23 +507,23 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         /// ->  calculating your next best move requires anticipating
         ///     your oponent's best move, therefore this is not specific
         ///     to the type of the player
-        Move move;
+        MoveNode child;
         if (type == Type.WHITE)
         {
-            move = set_children.last();
+            child = set_children.last();
         }
         else
         {
-            move = set_children.first();
+            child = set_children.first();
         }
         /// 
         /// This move now has the weight of it's own 'best' child
         /// This change is reverted later
-        m_add_weight(move.get_weight());
+        m_set_weight(child.get_weight());
         //header.m_add_children_to_average(set_children.size());
         ///
         /// return value is only used to hand the move over to the TreeHeader by the top_node
-        return move;
+        return child;
     }
 
 
@@ -536,7 +555,6 @@ public class MoveNode extends Move implements Comparable<MoveNode>
      */
     private boolean set_final_state(Board board, Calculator calculator, int iteration)
     {
-
         if (board.get_state().equals(GameState.CHECKMATE))
         {
             return true;
@@ -545,11 +563,11 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         {
             if (board.get_type() != Type.BLACK)
             {
-                m_add_weight((float)(-header.get_weight() - 2.225));
+                m_set_weight((float)(-header.get_weight() - 2.225));
             }
             else
             {
-                m_add_weight((float)(-header.get_weight() + 2.225));
+                m_set_weight((float)(-header.get_weight() + 2.225));
             }
             return true;
         }
@@ -577,5 +595,6 @@ public class MoveNode extends Move implements Comparable<MoveNode>
         /// move.get_weight() <= get_weight()
         return 1;
     }
+
 
 }
