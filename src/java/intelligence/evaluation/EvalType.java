@@ -42,7 +42,7 @@ public enum EvalType
     TIMELINE;
 
 
-    public static final int NUMBER_OF_PIECE_SPECIFIC_VALUES = 24; 
+    public static final int NUMBER_OF_PIECE_SPECIFIC_VALUES = 18; 
     public static final int NUMBER_OF_GLOBAL_VALUES = 8;
     public static final int NUMBER_OF_TOPICS = 2;
 

@@ -96,14 +96,14 @@ public class Calculator
             LinkedList<Piece> ll_piece = board.get_collection(types[i]).get_active_pieces();
             for (Piece piece : ll_piece)
             {
-                values[i] += vision(board, piece)               * configuration.coefficient(EvalType.VISION,                     piece.get_piece_type(), get_piececount(types[i]))
+                values[i] += vision(piece)                      * configuration.coefficient(EvalType.VISION,                     piece.get_piece_type(), get_piececount(types[i]))
                            + legal_moves(board, piece)          * configuration.coefficient(EvalType.LEGAL_MOVES,                piece.get_piece_type(), get_piececount(types[i]))
                            + likes_center(piece)                * configuration.coefficient(EvalType.LIKES_CENTER,               piece.get_piece_type(), get_piececount(types[i]))
                            + likes_forward(piece)               * configuration.coefficient(EvalType.LIKES_FORWARD,              piece.get_piece_type(), get_piececount(types[i]))
-                           + contested_positions(board, piece)  * configuration.coefficient(EvalType.CONTESTED_POSITIONS,        piece.get_piece_type(), get_piececount(types[i]))
-                           + safe_moves(board, piece)           * configuration.coefficient(EvalType.SAFE_MOVES,                 piece.get_piece_type(), get_piececount(types[i]))
-                           + protection(board, piece)           * configuration.coefficient(EvalType.PROTECTION,                 piece.get_piece_type(), get_piececount(types[i]))
-                           + is_observed(board, piece)          * configuration.coefficient(EvalType.IS_OBSERVED,                piece.get_piece_type(), get_piececount(types[i]));
+                           + contested_positions(piece)         * configuration.coefficient(EvalType.CONTESTED_POSITIONS,        piece.get_piece_type(), get_piececount(types[i]))
+                           + safe_moves(piece)                  * configuration.coefficient(EvalType.SAFE_MOVES,                 piece.get_piece_type(), get_piececount(types[i]))
+                           + protection(piece)                  * configuration.coefficient(EvalType.PROTECTION,                 piece.get_piece_type(), get_piececount(types[i]))
+                           + is_observed(piece)                 * configuration.coefficient(EvalType.IS_OBSERVED,                piece.get_piece_type(), get_piececount(types[i]));
             }
         }
         if (board.get_type() == Type.WHITE)
@@ -178,22 +178,20 @@ public class Calculator
         {
             value += 1 / 1 + value * 1000 * configuration.coefficient(EvalType.LEGAL_MOVES_DEGRADATION, piece.get_piece_type(), get_piececount(piece.get_type()));
         }
+        ///
+        /// The idea is to prevent queens to simply yeet themselves at the king,
+        /// as the enemy player would no longer have any legal moves.
+        /// 
         if (board.get_state() == GameState.CHECK)
         {
             value = value * configuration.coefficient(EvalType.LEGAL_MOVES_WHILE_IN_CHECK, get_piececount(piece.get_type()));
-        }
-
-        // modified by whether it's the enemy or not 
-        if (board.get_type() != piece.get_type())
-        {
-            value += value * 1000 * configuration.coefficient(EvalType.LEGAL_MOVES_ENEMY_MODIFIER, piece.get_piece_type(), get_piececount(piece.get_type()));
         }
         return value;
     }
 
 
     /**
-     * 
+     *  Returns a value representative of how many of the positions, the King would be visible from, have opposing observers.
      * 
      * @param board
      * @param type
@@ -203,7 +201,6 @@ public class Calculator
     private float king_safety(Board board, Type type)
     {
         float value = 0;
-
         LinkedList<Position> positions = board.get_collection(type).get_active_pieces().get(0).get_observer().get_observed_positions();
         for (Position position : positions)
         {
@@ -224,7 +221,7 @@ public class Calculator
 
 
     /**
-     * 
+     *  Returns a value representative of how many positions the King is visible from.
      * 
      * @param board
      * @param type
@@ -238,6 +235,8 @@ public class Calculator
 
 
     /**
+     *  Checks are bad.
+     *  Checkmates are significantly worse. 
      * 
      * @param board
      * @param type
@@ -259,8 +258,8 @@ public class Calculator
 
 
     /**
-     * 
-     * 
+     *  Returns a value for castling rights.
+     *  Simply +1 for each.
      * 
      * @param board
      * @param type
@@ -284,14 +283,13 @@ public class Calculator
 
 
     /**
+     *  Returns a value representative of each position this piece can see.
      * 
-     * 
-     * @param board
      * @param piece
      * 
      * @return {@code float value} 
      */
-    private float vision(Board board, Piece piece)
+    private float vision(Piece piece)
     {
         float value = 0;
         for (Position position : piece.get_observer().get_observed_positions())
@@ -304,26 +302,20 @@ public class Calculator
                 }
             }
         }
-
-        // modified by whether it's the enemy or not 
-        if (board.get_type() != piece.get_type())
-        {
-            value += value * 1000 * configuration.coefficient(EvalType.VISION_ENEMY_MODIFIER, piece.get_piece_type(), get_piececount(piece.get_type()));
-        }
-
         return value;
     }
 
 
     /**
+     *  Returns a value representative of all protection it has, modified by it's weight,
+     *  the value the piece sets on being protected and each extra protection it gains is
+     *  degraded by the amount it already has.
      * 
-     * 
-     * @param board
      * @param piece
      * 
      * @return {@code float value}
      */
-    private float protection(Board board, Piece piece)
+    private float protection(Piece piece)
     {
         float value = 0;
         for(ObserverStorage o: piece.get_position().get_observers())
@@ -338,19 +330,12 @@ public class Calculator
                           * configuration.coefficient(EvalType.PROTECTION_DEGRADATION, piece.get_piece_type(), get_piececount(piece.get_type())));
             }
         }
-
-        // modified by whether it's the enemy or not 
-        if (board.get_type() != piece.get_type())
-        {
-            value += value * 1000 * configuration.coefficient(EvalType.PROTECTION_ENEMY_MODIFIER, piece.get_piece_type(), get_piececount(piece.get_type()));
-        }
-
         return value;
     }
 
 
     /**
-     * 
+     *  +1 for each square it is closer to the center.
      * 
      * @param piece
      * 
@@ -360,16 +345,14 @@ public class Calculator
     {
         float x = piece.get_position().get_x();
         float y = piece.get_position().get_y();
-
         x = (float)(-1/3.5 * Math.pow((3.5-x), 2) + 3.5);
         y = (float)(-1/3.5 * Math.pow((3.5-y), 2) + 3.5);
-
         return Float.min(x, y);
     }
 
 
     /**
-     * 
+     *  +1 for each row it is moved forward.
      * 
      * @param piece
      * 
@@ -388,9 +371,9 @@ public class Calculator
 
 
     /**
+     *  Returns a value representative of the collective pieceweight of the given type.
      * 
-     * 
-     * @param board
+     * @param board 
      * @param type
      * 
      * @return {@code float value}
@@ -400,7 +383,7 @@ public class Calculator
         LinkedList<Piece> ll_active_pieces; 
         int piececount = get_piececount(type);
         float degradation_coefficient = configuration.coefficient(EvalType.PIECEWEIGHT_DEGRADATION, piececount); 
-
+        ///
         ll_active_pieces = board.get_collection(type).get_active_pieces();
         float weight = 0;
         for (Piece piece : ll_active_pieces)
@@ -413,14 +396,14 @@ public class Calculator
 
 
     /**
+     *  Returns a value representative of the amount of contested positions this piece has.
+     *  Contested positions are defined as positions, which are observed by opposing pieces.
      * 
-     * 
-     * @param board
      * @param piece
      * 
      * @return {@code float value}
      */
-    private float contested_positions(Board board, Piece piece)
+    private float contested_positions(Piece piece)
     {
         float value = 0;
         for (Position position : piece.get_legal_moves().keySet())
@@ -437,44 +420,31 @@ public class Calculator
                 }
             }
         }
-
-        // modified by whether it's the enemy or not 
-        if (board.get_type() != piece.get_type())
-        {
-            value += value * 1000 * configuration.coefficient(EvalType.CONTESTED_POSITIONS_ENEMY_MODIFIER, piece.get_piece_type(), get_piececount(piece.get_type()));
-        }
-
         return value;
     }
 
 
     /**
-     *  calculates moves, that are not being controlled by enemy pieces
+     *  Calculates moves that are not being controlled by enemy pieces
      * 
      * 
-     * @param board
      * @param piece
      * 
      * @return {@code float value}
      */
-    private float safe_moves(Board board, Piece piece)
+    private float safe_moves(Piece piece)
     {
         float value = 0;
+        float safe_moves_degradation = configuration.coefficient(EvalType.SAFE_MOVES_DEGRADATION, piece.get_piece_type(), get_piececount(piece.get_type()));
         for (Position position : piece.get_legal_moves().keySet())
         {
             // take into account the weight of the pieces controlling?
             if (!position.has_opposing_pieces_observing(piece.get_type()))
             {
-                value += 1 / (1 + value * 1000 * configuration.coefficient(EvalType.SAFE_MOVES_DEGRADATION, piece.get_piece_type(), get_piececount(piece.get_type())));
+                value += 1
+                      / (1 + value * 1000 * safe_moves_degradation);
             }
         }
-
-        // modified by whether it's the enemy or not
-        if (board.get_type() != piece.get_type())
-        {
-            value += value * 1000 * configuration.coefficient(EvalType.SAFE_MOVES_ENEMY_MODIFIER, piece.get_piece_type(), get_piececount(piece.get_type()));
-        }
-
         return value;
     }
 
@@ -482,33 +452,29 @@ public class Calculator
     /**
      * 
      * 
-     * @param board
      * @param piece
      * 
      * @return {@code float value}
      */
-    private float is_observed(Board board, Piece piece)
+    private float is_observed(Piece piece)
     {
         float value = 0;
+        float weight_modifier = configuration.coefficient(EvalType.WEIGHT_MODIFIER,
+                                                          piece.get_piece_type(),
+                                                          get_piececount(piece.get_type()));
+        float is_observed_weight_modifier = configuration.coefficient(EvalType.IS_OBSERVED_WEIGHT_MODIFIER,
+                                                                      piece.get_piece_type(),
+                                                                      get_piececount(piece.get_type()));
+        float is_observed_degradation = configuration.coefficient(EvalType.IS_OBSERVED_DEGRADATION,
+                                                                  piece.get_piece_type(),
+                                                                  get_piececount(piece.get_type()));
         for (ObserverStorage o : piece.get_position().get_observers())
         {
             if (!piece.is_type(o.get_piece().get_type()))
             {
-                value += piece.get_weight()
-                      * configuration.coefficient(EvalType.WEIGHT_MODIFIER, piece.get_piece_type(), get_piececount(piece.get_type()))
-                      * configuration.coefficient(EvalType.IS_OBSERVED_WEIGHT_MODIFIER, piece.get_piece_type(), get_piececount(piece.get_type()))
-                      /(1 + value
-                          * 1000
-                          * configuration.coefficient(EvalType.IS_OBSERVED_DEGRADATION, piece.get_piece_type(), get_piececount(piece.get_type())));
+                value += piece.get_weight() * weight_modifier * is_observed_weight_modifier
+                      /  (1 + value * 1000 * is_observed_degradation);
             }
-        }
-
-        // modified by whether it's the enemy or not 
-        if (board.get_type() != piece.get_type())
-        {
-            value += value
-                  * 1000
-                  * configuration.coefficient(EvalType.IS_OBSERVED_ENEMY_MODIFIER, piece.get_piece_type(), get_piececount(piece.get_type()));
         }
         return value;
     }
