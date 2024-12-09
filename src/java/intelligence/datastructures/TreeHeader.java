@@ -61,14 +61,6 @@ public class TreeHeader
     }
 
 
-    public void m_rm_cache() {
-        for (CacheNode cache_node : cache)
-        {
-            cache_node.m_delete(); 
-        }
-    }
-
-
     public int get_move_count()
     {
         return moves;
@@ -108,7 +100,6 @@ public class TreeHeader
         this.time_total = System.nanoTime() - time_total;
         this.total_request_time += time_total;
         this.total_requests++;
-        m_rm_cache();
     }
 
     

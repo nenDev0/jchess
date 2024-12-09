@@ -85,9 +85,9 @@ public class MoveNode implements Comparable<MoveNode>
      * 
      * @return {@code int} // maximum amount of children, this node should have
      */
-    private int max_children(int iteration)
+    public static int max_children(int depth, int iteration)
     {
-        return (header.get_depth() - iteration)/5 + 2;
+        return (depth - iteration)/5 + 2;
         //return 8;
         
         //return Integer.MAX_VALUE;
@@ -403,14 +403,14 @@ public class MoveNode implements Comparable<MoveNode>
     {
         if (board.get_type() == Type.WHITE)
         {
-            while (max_children(iteration) > set_children.size() && !set_abandoned.isEmpty())
+            while (max_children(header.get_depth(), iteration) > set_children.size() && !set_abandoned.isEmpty())
             {
                 set_children.add(set_abandoned.pollLast());
             }
         }
         else
         {
-            while (max_children(iteration) > set_children.size() && !set_abandoned.isEmpty())
+            while (max_children(header.get_depth(), iteration) > set_children.size() && !set_abandoned.isEmpty())
             {
                 set_children.add(set_abandoned.pollFirst());
             }
@@ -433,14 +433,14 @@ public class MoveNode implements Comparable<MoveNode>
          */
         if (board.get_type() == Type.WHITE)
         {
-            while (max_children(iteration) < set_children.size())
+            while (max_children(header.get_depth(), iteration) < set_children.size())
             {
                 set_abandoned.add(set_children.pollFirst());
             }
         }
         else
         {
-            while (max_children(iteration) < set_children.size())
+            while (max_children(header.get_depth(), iteration) < set_children.size())
             {
                 set_abandoned.add(set_children.pollLast());
             }

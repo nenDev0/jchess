@@ -16,7 +16,8 @@ import java.util.TreeMap;
  *  <p> GC will have a field-day here, however the datastructure is kept as minimalistic as possible.
  * 
  */
-public class CacheNode {
+public class CacheNode
+{
     
     private MoveNode move;
     private TreeMap<Integer, CacheNode> map_nodes; /// connects a new cache_node with a move-vector
