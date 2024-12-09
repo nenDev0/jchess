@@ -16,9 +16,6 @@ public class JsonHandler
 {
     
     private String file_data;
-    public static final int NUMBER_OF_PIECE_SPECIFIC_VALUES = 24; 
-    public static final int NUMBER_OF_GLOBAL_VALUES = 8;
-    public static final int NUMBER_OF_TOPICS = 2;
 
 
     /**
@@ -126,7 +123,7 @@ public class JsonHandler
                     + "    \"TYPE\": \"" + type.name() + "\",\n";
         json = json + "    \"" + EvalType.TIMELINE + "\":                                     " + config.state_setting() + ",\n";
         json = json + "    \""+ EvalType.GLOBAL +"\":\n    {\n";
-        for (int i = NUMBER_OF_PIECE_SPECIFIC_VALUES; i < NUMBER_OF_PIECE_SPECIFIC_VALUES + NUMBER_OF_GLOBAL_VALUES; i++)
+        for (int i = EvalType.NUMBER_OF_PIECE_SPECIFIC_VALUES; i < EvalType.NUMBER_OF_PIECE_SPECIFIC_VALUES + EvalType.NUMBER_OF_GLOBAL_VALUES; i++)
         {
             Setting setting = config.setting(evals[i]);
             json = json + "        \"" + evals[i].name() + "\": ";
@@ -137,7 +134,7 @@ public class JsonHandler
                 j++;
             }
             json = json + setting;
-            if (i < NUMBER_OF_PIECE_SPECIFIC_VALUES + NUMBER_OF_GLOBAL_VALUES - 1)
+            if (i < EvalType.NUMBER_OF_PIECE_SPECIFIC_VALUES + EvalType.NUMBER_OF_GLOBAL_VALUES - 1)
             {
                 json = json + ",";
             }
@@ -147,7 +144,7 @@ public class JsonHandler
         for (int t = 0; t < piece_types.length; t++)
         {
             json = json + "    \"" + piece_types[t].name() + "\":\n    {\n";
-            for (int i = 0 ; i < NUMBER_OF_PIECE_SPECIFIC_VALUES ; i++)
+            for (int i = 0 ; i < EvalType.NUMBER_OF_PIECE_SPECIFIC_VALUES ; i++)
             {
                 json = json + write_setting(evals[i], config.setting(evals[i], piece_types[t]), i);
             }
@@ -184,7 +181,7 @@ public class JsonHandler
             j++;
         }
         s = s + setting;
-        if (i < NUMBER_OF_PIECE_SPECIFIC_VALUES - 1)
+        if (i < EvalType.NUMBER_OF_PIECE_SPECIFIC_VALUES - 1)
         {
             s = s + ",";
         }

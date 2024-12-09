@@ -161,20 +161,17 @@ public class Configuration
 
 
         EvalType[] eval_types = EvalType.values();
-        for (int i = JsonHandler.NUMBER_OF_PIECE_SPECIFIC_VALUES; i < JsonHandler.NUMBER_OF_PIECE_SPECIFIC_VALUES + JsonHandler.NUMBER_OF_GLOBAL_VALUES; i++)
+        for (int i = EvalType.NUMBER_OF_PIECE_SPECIFIC_VALUES; i < EvalType.NUMBER_OF_PIECE_SPECIFIC_VALUES + EvalType.NUMBER_OF_GLOBAL_VALUES; i++)
         {
             m_add_config(eval_types[i], null);
             }
-
             for (PieceType impl : PieceType.values())
             {
-                for (int i = 0; i < JsonHandler.NUMBER_OF_PIECE_SPECIFIC_VALUES; i++)
+                for (int i = 0; i < EvalType.NUMBER_OF_PIECE_SPECIFIC_VALUES; i++)
                 {
                     m_add_config(eval_types[i], impl);
                 }
             }
-
-
         //System.out.println(map_overall_config);
         //System.out.println(map_piece_config);
         m_normalize_values();
@@ -189,6 +186,7 @@ public class Configuration
      * 
      * @return void
      */
+    /// TODO: this uses very little of the bit space floats provide
     private void m_normalize_values()
     {
         EvalType[] evals = EvalType.values();
@@ -216,13 +214,13 @@ public class Configuration
         float modifier = (float)10/max;
         //System.out.println("maximum value found: "+max+", calculated modifier: "+modifier);
         
-        for (int i = JsonHandler.NUMBER_OF_PIECE_SPECIFIC_VALUES; i < JsonHandler.NUMBER_OF_PIECE_SPECIFIC_VALUES + JsonHandler.NUMBER_OF_GLOBAL_VALUES; i++)
+        for (int i = EvalType.NUMBER_OF_PIECE_SPECIFIC_VALUES; i < EvalType.NUMBER_OF_PIECE_SPECIFIC_VALUES + EvalType.NUMBER_OF_GLOBAL_VALUES; i++)
         {
             map_overall_config.get(evals[i]).m_modify_setting(modifier);
         }
         for (PieceType impl : PieceType.values())
         {
-            for (int i = 0; i < JsonHandler.NUMBER_OF_PIECE_SPECIFIC_VALUES; i++)
+            for (int i = 0; i < EvalType.NUMBER_OF_PIECE_SPECIFIC_VALUES; i++)
                 {
                 map_piece_config.get(impl).get(evals[i]).m_modify_setting(modifier);
             }
@@ -303,14 +301,15 @@ public class Configuration
         {
             values = cfg_handler.values(cfg_handler.info(piece_implementation.toString(), eval_type.toString()));
         }
-
+        ///
         if (randomized && eval_type != EvalType.TIMELINE)
         {
             values = m_randomize(values);
         }
-        
+        ///
         Setting setting;
-        if (eval_type == EvalType.TIMELINE) {
+        if (eval_type == EvalType.TIMELINE)
+        {
             setting = new Setting(values[0],
                                   values[1], 
                                   values[2]);
