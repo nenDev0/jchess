@@ -182,33 +182,65 @@ public class TreeHeader
         move = move.convert(board);
         board.m_commit(move);
         top_node.m_set_children(move, board);
-        int piececount = 0;
-        for (Type type : Type.values())
-        {
-            piececount += board.get_collection(type).get_active_pieces().size();
-        }
         ///
         /// increases depth, when the overall piececount decreased significantly enough
         /// This hopefully allows the bot to find easy queen-king checkmates
-        /// This could be based off of possible moves per piece in future
+        /// This could be based off of total possible moves in future
         /// 
         for (MoveType move_type : move.get_types())
         {
-            if (move_type.equals(MoveType.TAKES))
+            if (move_type.equals(MoveType.TAKES) ||
+                move_type.equals(MoveType.EN_PASSANT_LEFT) ||
+                move_type.equals(MoveType.EN_PASSANT_RIGHT))
             {
-                this.depth = original_depth + 2 *(int)(original_depth * ((float)32/piececount - 1)/32);
-                int cache_size = depth/2;
-                if (cache_size < 0)
+                int piececount = 0;
+                for (Type type : Type.values())
                 {
-                    cache_size = 0;
+                    piececount += board.get_collection(type).get_active_pieces().size();
                 }
-                cache = new CacheNode[cache_size];
-                for (int i = 0; i < cache_size; i++)
-                {
-                    cache[i] = new CacheNode();
-                }
+                this.depth = original_depth + 2 *(int)(original_depth * ((float)32/piececount - 1)/24);
                 System.out.println("depth is: "+depth);
             }
+        }
+        /// 
+        /// only needs to be adjusted every 2 moves, as this bot will only
+        /// have a move requested every second move.
+        /// 
+        if (type == Type.WHITE && moves % 2 != 0 ||
+            type == Type.BLACK && moves % 2 != 1)
+        {
+            return;
+        }
+        int new_cache_size = depth/2;
+        if (new_cache_size < 0)
+        {
+            new_cache_size = 0;
+        }
+        ///
+        /// Carry cached nodes over to still be usable after tree adjustion
+        /// This is necessary if and only if the tree grows every iteration.
+        /// 
+        /// only needs to be adjusted every 2 moves, as this bot will only
+        /// have a move requested every second move.
+        /// 
+        /// Note, this is even useful, when the tree does not contain the move mentioned,
+        /// as future child nodes could still already exist in the cache.
+        /// 
+        CacheNode[] carried_nodes = cache;
+        CacheNode[] cache = new CacheNode[new_cache_size];
+        int filled = 0;
+        for (int i = 0; i < carried_nodes.length - 2 && i < new_cache_size; i++)
+        {
+            filled++;
+            cache[i] = carried_nodes[i + 2];
+        }
+        /// 
+        /// cache array size needs to be adjustable, as the depth is variable.
+        /// Any additionally opened cache nodes initialized.
+        /// 
+        for (int i = filled; i < new_cache_size; i++)
+        {
+            cache[i] = new CacheNode();
         }
    }
 
