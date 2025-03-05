@@ -10,7 +10,7 @@ import src.java.engine.board.piecelib.Piece.PieceType;
  *  Contains all data needed to execute a Move on the board.
  *  This class should be used to handle all the specific rules connected to the
  *  {@code MoveType's} ({@link #arr_types})
- *  
+ *
  */
 public class Move
 {
@@ -18,10 +18,10 @@ public class Move
 
     /**
      *      Note that some of these can happen at the same time.
-     * 
+     *
      *  <p> All of theses states must be saved to ensure correct history reduction
      *      for the bot algorithm.
-     * 
+     *
      *  <p> In case the Chess Standard Notation were to be implemented,
      *      they would all have to be saved correctly as well
      */
@@ -48,47 +48,26 @@ public class Move
     private final PieceType implementation;
     private final Piece taken_piece;
     private final MoveType[] arr_types;
-    ///
-    private float weight;
-
-
-    /**
-     *  Alternative Constructor
-     *  This is only used in a single instance:
-     *  Allows MoveNodes, which extend Nodes, to have no unnecessary random information.
-     *  Ensures none of the internal logic is processed.
-     * 
-     *  <p> Note: When this Constuctor is called,
-     *      any methods within this instance, besides weight related calls, throw Exceptions
-     */
-    public Move()
-    {
-        arr_types = null;
-        position_from = null;
-        position_to = null;
-        implementation = null;
-        taken_piece = null;
-    }
 
 
     /**
      *  Constructor.
      *  Pulls all data necessary to correctly execute the move.
-     * 
+     *
      * @throws NullPointerException, if {@link #position_to} is null
      *  and {@link #arr_types} contains {@code MoveType.TAKES}
-     * 
+     *
      * @param position_from
      * @param position_to
      * @param arr_types
-     * 
+     *
      */
     public Move(Position position_from, Position position_to, MoveType[] arr_types)
     {
         this.position_from = position_from;
         this.position_to = position_to;
         this.arr_types = arr_types;
-        /// 
+        ///
         /// The move must receive this information.
         /// new class to dictate, which piece is allowed to move where?
         /// -> reduce class hierarchy to only include "piece" as an overall class?
@@ -100,7 +79,7 @@ public class Move
                     break;
                 ///
                 /// There currently is no better connection to enable this.
-                /*case EN_PASSANT_LEFT: 
+                /*case EN_PASSANT_LEFT:
                     taken_piece = position_from.get_piece().
                                                 get_collection().
                                                 get_board_access().
@@ -125,31 +104,8 @@ public class Move
 
 
     /**
-     *  Sets the weight of this move to the given value.
-     * 
-     * @param weight
-     * 
-     */
-    public void m_add_weight(float weight)
-    {
-        this.weight = weight;
-    }
-
-
-    /**
-     * 
-     * 
-     * @return {@link #weight}
-     */
-    public float get_weight()
-    {
-        return weight;
-    }
- 
-
-    /**
-     * 
-     * 
+     *
+     *
      * @return {@link #arr_types}
      */
     public MoveType[] get_types()
@@ -159,8 +115,8 @@ public class Move
 
 
     /**
-     * 
-     * 
+     *
+     *
      * @return {@link #position_from}
      */
     public Position position_from()
@@ -170,8 +126,8 @@ public class Move
 
 
     /**
-     * 
-     * 
+     *
+     *
      * @return {@link #position_to}
      */
     public Position position_to()
@@ -183,7 +139,7 @@ public class Move
     /**
      *  Commits this move on the board.
      *  (Currently not true:) Handles all special rules.
-     * 
+     *
      * @throws NullPointerException {@code if (position_from == null ||
      *                                         position_to == null   ||
      *                                         position_from.get_piece() == null)}
@@ -199,7 +155,7 @@ public class Move
     /**
      *  Reverses this move.
      *  (Currently not true:) Ensures consistency and takes care of all special rules.
-     * 
+     *
      * @throws NullPointerException {@code if (position_from == null ||
      *                                         position_to == null   ||
      *                                         position_to.get_piece() == null)}
@@ -213,7 +169,7 @@ public class Move
             switch (move_type)
             {
                 case TAKES:
-                case EN_PASSANT_LEFT: 
+                case EN_PASSANT_LEFT:
                     taken_piece = position_from.get_piece().
                                                 get_collection().
                                                 get_board_access().
@@ -290,14 +246,14 @@ public class Move
 
     /**
      *  Clones this {@code move}, with pointers adjusted to the board given
-     *  
+     *
      * @throws NullPointerException {@code if (position_from == null ||
      *                                         position_to == null   ||
      *                                         board == null         ||
      *                                         movetypes are wrong)}
-     * 
+     *
      * @param board
-     * 
+     *
      * @return
      */
     public Move convert(Board board)
@@ -321,5 +277,5 @@ public class Move
        return (position_from.hashCode() << 6) + position_to.hashCode();
     }
 
-    
+
 }

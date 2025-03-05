@@ -28,7 +28,7 @@ public class Bot extends Thread
         this.calculator = new Calculator(config);
         //System.out.println(info_handler.info("DEPTH"));
         this.depth = Integer.parseInt(Config.cfg_handler.info("DEPTH")) * 2 + 1;
-        tree = new TreeHeader(this.depth, new Board(), type);
+        tree = new TreeHeader(this.depth, new Board(), calculator, type);
 
         //this.time_taken = 0;
         //this.moves_total = 0;
@@ -41,7 +41,7 @@ public class Bot extends Thread
 
     public void m_reset_tree()
     {
-        this.tree = new TreeHeader(depth, new Board(), type);
+        this.tree = new TreeHeader(depth, new Board(), calculator, type);
     }
 
     public void write_config()
