@@ -72,7 +72,7 @@ public class Game
     public void m_reset()
     {
         board.m_to_start();
-        board.m_set_normal();
+        //board.m_set_normal();
         selected_piece = null;
     }
 
@@ -150,6 +150,7 @@ public class Game
         {*/
         sound_engine.play_move();
         //}
+        System.out.println(board);
         return false;
     }
 

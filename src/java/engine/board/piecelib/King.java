@@ -131,7 +131,6 @@ public class King extends Piece
         boolean queenside_castle = can_castle_queenside();
         boolean kingside_castle = can_castle_kingside();
         super.m_set_position(position);
-        get_collection().m_release_check();
         ///
         if (previous_position == null)
         {

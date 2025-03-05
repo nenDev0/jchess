@@ -27,7 +27,7 @@ public class PieceCollection implements Restrictor
     private HashMap<PieceType, LinkedList<Piece>> map_active_pieces;
     private LinkedList<Piece> ll_active_pieces;
     private LinkedList<Piece> ll_taken_pieces; 
-    //TODO: this can be removed, if piece class gets overhauled
+    /// TODO: this can be removed, if piece class gets overhauled
     private LinkedList<Piece> ll_continuity;
     private final Type type;
     private final Board board;
@@ -185,33 +185,11 @@ public class PieceCollection implements Restrictor
     }
 
 
-    public void m_state()
+    public boolean get_in_check()
     {
-        if (m_has_moves())
-        {
-            if (board.get_history().is_draw_by_repetition())
-            {
-                board.m_set_draw();
-                return;
-            }
-            if (!this.in_check)
-            {
-                board.m_set_normal();
-                return; 
-            }
-            board.m_set_check();
-            return;
-        }
-        if (get_pieces_of_type(PieceType.KING).get(0).get_position().has_opposing_pieces_observing(get_type()))
-        {
-            board.m_set_checkmate();
-        }
-        else
-        {
-            board.m_set_draw();
-        }
+        return in_check;
     }
-    
+
 
     public void m_release_check()
     {

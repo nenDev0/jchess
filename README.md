@@ -22,7 +22,6 @@ This project took me about 5 weeks full-time to get running. And I mean full-tim
 ### What this Project does not include
 
 - easy and intuitive customizability
-- good documentation
 - updated diagrams
 - functional warranty
 - promises for your eyes and brain to function after reading the code
@@ -51,9 +50,31 @@ feel free to assist me in my effort
 ## Authors
 @nenDev0
 
+## Github Usage
+
+### Git Issues
+
+Git Issues are the way any future features, improvements, bugs, etc. are documented. As they get implemented the issues are subsequently closed.
+
+### Branches
+
+- developmemt:
+any development, currently going on in the separate components, will be finalized here before a merge with the main branch
+
+- dev/engine, dev/intelligence, dev/application:
+selfexplanatory. The idea is to push any changes to these components via their designated branch. 
+
+- dev/testing:
+Any changes, which require thorough testing, will be pushed here.
+This means that it will most likely be filled with merges etc.
+It is possible, this branch will mostly be used locally, meaning little to no changes will be visible on Github.
+
+
 ## Code Notes
 
 Before you start reading or messing with the code, these notes may help you understand some things.
 
-- Exceptions are mostly not handled, as any errors in the code will lead to it being unplayable anyways.
+- Exceptions are mostly not handled:
+Exceptions are mostly not handled, since any errors in the code will lead to it being unplayable anyways.
+They should ideally not happen in the first place, as that would point towards an issue in the code.
   

@@ -4,7 +4,6 @@ package src.java.engine.board;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 
 import src.java.engine.board.Move.MoveType;
 import src.java.engine.board.piecelib.Piece;
@@ -192,46 +191,6 @@ public class Board extends NotificationCollector implements BoardAccess
      * 
      * 
      */
-    public void m_set_check()
-    {
-        this.state = GameState.CHECK;
-    }
-
-
-    /**
-     * 
-     * 
-     */
-    public void m_set_checkmate()
-    {
-        this.state = GameState.CHECKMATE;
-    }
-
-
-    /**
-     * 
-     * 
-     */
-    public void m_set_normal()
-    {
-        this.state = GameState.NORMAL;
-    }
-
-
-    /**
-     * 
-     * 
-     */
-    public void m_set_draw()
-    {
-        this.state = GameState.DRAW;
-    }
-
-
-    /**
-     * 
-     * 
-     */
     public void m_type()
     {
         this.type = Type.get_opposite(this.type);
@@ -252,7 +211,7 @@ public class Board extends NotificationCollector implements BoardAccess
         get_collection(get_type()).m_request_update(PieceType.PAWN);
         m_type();
         m_dump_update_notifications();
-        get_collection(get_type()).m_state();
+        m_state();
     }
 
 
@@ -270,7 +229,7 @@ public class Board extends NotificationCollector implements BoardAccess
         get_collection(get_type()).m_release_check();
         m_type();
         get_history().m_reverse();
-        get_collection(get_type()).m_state();
+        m_state();
         /// Currently, it seems without this, the code can throw a NPE
         /// Testing the code with it enabled for now, hoping there is no NPE,
         /// however that would not exactly aim towards this being the issue, as
@@ -281,6 +240,53 @@ public class Board extends NotificationCollector implements BoardAccess
         /// because the return value of "src.java.engine.board.piecelib.Piece.get_position()" is null
         get_collection(get_type()).m_request_update(PieceType.PAWN);
         m_dump_update_notifications();
+    }
+
+
+    /**
+     * 
+     * 
+     */
+    private void m_state()
+    {
+        PieceCollection collection = get_collection(type);
+        if (collection.m_has_moves())
+        {
+            if (history.is_draw_by_repetition())
+            {
+                state = GameState.DRAW;
+                return;
+            }
+            // a win is impossible.
+            if (white_pieces.get_active_pieces().size() < 4 
+            && black_pieces.get_active_pieces().size() < 4)
+            {
+                if (white_pieces.get_pieces_of_type(PieceType.QUEEN).size() == 0
+                && black_pieces.get_pieces_of_type(PieceType.QUEEN).size() == 0
+                && white_pieces.get_pieces_of_type(PieceType.ROOK ).size() == 0
+                && black_pieces.get_pieces_of_type(PieceType.ROOK ).size() == 0
+                && white_pieces.get_pieces_of_type(PieceType.PAWN ).size() == 0
+                && black_pieces.get_pieces_of_type(PieceType.PAWN ).size() == 0)
+                {
+                    state = GameState.DRAW;
+                }
+            }
+            if (!collection.get_in_check())
+            {
+                state = GameState.NORMAL;
+                return; 
+            }
+            state = GameState.CHECK;
+            return;
+        }
+        if (collection.get_pieces_of_type(PieceType.KING).get(0).get_position().has_opposing_pieces_observing(get_type()))
+        {
+            state = GameState.CHECKMATE;
+        }
+        else
+        {
+            state = GameState.DRAW;
+        }
     }
 
 
@@ -427,26 +433,6 @@ public class Board extends NotificationCollector implements BoardAccess
         }
         clone.m_dump_update_notifications();
         return clone;
-    }
-
-
-    /**
-     * 
-     * 
-     * @return
-     */
-    public TreeMap<String, Integer> get_reduced()
-    {
-        TreeMap<String, Integer> map_pieces = new TreeMap<String, Integer>();
-        for (Type type : Type.values())
-        {
-            for (Piece piece : get_collection(type).get_active_pieces())
-            {
-                Position pos = piece.get_position();
-                map_pieces.put(piece.ID(), Integer.rotateLeft(pos.get_x(), 3) + pos.get_y());
-            }
-        }
-        return map_pieces;
     }
 
 
